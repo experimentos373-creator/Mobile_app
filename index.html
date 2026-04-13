@@ -623,6 +623,16 @@
 
     window.typesetMath = function(el) {
       if (!el) return;
+      
+      // Lazy load MathJax script
+      if (!document.getElementById('MathJax-script')) {
+        const script = document.createElement('script');
+        script.id = 'MathJax-script';
+        script.src = 'js/vendor/mathjax.js';
+        script.async = true;
+        document.head.appendChild(script);
+      }
+
       // Enhanced retry logic for MathJax initialization
       const tryTypeset = (count = 0) => {
         if (window.MathJax && MathJax.typesetPromise) {
@@ -657,7 +667,6 @@
       }
     };
   </script>
-  <script id="MathJax-script" async src="js/vendor/mathjax.js"></script>
 
   <!-- Scripts (defer preserves order but doesn't block rendering) -->
   <script defer src="js/data.js?v=29"></script>
