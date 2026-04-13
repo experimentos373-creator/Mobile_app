@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Upgrade Study App</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a2b3d",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#15191d",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Lexend', sans-serif; }
+        .blur-bg { backdrop-filter: blur(8px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<!-- Background Exam List (Blurred Context) -->
+<div class="fixed inset-0 z-0 p-4 overflow-hidden opacity-40 grayscale">
+<div class="flex items-center justify-between mb-6">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+<h1 class="text-xl font-bold text-primary">Provas Anteriores</h1>
+<span class="material-symbols-outlined text-primary">search</span>
+</div>
+<div class="space-y-4">
+<!-- Mock Exam Cards -->
+<div class="p-4 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+<div>
+<div class="h-4 w-32 bg-slate-200 rounded mb-2"></div>
+<div class="h-3 w-20 bg-slate-100 rounded"></div>
+</div>
+<span class="material-symbols-outlined text-green-500">check_circle</span>
+</div>
+<div class="p-4 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+<div>
+<div class="h-4 w-48 bg-slate-200 rounded mb-2"></div>
+<div class="h-3 w-24 bg-slate-100 rounded"></div>
+</div>
+<span class="material-symbols-outlined text-slate-300">lock</span>
+</div>
+<div class="p-4 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+<div>
+<div class="h-4 w-40 bg-slate-200 rounded mb-2"></div>
+<div class="h-3 w-16 bg-slate-100 rounded"></div>
+</div>
+<span class="material-symbols-outlined text-slate-300">lock</span>
+</div>
+<div class="p-4 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+<div>
+<div class="h-4 w-52 bg-slate-200 rounded mb-2"></div>
+<div class="h-3 w-28 bg-slate-100 rounded"></div>
+</div>
+<span class="material-symbols-outlined text-slate-300">lock</span>
+</div>
+</div>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-end justify-center bg-primary/40 blur-bg">
+<!-- Bottom Sheet Content -->
+<div class="relative w-full max-w-md bg-background-light dark:bg-background-dark rounded-t-xl shadow-2xl overflow-hidden transition-transform transform translate-y-0">
+<!-- Handle Indicator -->
+<div class="flex h-6 w-full items-center justify-center">
+<div class="h-1.5 w-12 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+</div>
+<div class="px-6 pt-2 pb-8">
+<!-- Illustration/Icon Area -->
+<div class="flex justify-center mb-6">
+<div class="relative">
+<div class="h-24 w-24 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-primary" style="font-variation-settings: 'FILL' 1">lock_open</span>
+</div>
+<div class="absolute -top-1 -right-1 h-8 w-8 bg-yellow-400 rounded-full flex items-center justify-center border-4 border-background-light">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1">grade</span>
+</div>
+</div>
+</div>
+<!-- Text Content -->
+<div class="text-center mb-8">
+<h3 class="text-slate-900 dark:text-slate-100 text-2xl font-bold leading-tight mb-3">
+                        Quer acesso a mais provas?
+                    </h3>
+<p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-relaxed">
+                        Upgrade para Pro ou Plus+ e desbloqueie todo o banco de questões e simulados exclusivos.
+                    </p>
+</div>
+<!-- Plan Cards Preview (Horizontal Scrollable) -->
+<div class="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x px-1">
+<!-- Pro Plan Card -->
+<div class="min-w-[240px] flex-shrink-0 snap-center p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<h4 class="text-slate-900 dark:text-slate-100 font-bold">Pro</h4>
+<span class="text-xs font-semibold text-primary/60">Básico</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-black text-slate-900 dark:text-slate-100">R$ 19,90</span>
+<span class="text-sm text-slate-500">/mês</span>
+</div>
+<ul class="space-y-2 mt-2">
+<li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-sm">check</span>
+                                500 questões/mês
+                            </li>
+<li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-sm">check</span>
+                                Simulados básicos
+                            </li>
+</ul>
+</div>
+<!-- Plus+ Plan Card -->
+<div class="min-w-[240px] flex-shrink-0 snap-center p-5 rounded-xl border-2 border-primary bg-primary/5 dark:bg-primary/20 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<h4 class="text-primary dark:text-slate-100 font-bold">Plus+</h4>
+<span class="text-[10px] font-bold uppercase tracking-wider bg-primary text-white px-2 py-0.5 rounded-full">Recomendado</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-black text-primary dark:text-slate-100">R$ 29,90</span>
+<span class="text-sm text-primary/60">/mês</span>
+</div>
+<ul class="space-y-2 mt-2">
+<li class="flex items-center gap-2 text-sm text-slate-800 dark:text-slate-200">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                                Acesso ilimitado
+                            </li>
+<li class="flex items-center gap-2 text-sm text-slate-800 dark:text-slate-200">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                                Simulados avançados
+                            </li>
+<li class="flex items-center gap-2 text-sm text-slate-800 dark:text-slate-200">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                                Suporte prioritário
+                            </li>
+</ul>
+</div>
+</div>
+<!-- Primary Action Button -->
+<div class="flex flex-col gap-3 mt-2">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl text-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                        Ver Planos
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-full text-slate-500 dark:text-slate-400 font-medium py-2 rounded-lg text-sm transition-colors">
+                        Agora não, obrigado
+                    </button>
+</div>
+</div>
+<!-- Bottom Safety Area -->
+<div class="h-6 bg-background-light dark:bg-background-dark"></div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a2b3d",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#15191d",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Aprender com Professores</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Top Navigation Header -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center p-4 justify-between max-w-2xl mx-auto w-full">
+<div class="text-primary dark:text-slate-100 flex size-10 items-center justify-center rounded-full hover:bg-primary/10 cursor-pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h1 class="text-lg font-bold leading-tight tracking-tight flex-1 text-center">Aprender com Professores</h1>
+<div class="flex size-10 items-center justify-center">
+<button class="relative text-primary dark:text-slate-100 p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-background-light"></span>
+</button>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="px-4 pb-4 max-w-2xl mx-auto w-full">
+<label class="flex flex-col w-full group">
+<div class="flex w-full items-stretch rounded-xl h-12 bg-white dark:bg-slate-800 shadow-sm border border-primary/5 group-focus-within:border-primary/30 transition-all">
+<div class="text-slate-400 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full border-none bg-transparent focus:ring-0 text-base font-normal placeholder:text-slate-400" placeholder="Buscar tópicos ou professores"/>
+</div>
+</label>
+</div>
+<!-- Horizontal Subject Filters -->
+<div class="flex gap-3 px-4 pb-4 overflow-x-auto no-scrollbar max-w-2xl mx-auto w-full">
+<div class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary text-white px-5 cursor-pointer shadow-sm">
+<p class="text-sm font-medium">Todos</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 border border-primary/5 hover:border-primary/20 cursor-pointer transition-all">
+<p class="text-sm font-medium">Matemática</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 border border-primary/5 hover:border-primary/20 cursor-pointer transition-all">
+<p class="text-sm font-medium">Física</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 border border-primary/5 hover:border-primary/20 cursor-pointer transition-all">
+<p class="text-sm font-medium">Química</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 border border-primary/5 hover:border-primary/20 cursor-pointer transition-all">
+<p class="text-sm font-medium">Biologia</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 border border-primary/5 hover:border-primary/20 cursor-pointer transition-all">
+<p class="text-sm font-medium">Português</p>
+</div>
+</div>
+</header>
+<!-- Main Content: Video List -->
+<main class="flex-1 max-w-2xl mx-auto w-full p-4 space-y-6 overflow-y-auto pb-24">
+<h2 class="text-xl font-bold tracking-tight">Vídeos Recomendados</h2>
+<!-- Video Card 1 -->
+<div class="group relative flex flex-col gap-3 bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-primary/5 hover:shadow-md transition-shadow">
+<div class="relative aspect-video w-full overflow-hidden rounded-lg bg-slate-200">
+<img class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Blackboard with complex math equations and vibrant lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDf_pzTu8lgMLtPXxeiez6Q-w7Ks0krdg2dv7gcRYDAV5pb5PKm0FOe3vn94h-15bgG9ZM32RmgA9QYsg8X0DLfYPRi27y1BCCFUYQJrOfp6_Fz3EsQbLRhJJddKRw_yNC_bkMEZY_bKtPiKY-61IxSudYSQSzPe0jjaWe9_wN8zyCPweZ2VoOLRtcWwUkbc9IlueOLS9a8F5JpNF9NYJaBLqww0_WH62X_o7-Sj1iYxGcONdqgsNUFXAsyuXW8AYZs9-PXVwU_1M"/>
+<div class="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="bg-primary text-white size-14 rounded-full flex items-center justify-center shadow-xl">
+<span class="material-symbols-outlined text-4xl">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded">15:00</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-wider">Prof. Ferretto</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded-full uppercase">Matemática</span>
+<span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase">Média</span>
+</div>
+<h3 class="text-base font-semibold leading-tight line-clamp-2">Logaritmos: Domine as propriedades fundamentais para o ENEM</h3>
+<div class="flex items-center gap-3 text-xs text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 15 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">visibility</span> 12k views</span>
+</div>
+</div>
+</div>
+<!-- Video Card 2 -->
+<div class="group relative flex flex-col gap-3 bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-primary/5 hover:shadow-md transition-shadow">
+<div class="relative aspect-video w-full overflow-hidden rounded-lg bg-slate-200">
+<img class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Laboratory equipment with blue chemical reactions" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJY2PT5Bn0cWIjy1eqn9W9It2SvFa591HSYIhsmNsPnHX6AGj44M-LPpc3uUJXmjb8qand72REKvQhA2VjUr5pVtVcgPp2ykj_Ul70u-ihkalSmDUx9wYgFDB1rDsFc5uqkOOgInYdp7B-NmT6VZyWdgQcmiZ43LcCOY0uf-yU3_j4jPo8BA84jalhRSA-FjciRVVVWRZwDzLh_Uwtl9pzRTLQ21c1pyE5pQMzXZmjX5DH3D0YFm-TzDAPRg4DbsZ5V-BfLea-jEU"/>
+<div class="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="bg-primary text-white size-14 rounded-full flex items-center justify-center shadow-xl">
+<span class="material-symbols-outlined text-4xl">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded">22:45</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-wider">Prof. Paulo Valim</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded-full uppercase">Química</span>
+<span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full uppercase">Difícil</span>
+</div>
+<h3 class="text-base font-semibold leading-tight line-clamp-2">Estequiometria Avançada: Do básico ao nível ITA/IME</h3>
+<div class="flex items-center gap-3 text-xs text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 22 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">visibility</span> 8.5k views</span>
+</div>
+</div>
+</div>
+<!-- Video Card 3 -->
+<div class="group relative flex flex-col gap-3 bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-primary/5 hover:shadow-md transition-shadow">
+<div class="relative aspect-video w-full overflow-hidden rounded-lg bg-slate-200">
+<img class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Stacks of old literature books and ink pen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2LdXivq895pUo_4_Wlf-p-J5G5elvsM69ZE4t-4u23hUqT2sI1cng8KMoIHpJNnSypAjoD_1LuDao1Xm7rSKxb3kKr-iqFKIbzNPluE4BR_5U4YM5NrF2z8RuTGHscGwBXFx0xRnQxZqBOfSV7X_zd-pNWXcBrAwtMnyY2QxpUGqCJ-_JdJclaghUkeJg263ZUm09kGaX_gGwzfZ5KJi3qNSy5hZIJ_kqLYEdwZqL3SCbbH1F71GLEn3l3FfwtwsmwE249JnNTyY"/>
+<div class="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="bg-primary text-white size-14 rounded-full flex items-center justify-center shadow-xl">
+<span class="material-symbols-outlined text-4xl">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded">12:10</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-wider">Prof. Noslen</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded-full uppercase">Português</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full uppercase">Fácil</span>
+</div>
+<h3 class="text-base font-semibold leading-tight line-clamp-2">Análise Sintática: Nunca mais erre sujeito e predicado</h3>
+<div class="flex items-center gap-3 text-xs text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 12 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">visibility</span> 25k views</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-primary/10 pb-6 pt-2 z-50">
+<div class="flex justify-around items-center max-w-2xl mx-auto px-4">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Início</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary dark:text-white" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">video_library</span>
+<span class="text-[10px] font-bold">Aulas</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="text-[10px] font-medium">Simulados</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</div>
+</nav>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

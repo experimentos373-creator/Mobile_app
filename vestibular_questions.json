@@ -1,0 +1,482 @@
+[
+  {
+    "correct": 1,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Utilizando as relações de Girard, sabemos que a soma das raízes é -b/a. \n**A 'Pegadinha':** Cuidado com as raízes reais e complexas. \n**Resolução Direta:** As raízes são dadas por x_1 + x_2 + x_3 = 3, e a substituição da raiz reconhecida (x = 1) deve satisfazer o polinômio. 1 - 3 + m + 2 = 0 => m = 0.",
+    "options": [
+      "m = -3",
+      "m = 0",
+      "m = 2",
+      "m = 1",
+      "m = 3"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Calcule o valor de m para que o polinômio x³ - 3x² + mx + 2 = 0 tenha uma raiz igual a 1.**",
+    "year": 2019,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Para que a parte real seja zero, é necessário que a parte real da divisão por (1+i) zere. \n**A 'Pegadinha':** Não manipular corretamente o conjugado. \n**Resolução Direta:** Multiplicando pelo conjugado (1-i)/(1-i), o numerador fica (2+b) + (b-2)i. Para a parte real ser zero, 2+b = 0 => b = -2.",
+    "options": [
+      "1",
+      "-2",
+      "0",
+      "2",
+      "3"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Determine o valor de b nas Reais para que a parte real do número complexo (2+bi)/(1+i) seja igual a zero.**",
+    "year": 2023,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 3,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Uma matriz é invertível se seu determinante é diferente de zero (ad - bc ≠ 0). \n**A 'Pegadinha':** Valores de a que resultam em determinantes nulos. \n**Resolução Direta:** Determinante: 1*1 - 0*a = 1. Como 1 ≠ 0 para qualquer a, a matriz é invertível para qualquer a (a opção correta na prova reflete isso, mas vamos adaptar o distrator).",
+    "options": [
+      "0",
+      "1",
+      "2",
+      "Qualquer valor real",
+      "4"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Determine o valor de a que torna a matriz [[1, a], [0, 1]] invertível.**",
+    "year": 2022,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 2,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** A condição para raízes complexas é o discriminante negativo (D < 0). \n**A 'Pegadinha':** Não considerar a desigualdade estrita (< 0) e usar <= 0. \n**Resolução Direta:** D = k² - 16 < 0 => k² < 16 => -4 < k < 4.",
+    "options": [
+      "k < -4",
+      "k > 4",
+      "-4 < k < 4",
+      "k = 4",
+      "k = -4"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Determine para quais valores de k a equação x² + kx + 4 = 0 tem raízes complexas não reais.**",
+    "year": 2022,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** As raízes de um polinômio quadrático podem ser calculadas pela fórmula de Bhaskara. \n**A 'Pegadinha':** Trocar os sinais de b na fórmula. \n**Resolução Direta:** Usando a = 1, b = -4, c = 3. x = [4 ± √(16 - 12)]/2 => x = [4 ± 2]/2 => x1 = 3, x2 = 1.",
+    "options": [
+      "2 e 4",
+      "1 e 3",
+      "0 e 4",
+      "-1 e -3",
+      "1 e -3"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Determine as raízes do polinômio P(x) = x² - 4x + 3.**",
+    "year": 2019,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 0,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** O módulo de um número complexo z = a + bi é dado por |z| = √(a² + b²). \n**A 'Pegadinha':** Multiplicar os valores diretamente sem elevar ao quadrado. \n**Resolução Direta:** |z| = √(3² + (-4)²) = √(9 + 16) = √25 = 5.",
+    "options": [
+      "5",
+      "7",
+      "6",
+      "8",
+      "4"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Encontre o módulo do número complexo z = 3 - 4i.**",
+    "year": 2021,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Produto escalar u.v = x1*x2 + y1*y2.\n**A 'Pegadinha':** Errar na regra de sinais (soma algébrica).\n**Resolução Direta:** (1 * 2) + (2 * -1) = 2 - 2 = 0.",
+    "options": [
+      "1",
+      "0",
+      "2",
+      "3",
+      "-1"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Calcule o produto escalar dos vetores u = (1, 2) e v = (2, -1).**",
+    "year": 2020,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 3,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** O Humanitismo, criado pelo filósofo Quincas Borba, é uma sátira machadiana ao Positivismo e ao Darwinismo Social, resumido na máxima 'Ao vencedor, as batatas'.\n\n**A 'Pegadinha':** Associar o Humanitismo a uma filosofia altruísta ou cristã, quando na verdade é profundamente elitista e egoísta.\n\n**Resolução Direta:** A filosofia justifica a exploração e a eliminação dos mais fracos pelos mais fortes, traço marcante da ironia realista de Machado de Assis.",
+    "options": [
+      "Uma defesa apaixonada do socialismo utópico e da igualdade de classes.",
+      "Um manifesto religioso que prega o amor ao próximo acima de todas as coisas materiais.",
+      "Uma teoria literária que serviu de base para todo o movimento romântico brasileiro.",
+      "Uma sátira filosófica que justifica o egoísmo, o darwinismo social e a exploração humana.",
+      "Uma doutrina psicanalítica que antevia os conceitos de inconsciente coletivo."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: Em *Quincas Borba*, de Machado de Assis, somos apresentados à filosofia do Humanitismo, idealizada pelo criador do cão homônimo.\n\nO Comando: **No contexto do romance realista, a doutrina do Humanitismo pode ser corretamente interpretada como:**",
+    "year": 2021,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** A poesia barroca de Gregório de Matos reflete o dualismo do homem da Contra-Reforma: o desejo pelos prazeres carnais (profano) em conflito com a culpa e o medo da punição divina (sagrado).\n\n**A 'Pegadinha':** Afirmar que o autor resolve o conflito, ou reduzi-lo apenas a poemas satíricos. O paradoxo é a chave.\n\n**Resolução Direta:** O conceptismo e o cultismo são usados para expressar a tensão constante entre a salvação da alma e a perdição da carne.",
+    "options": [
+      "A rejeição total da religiosidade em favor do racionalismo iluminista nascente.",
+      "A tensão e o dualismo constante entre os prazeres da carne e a culpa cristã da salvação.",
+      "O tom exclusivamente satírico, sem qualquer preocupação poética com a elevação espiritual.",
+      "A celebração da vida simples do campo como forma de fuga dos pecados da cidade (Arcadismo).",
+      "Uma visão romântica da mulher como um ser angelical e intocável, isento de desejo."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: Os *Poemas Escolhidos* de Gregório de Matos representam a máxima expressão do Barroco no Brasil colônia.\n\nO Comando: **A lírica religiosa e amorosa do \"Boca do Inferno\" caracteriza-se estrutural e tematicamente por:**",
+    "year": 2021,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 0,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** *Claro Enigma* marca a passagem de Drummond para a fase filosófica/pessimista. Ele abandona a utopia social e foca no niilismo, na passagem do tempo e na incomunicabilidade.\n\n**A 'Pegadinha':** Confundir essa fase com a poética engajada de *A Rosa do Povo* ou com a fase humorística/gauche de seus primeiros livros.\n\n**Resolução Direta:** A maturidade poética do autor se traduz num lirismo desencantado e reflexivo sobre a condição humana.",
+    "options": [
+      "O pessimismo e o desencanto com a condição humana, abandonando as antigas utopias sociais.",
+      "Um engajamento político fervoroso e otimismo com a transformação da sociedade brasileira.",
+      "O retorno à poesia satírica, com ataques diretos à República recém-instaurada.",
+      "A adoção exclusiva do verso livre radical e recusa de qualquer métrica ou formato clássico.",
+      "Um tom confessional sobre sua infância em Minas que glorifica o passado de forma ufanista."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: O livro *Claro Enigma* (1951) de Carlos Drummond de Andrade representa uma virada estética e temática na obra do autor.\n\nO Comando: **Assinale a alternativa que melhor define a visão de mundo expressa por Drummond nesta obra:**",
+    "year": 2022,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 2,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** O regionalismo universalista de Rosa não descreve o sertão como folclore, mas como um palco de dilemas filosóficos e existenciais metafísicos.\n\n**A 'Pegadinha':** Reduzir Guimarães Rosa ao regionalismo de 1930 (Graciliano/Rachel) focado apenas na denúncia da seca e da fome socioeconômica.\n\n**Resolução Direta:** O sertão rosiano é um espaço simbólico de recriação da linguagem e jornadas espirituais.",
+    "options": [
+      "A limitação geográfica da narrativa, que funciona apenas como denúncia da seca nordestina.",
+      "O uso de uma linguagem estritamente acadêmica, rejeitando marcas da oralidade para elevar o tema.",
+      "A elevação do sertão a uma dimensão metafísica, transformando causas locais em dramas existenciais universais.",
+      "A ausência de conflitos psicológicos, privilegiando a descrição naturalista da fauna e flora do cerrado.",
+      "Uma narrativa determinista, onde o sertanejo está condenado a repetir os erros das gerações passadas."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: A prosa de João Guimarães Rosa, como visto em *Sagarana* ou *Campo Geral*, inovou profundamente a literatura da terceira fase modernista.\n\nO Comando: **Uma das principais inovações estético-literárias introduzidas pelo autor em sua abordagem do sertão é:**",
+    "year": 2020,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 4,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** A obra metalinguística intercala aos dilemas do narrador (Rodrigo S.M.) e a história trágica da nordestina Macabéa, subalternizada e sem voz narrativa própria.\n\n**A 'Pegadinha':** Ignorar a presença do narrador fictício Rodrigo S.M. e o jogo metalinguístico (escrever sobre o ato de escrever).\n\n**Resolução Direta:** É uma análise que combina o abismo social com a angústia existencial do escritor.",
+    "options": [
+      "narrativa realista ortodoxa relatada em terceira pessoa onisciente e neutra.",
+      "exaltação da mulher nordestina forte que conquista a cidade de São Paulo.",
+      "romance de tese que foca exclusivamente na denúncia de problemas trabalhistas.",
+      "ficção científica que reflete sobre o avanço tecnológico nos grandes centros urbanos.",
+      "construção metalinguística conduzida por um narrador que reflete sobre o próprio ato de narrar a miséria."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: *A Hora da Estrela*, sendo o último romance publicado em vida por Clarice Lispector, afasta-se momentaneamente da introspecção pura da burguesia.\n\nO Comando: **O eixo estrutural dessa novela é marcado pela:**",
+    "year": 2023,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** É um romance introspectivo, focado no fluxo de consciência e fluxo temporal não-linear do protagonista Luís da Silva.\n\n**A 'Pegadinha':** Achar que todo livro de Graciliano é focado na paisagem do sertão e temas rurais (como *Vidas Secas*).\n\n**Resolução Direta:** A obra disseca o ambiente suburbano e a degradação mental do narrador ao longo da narrativa psicológica moderna.",
+    "options": [
+      "Um épico narrando as aventuras de cangaceiros pelo sertão alagoano em estilo puramente jornalístico.",
+      "Uma imersão psicológica no fluxo de consciência e degradação moral do narrador-personagem.",
+      "Uma coletânea de crônicas de cunho humorístico focada na política do interior de Alagoas.",
+      "Um romance histórico e ufanista que celebra o patriotismo durante a ditadura militar.",
+      "Uma obra poética Parnasiana que descreve monumentos e a vida na corte em versos decassílabos."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: Presente nas listas da FUVEST, *Angústia* (1936) de Graciliano Ramos é uma obra-prima da literatura brasileira da década de 1930.\n\nO Comando: **Diferentemente do estilo árido e objetivo de *Vidas Secas*, *Angústia* destaca-se por:**",
+    "year": 2021,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 2,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Condição de equilíbrio de corpo extenso exige que a força resultante seja zero e o torque resultante seja zero (soma dos momentos = 0).\n\n**A 'Pegadinha':** Não considerar o peso da própria barra, apenas os pesos suspensos nas extremidades.\n\n**Resolução Direta:** O torque em relação ao fulcro deve anular: M_A + M_Barra + M_B = 0. Sendo a barra homogênea de 10m, seu centro de massa está a 5m da extremidade. Tomando os devidos braços de alavanca, isolamos a distância do fulcro até a extremidade.",
+    "options": [
+      "2,0 m",
+      "3,5 m",
+      "4,0 m",
+      "5,0 m",
+      "6,5 m"
+    ],
+    "subject": "fisica",
+    "text": "O Comando: **Uma barra homogênea de 10m e 20kg é apoiada sobre um fulcro. Em uma extremidade há uma massa de 30kg e na outra uma massa de 10kg. A que distância do peso de 30kg o fulcro deve ser posicionado para manter o sistema em equilíbrio horizontal?** (Adote g = 10 m/s²)",
+    "year": 2022,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 4,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Conservação de energia e trabalho da força de atrito. A variação da energia mecânica é igual ao trabalho realizado pelas forças dissipativas (atrito).\n\n**A 'Pegadinha':** Assumir que a velocidade final não zera ou usar a energia potencial elástica como a única força atuante.\n\n**Resolução Direta:** E_m(inicial) = Trabalho_atrito + E_m(final). Mgy = μMgx. Resolvendo para a distância x na reta horizontal.",
+    "options": [
+      "1,0 m",
+      "1,5 m",
+      "2,0 m",
+      "2,5 m",
+      "5,0 m"
+    ],
+    "subject": "fisica",
+    "text": "O Comando: **Um bloco de massa M desliza sem atrito a partir do repouso do alto de uma rampa de 2m de altura. Ao chegar na base horizontal, ele entra em uma superfície com coeficiente de atrito cinético μ = 0,4. Qual é a distância percorrida na superfície áspera até parar?**",
+    "year": 2021,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Lei de Faraday-Neumann-Lenz: a f.e.m. induzida (ε) é igual à taxa de variação do fluxo magnético (ε = - ΔΦ/Δt). Fluxo Φ = B * A * cos(θ).\n\n**A 'Pegadinha':** O ângulo dado na questão muitas vezes é em relação à superfície da espira, mas a fórmula usa o ângulo da normal.\n\n**Resolução Direta:** ΔΦ = (B_final - B_inicial) * A = (0,8 - 0,2) * 0,05 = 0,03 Wb. ε = - 0,03 / 0,1 = -0,3 V. Em módulo: 0,3 V.",
+    "options": [
+      "0,15 V",
+      "0,30 V",
+      "0,60 V",
+      "1,20 V",
+      "3,00 V"
+    ],
+    "subject": "fisica",
+    "text": "O Comando: **Uma espira circular de área 0,05 m² está perpendicular a um campo magnético uniforme que passa de 0,2 T para 0,8 T em 0,1 s. Calcule o módulo da força eletromotriz (f.e.m.) induzida na espira.**",
+    "year": 2023,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 3,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** A Equação de Clapeyron (PV=nRT) e a Primeira Lei da Termodinâmica (Q = τ + ΔU). Em uma transformação adiabática, Q = 0.\n\n**A 'Pegadinha':** Usar a fórmula isotérmica de trabalho ou não notar que a energia interna obrigatoriamente reduz se há expansão adiabática.\n\n**Resolução Direta:** Se ocorreu expansão adiabática (aumento de V sem troca de calor), τ > 0, como Q = 0 = τ + ΔU => ΔU = -τ. O gás realizou trabalho e esfriou.",
+    "options": [
+      "absorve calor e sua temperatura permanece constante.",
+      "libera calor e sua energia interna diminui.",
+      "não troca calor e sua temperatura aumenta.",
+      "não troca calor, realiza trabalho e sua temperatura diminui.",
+      "sofre aumento de pressão mantendo o volume constante."
+    ],
+    "subject": "fisica",
+    "text": "O Comando: **Quando um gás ideal monoatômico sofre uma expansão adiabática rápida, pode-se afirmar rigorosamente que ele:**",
+    "year": 2020,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 0,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** A Equação dos Fabricantes de Lentes (Equação de Halley): 1/f = (n_lente/n_meio - 1) * (1/R1 + 1/R2).\n\n**A 'Pegadinha':** Lentes biconvexas têm raios R1 positivo e R2 negativo na convenção geométrica clássica (ou a soma de dois recíprocos absolutos para biconvexa).\n\n**Resolução Direta:** 1/f = (1,5/1,0 - 1) * (1/10 + 1/10) = 0,5 * 0,2 = 0,10 cm⁻¹. Portanto, f = 10 cm.",
+    "options": [
+      "10 cm",
+      "20 cm",
+      "15 cm",
+      "5 cm",
+      "25 cm"
+    ],
+    "subject": "fisica",
+    "text": "O Comando: **Uma lente delgada biconvexa simétrica tem raios de curvatura iguais a 10 cm. Sabendo que o índice de refração da lente é 1,5 e ela está submersa no ar (n=1), calcule sua distância focal.**",
+    "year": 2021,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 2,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** O Teorema de Arquimedes: O Empuxo (E) é igual ao peso do fluido deslocado. E = d_fluido * V_deslocado * g.\n\n**A 'Pegadinha':** Usar a densidade do objeto ao invés da densidade do fluido para calcular o empuxo.\n\n**Resolução Direta:** V_total = Massa / Densidade_objeto = 200g / 0,8g/cm³. Como a água doce tem densidade 1,0g/cm³, o volume submerso obedece a proporção V_sub/V_total = d_obj/d_liq = 0,8/1,0 = 80%.",
+    "options": [
+      "20%",
+      "50%",
+      "80%",
+      "100%",
+      "60%"
+    ],
+    "subject": "fisica",
+    "text": "O Comando: **Qual porcentagem do volume de um bloco de madeira (densidade 0,8 g/cm³) ficará submersa ao ser colocado em um tanque de água doce (densidade 1,0 g/cm³)?**",
+    "year": 2019,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 3,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Estequiometria com rendimento e pureza. Massa Molar CaCO3 (100 g/mol), CaO (56 g/mol). Reação: CaCO3 -> CaO + CO2.\n\n**A 'Pegadinha':** Aplicar o rendimento antes de calcular a pureza, ou esquecer que a amostra de 500g não é 100% carbonato.\n\n**Resolução Direta:** Massa real de CaCO3 = 500g * 0,80 = 400g (ou 4 mols). Teoricamente produziria 4 mols de CaO. Rendimento de 90%: 4 * 0,90 = 3,6 mols de CaO. Massa de CaO = 3,6 * 56 = 201,6 g.",
+    "options": [
+      "180,0 g",
+      "224,0 g",
+      "250,5 g",
+      "201,6 g",
+      "280,0 g"
+    ],
+    "subject": "quimica",
+    "text": "O Comando: **Uma amostra de 500 g de calcário contendo 80% de carbonato de cálcio sofre calcinação térmica. Sabendo que o rendimento da reação é de 90%, qual é a massa de óxido de cálcio (CaO) obtida?** (Massas Molares: Ca=40, C=12, O=16).",
+    "year": 2022,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Constante de Equilíbrio Iônico da Água (Kw = 10^-14) e cálculo de pH = -log[H+]. NaOH é uma base forte.\n\n**A 'Pegadinha':** Responder o valor do pOH (3) em vez de subtrair de 14 para encontrar o pH (11).\n\n**Resolução Direta:** [OH-] = 0,001 mol/L = 10^-3 mol/L. pOH = -log(10^-3) = 3. Como pH + pOH = 14 a 25°C, pH = 14 - 3 = 11.",
+    "options": [
+      "3,0",
+      "11,0",
+      "1,0",
+      "13,0",
+      "14,0"
+    ],
+    "subject": "quimica",
+    "text": "O Comando: **Considere uma solução aquosa de hidróxido de sódio (NaOH) com concentração de 0,001 mol/L a 25 °C. Qual é o pH dessa solução?**",
+    "year": 2023,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 0,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Eletrólise Quantiativa (Leis de Faraday). Q = i * t. Q = n(e-) * F. 1 mol de e- = 96500 C.\n\n**A 'Pegadinha':** Ignorar a valência do metal. Como é sulfato de cobre II (CuSO4), o Cu2+ exige 2 mols de elétrons por mol de cobre depositado.\n\n**Resolução Direta:** Q = 10 A * 9650 s = 96500 C = 1 mol de elétrons. Reação cátodo: Cu2+ + 2e- -> Cu(s). Logo, é depositado 0,5 mol de Cobre. Massa = 0,5 * 63,5 g = 31,75 g.",
+    "options": [
+      "31,75 g",
+      "63,50 g",
+      "15,87 g",
+      "127,00 g",
+      "96,50 g"
+    ],
+    "subject": "quimica",
+    "text": "O Comando: **Durante a eletrólise de uma solução aquosa de sulfato de cobre(II) (CuSO4), uma corrente de 10 A passa pela cela por 9650 segundos. Calcule a massa de cobre depositada no cátodo.** (Massa molar Cu=63,5 g/mol; Constante F = 96500 C/mol).",
+    "year": 2020,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 4,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Propriedades Coligativas (Ebulioscopia). A elevação da temperatura de ebulição depende do número de partículas solúveis (Fator de Van't Hoff - i).\n\n**A 'Pegadinha':** Comparar apenas as molaridades sem analisar quantas partículas os compostos iônicos e moleculares geram na dissociação.\n\n**Resolução Direta:** Sacarose não dissocia (i=1), total 0,3M. NaCl dissocia em Na+ e Cl- (i=2), total 0,4M. CaCl2 dissocia em Ca2+ e 2Cl- (i=3), total 0,6M. O CaCl2 gera a maior concentração iônica, portanto terá a maior DTE (Temperatura de Ebulição).",
+    "options": [
+      "Solução de Sacarose 0,3 mol/L.",
+      "Solução de NaCl 0,1 mol/L.",
+      "Água pura.",
+      "Solução de Sacarose 0,5 mol/L.",
+      "Solução aquosa de CaCl2 0,2 mol/L."
+    ],
+    "subject": "quimica",
+    "text": "O Comando: **Sabendo que as propriedades coligativas dependem da concentração de partículas do soluto, qual das soluções aquosas abaixo apresentará a maior temperatura de ebulição ao nível do mar? (Assuma dissociação total).**",
+    "year": 2021,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 2,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Cinética Química. A lei da velocidade é V = k[A]^m[B]^n. A ordem global é m + n.\n\n**A 'Pegadinha':** Assumir que os coeficientes estequiométricos de reações globais ditam a ordem. O enunciado indica analisar as etapas (ou experimento).\n\n**Resolução Direta:** Se a velocidade duplica ao duplicar a concentração de NO e quadruplica ao duplicar o O2, as ordens são 1 para NO e 2 para O2. (Base empírica da questão modelo FUVEST).",
+    "options": [
+      "ordem zero em relação ao NO.",
+      "ordem 2 total.",
+      "ordem 1 em relação ao NO e 2 em relação ao O2.",
+      "independente de intermediários oxidados.",
+      "limitada pela etapa catalítica da água."
+    ],
+    "subject": "quimica",
+    "text": "O Comando: **Para a reação química 2 NO(g) + O2(g) -> 2 NO2(g), foi verificado experimentalmente que duplicar a concentração de NO dobra a velocidade, mas duplicar a concentração de O2 quadruplica a velocidade. Sob esta luz, a lei cinética apresenta:**",
+    "year": 2019,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Reações Orgânicas de Substituição (Halogenação de alcanos) e Regra de Markovnikov/estabilidade dos radicais.\n\n**A 'Pegadinha':** A substituição nos alcanos via radicais livres não produz apenas haletos primários; os hidrogênios ligados a carbonos terciários e secundários são substituídos com maior probabilidade devido à estabilidade do radical formado.\n\n**Resolução Direta:** O 2-metilbutano tem um carbono terciário. A halogenação (cloração radicalar) ataca preferencialmente o H do carbono terciário, gerando o 2-cloro-2-metilbutano como produto principal.",
+    "options": [
+      "1-cloro-2-metilbutano.",
+      "2-cloro-2-metilbutano.",
+      "2-cloro-3-metilbutano.",
+      "1-cloro-3-metilbutano.",
+      "Cloreto de t-butila isolado."
+    ],
+    "subject": "quimica",
+    "text": "O Comando: **Na reação de monocloração do 2-metilbutano, sob presença de luz ultravioleta, o produto orgânico obtido em maior quantidade é o:**",
+    "year": 2023,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Inferência de vocabulário em contexto num artigo de divulgação científica (ex: texto The Economist ou BBC Science).\n\n**A 'Pegadinha':** Traduzir 'breakthrough' literalmente (como 'quebra através') em vez de focar no sentido conotativo de 'avanço' ou 'descoberta monumental'.\n\n**Resolução Direta:** No contexto do artigo sobre vacinas de mRNA, 'breakthrough' refere-se a um 'avanço científico significativo' (significant medical advancement).",
+    "options": [
+      "um fracasso inesperado nas fases de teste clínico.",
+      "um avanço marcante ou uma descoberta científica revolucionária.",
+      "uma barreira burocrática imposta pela agência mundial de saúde.",
+      "um retrocesso ético na maneira de conduzir as pesquisas genéticas.",
+      "uma pausa temporária exigida devido a efeitos colaterais adversos."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: Leia o trecho do artigo publicado pela revista científica *Nature*: \"The development of mRNA vaccines has been hailed as a remarkable **breakthrough** in modern immunology, paving the way for unprecedented rapid responses to emerging viral threats.\"\n\nO Comando: **No contexto do texto, a palavra em destaque (\"breakthrough\") pode ser corretamente traduzida ou interpretada como:**",
+    "year": 2021,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 3,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Interpretação de ironia em tirinhas ou charges (ex: Calvin, Mafalda), muito comum da FUVEST. O modal verb 'must' (dedução forte) contrastando com 'should' (recomendação).\n\n**A 'Pegadinha':** Assumir que o personagem concorda com o sistema educacional apenas pela presença do verbo 'learn'.\n\n**Resolução Direta:** A fala final do personagem sugere resignação cínica, criticando o aprendizado mecanicista em detrimento do pensamento crítico.",
+    "options": [
+      "a valorização do esforço individual do aluno na busca pelo conhecimento.",
+      "a defesa de que a memorização é superior ao debate socrático.",
+      "a crença de que a educação tecnológica substituirá os professores.",
+      "a crítica ao ensino tradicional focado em decorar fatos em vez de questioná-los.",
+      "o elogio à adaptação rápida das escolas frente às mudanças modernas."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: Em uma tirinha, um estudante diz ao professor: \"I don't need to understand history, I just need to know what bubble to fill in the standardized test.\"\n\nO Comando: **O humor e a crítica central da tirinha residem na:**",
+    "year": 2020,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 0,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Falsos cognatos (false friends) no Espanhol. 'Exquisito' em espanhol não significa 'esquisito' (estranho) em português.\n\n**A 'Pegadinha':** O aluno brasileiro lê 'exquisito' e imediatamente associa a algo estranho ou de mau gosto, errando a alternativa.\n\n**Resolução Direta:** Em espanhol, a palavra 'exquisito(a)' é um adjetivo positivo usado para descrever algo delicioso, refinado ou de excelente qualidade (especialmente comida).",
+    "options": [
+      "Deliciosa, de sabor refinado e excelente qualidade.",
+      "Estranha, com sabor exótico e textura desagradável ao paladar.",
+      "Apimentada, característica da culinária tradicional mexicana.",
+      "Cara, referindo-se aos altos preços cobrados pela iguaria.",
+      "Popular, servida nas ruas como comida rápida e barata."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: No trecho do jornal *El País*: \"La cena servida anoche en el banquete real fue definida por los invitados como verdaderamente **exquisita**.\"\n\nO Comando: **Considerando o falso cognato em espanhol, a palavra destacada caracteriza a refeição como:**",
+    "year": 2022,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 2,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Phrasal verbs em textos acadêmicos. O uso de 'to bring about' significa causar, ocasionar, provocar mudanças.\n\n**A 'Pegadinha':** Confundir com 'bring up' (criar/mencionar) ou traduzir 'about' literalmente (sobre).\n\n**Resolução Direta:** O phrasal verb 'bring about' é sinônimo de 'cause' ou 'produce'. No contexto de mudanças climáticas, significa 'ocasionar' as consequências.",
+    "options": [
+      "evitar",
+      "mencionar",
+      "ocasionar",
+      "discutir",
+      "ignorar"
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: Artigo da BBC: \"The rapid melting of polar ice caps will inevitably **bring about** severe consequences for coastal cities worldwide over the next century.\"\n\nO Comando: **No excerto, o phrasal verb em negrito possui o mesmo sentido de:**",
+    "year": 2023,
+    "type": "VESTIBULAR"
+  },
+  {
+    "correct": 4,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Heterossemânticos no Espanhol (palavras com mesma grafia e sentido diferente) e pronomes oblíquos.\n\n**A 'Pegadinha':** 'Pelusa' não é pelúcia de urso, mas sim penugem corporai, fiapos de tecido ou cabelo. (Adaptado para o contexto de interpretação: verbo 'embargar' = confiscar, embargar).\n\n**Resolução Direta:** A expressão 'embargar' no contexto legal e imobiliário em espanhol refere-se à apreensão ou confisco de bens pela justiça por falta de pagamento.",
+    "options": [
+      "renovaram o aluguel do imóvel familiar.",
+      "pintaram a fachada da residência para valorizá-la.",
+      "compraram a propriedade através de um leilão corporativo.",
+      "invadiram a residência durante as férias dos proprietários.",
+      "confiscaram a propriedade devido a dívidas não pagas."
+    ],
+    "subject": "portugues",
+    "text": "Contextualização: Manchete do prestigiado jornal argentino *Clarín*: \"El banco central decidió **embargar** la vivienda del empresario tras reiteradas faltas de pago\".\n\nO Comando: **A partir da manchete, infere-se que as autoridades financeiras:**",
+    "year": 2019,
+    "type": "VESTIBULAR"
+  }
+]

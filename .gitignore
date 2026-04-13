@@ -1,0 +1,26 @@
+node_modules/
+.DS_Store
+dist/
+build/
+.env
+.env.*
+*.log
+
+# AI & Agent Data
+.agent/
+.gemini/
+.vscode/
+
+# Project Scripts & Backups
+backups/
+"Proteção/"
+*.sql
+*.py
+*.txt
+*.md
+!README.md
+!manifest.json
+
+# Auth/Security
+security_audit_report.json
+security_audit_findings.md

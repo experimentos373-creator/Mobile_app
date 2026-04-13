@@ -1,0 +1,482 @@
+[
+  {
+    "correct": 3,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** A negação de uma proposição condicional (P -> Q) é equivalente a (P e não Q). A regra prática é 'Mantém a primeira e nega a segunda'.\n\n**A 'Pegadinha':** Negar ambas as partes com 'Se não chover, então não fico' ou inverter a condicional.\n\n**Resolução Direta:** P: 'chover', Q: 'fico em casa'. A negação é: 'Chove e não fico em casa'.",
+    "options": [
+      "Se não chover, então eu não fico em casa.",
+      "Se eu não fico em casa, então não chove.",
+      "Não chove e eu fico em casa.",
+      "Chove e eu não fico em casa.",
+      "Chove ou eu não fico em casa."
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Qual é a negação lógica da proposição: \"Se chover amanhã, então eu fico em casa\"?**",
+    "year": 2022,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 1,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Equivalência lógica da condicional. (P -> Q) é equivalente a (não Q -> não P) [Contrapositiva] ou a (não P ou Q).\n\n**A 'Pegadinha':** Confundir com a simples inversão das premissas (Q -> P).\n\n**Resolução Direta:** P: Estudo, Q: Passo. A contrapositiva é: Se não passo no concurso, então não estudo.",
+    "options": [
+      "Se passo no concurso, então estudo.",
+      "Se não passo no concurso, então não estudo.",
+      "Eu estudo ou eu passo no concurso.",
+      "Eu não estudo e passo no concurso.",
+      "Não passo no concurso ou não estudo."
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Assinale a alternativa que apresenta uma proposição logicamente equivalente a: \"Se estudo, então passo no concurso\".**",
+    "year": 2023,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 2,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Problema clássico de sequências lógicas (progressão mista ou de diferenças). A diferença entre os termos é: +3, +5, +7, +9...\n\n**A 'Pegadinha':** Tentar encontrar uma razão constante de P.A. ou P.G., que não existe aqui.\n\n**Resolução Direta:** A sequência é 2 (+3)=5; 5 (+5)=10; 10 (+7)=17; 17 (+9)=26. O próximo termo da diferença é +11. Então: 26 + 11 = 37.",
+    "options": [
+      "35",
+      "36",
+      "37",
+      "38",
+      "39"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Qual é o próximo número da sequência lógica: 2, 5, 10, 17, 26, ...?**",
+    "year": 2021,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 4,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Princípio da Casa dos Pombos (ou Princípio das Gavetas de Dirichlet). Devemos calcular o pior cenário possível para garantir a condição desejada.\n\n**A 'Pegadinha':** Tentar calcular probabilidades estatísticas em vez de construir o caso extremo.\n\n**Resolução Direta:** Pior cenário: tirar todas as 10 meias pretas e todas as 8 meias brancas (18 retiradas) e não formar um par azul. A próxima meia retirada (19ª) obrigatoriamente será azul (como não é o par, mais uma é necessária, totalizando 2 azuis). Assim: 10 + 8 + 2 = 20 meias para garantir com 100% de certeza.",
+    "options": [
+      "2",
+      "15",
+      "18",
+      "19",
+      "20"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Em uma gaveta há 10 meias pretas, 8 brancas e 6 azuis. No escuro, qual o número mínimo de meias que se deve retirar para ter certeza de ter nas mãos pelo menos um par da cor azul?** (Considere que as meias não têm lado direito ou esquerdo).",
+    "year": 2022,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 0,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Princípio Fundamental da Contagem (Análise Combinatória) aplicado para senhas, considerando restrições de formatação.\n\n**A 'Pegadinha':** Esquecer que as vogais não podem se repetir, mas os algarismos nada diz.\n\n**Resolução Direta:** São 5 vogais totais. Para 3 posições sem repetição: 5 * 4 * 3 = 60. Para 3 posições de números pares (0, 2, 4, 6, 8 = 5 opções) que *podem* se repetir: 5 * 5 * 5 = 125. Total: 60 * 125 = 7500.",
+    "options": [
+      "7.500",
+      "15.000",
+      "1.500",
+      "3.600",
+      "30.000"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **O sistema de segurança exige uma senha de 6 posições, sendo as 3 primeiras formadas por vogais sem repetição e as 3 últimas formadas por números pares (podendo repetir). Quantas senhas diferentes podem ser criadas?**",
+    "year": 2020,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 1,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Juros Compostos com taxas e montantes em meses distintos. M = C (1 + i)^t.\n\n**A 'Pegadinha':** Usar a fórmula de Juros Simples, multiplicando a taxa de 10% por 2, o que daria R$ 240,00 de juros ao invés dos juros sobre juros.\n\n**Resolução Direta:** M = 1200 * (1 + 0,10)² = 1200 * 1,21 = 1452. O Valor dos juros é 1452 - 1200 = R$ 252,00.",
+    "options": [
+      "R$ 240,00",
+      "R$ 252,00",
+      "R$ 1.440,00",
+      "R$ 1.452,00",
+      "R$ 220,00"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Um capital de R$ 1.200,00 foi aplicado a juros compostos com uma taxa de 10% ao mês. Qual é o valor dos JUROS (Cuidado, apenas dos juros) gerados após 2 meses de aplicação?**",
+    "year": 2021,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 3,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Regra de três composta com grandezas diretas e inversamente proporcionais. Mais auditores (inversa ao tempo), Mais processos (direta ao tempo).\n\n**A 'Pegadinha':** Tratar o número de auditores como grandeza diretamente proporcional, errando a montagem da equação.\n\n**Resolução Direta:** 4 auditores analisam 40 proc em 5 dias.\nTaxa: 40 / (4 * 5) = 2 processos/auditor/dia.\nPara 6 auditores e 60 processos: Tempo = Processos / (Taxa * Auditores) = 60 / (2 * 6) = 5 dias.",
+    "options": [
+      "3 dias",
+      "4 dias",
+      "8 dias",
+      "5 dias",
+      "6 dias"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Se 4 auditores fiscais analisam 40 processos em 5 dias de trabalho, em quantos dias 6 auditores analisariam 60 processos, considerando o mesmo ritmo de trabalho?**",
+    "year": 2023,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 2,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Lógica de Argumentação por premissas categóricas (Diagramas de Venn com quantificadores: Todo, Algum, Nenhum).\n\n**A 'Pegadinha':** Deduzir que 'Algum peixe voa' baseado em associações lógicas falsas com a palavra 'Nenhum'. Se 'Nenhum pássaro é peixe', então Pássaros e Peixes são conjuntos disjuntos.\n\n**Resolução Direta:** Premissas: 1) Todo pássaro voa (Pássaro ⊂ Voa). 2) Nenhum peixe é pássaro (Peixe ∩ Pássaro = ∅). O fato de peixes não serem pássaros não significa que não possam pertencer ao conjunto 'Voa'. Portanto, NÃO podemos concluir se peixes voam ou não voam baseados estritamente na lógica formal das premissas. Assim, deduzimos que 'Pode haver coisas que voam e não são pássaros'.",
+    "options": [
+      "Nenhum peixe voa.",
+      "Todo peixe que voa é pássaro.",
+      "Pode existir algo que voa e não é pássaro.",
+      "Se algo voa, então certeza é pássaro.",
+      "Algum pássaro é peixe."
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Considere válidas as seguintes premissas: P1: \"Todo pássaro voa.\" P2: \"Nenhum peixe é pássaro.\" A partir delas, é logicamente CORRETO concluir que:**",
+    "year": 2020,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 4,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Uso dos porquês na gramática normativa. 'Por que' (interrogativo, ou causa, equivalente a 'pelo qual'), 'Porque' (resposta/explicação), 'Por quê' (interrogativo final de frase), 'Porquê' (substantivo).\n\n**A 'Pegadinha':** A confusão causada pela preposição acompanhando uma palavra feminina (motivo/causa não está presente, mas fica implícito).\n\n**Resolução Direta:** Ignorar as razões pelas quais. Quando equivalente a 'pelo qual', 'pelos quais', usa-se separado e sem acento: 'por que'.",
+    "options": [
+      "Ignoramos os motivos porque a lei foi rejeitada.",
+      "A lei foi rejeitada, mas ninguém sabe o por que.",
+      "Eles protestaram porquê não concordavam com a emenda.",
+      "Aquele é o caminho porque passei ontem.",
+      "Desconheço a razão por que a audiência foi suspensa."
+    ],
+    "subject": "portugues",
+    "text": "O Comando: **Em provas da Fundação Getulio Vargas (FGV), o emprego dos porquês é recorrente. Assinale a frase em que o uso está RIGOROSAMENTE CORRETO de acordo com a norma-padrão:**",
+    "year": 2023,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 0,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Regência verbal da banca Cebraspe/Cespe. O verbo 'implicar', no sentido de 'acarretar', 'ter como consequência', é transitivo direto (não exige preposição 'em').\n\n**A 'Pegadinha':** No português falado, é comum usar 'isso implica em algo', mas a norma-padrão exige objeto direto.\n\n**Resolução Direta:** O correto é 'A corrupção implica atraso', e não 'implica NO atraso'. As demais opções contêm erros (como o verbo 'chegar' não usar 'a' na letra B - 'chegou ao...', ou 'assistir' pedindo 'a').",
+    "options": [
+      "A aprovação da reforma previdenciária implica grandes sacrifícios pela população.",
+      "O candidato chegou tarde no local de prova e perdeu o exame.",
+      "O juiz assistiu o depoimento em silêncio durante todo o inquérito.",
+      "Nós nos simpatizamos com o novo projeto de lei apresentado.",
+      "O policial visou ao alvo falso durante o treinamento de rotina."
+    ],
+    "subject": "portugues",
+    "text": "O Comando: **A regência nominal e verbal é tema constante no Cebraspe. Identifique a única alternativa em que a regência foi empregada ADEQUADAMENTE:**",
+    "year": 2022,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Crase (fusão da preposição 'a' com o artigo 'a' ou os pronomes demonstrativos). Não ocorre crase antes de palavras masculinas, verbos ou pronomes que não aceitam artigo.\n\n**A 'Pegadinha':** Usar acento grave antes do verbo 'partir' em locuções como 'à partir de hoje', um dos erros mais comuns.\n\n**Resolução Direta:** 'Ficou cara a cara' (palavra repetida, sem crase). 'Devolvemos o documento à diretora' (Quem devolve, devolve algo A alguém. 'diretora' aceita artigo A. a + a = à). 'Andou a pé' (pé é masculino). 'A partir de' (partir é verbo).",
+    "options": [
+      "Os adversários ficaram cara à cara durante o tribunal.",
+      "O servidor solicitou a transferência e entregou os papéis à nova chefe.",
+      "A nova taxa passará a valer à partir de segunda-feira.",
+      "Ele costuma voltar do fórum à pé todos os dias.",
+      "O documento foi enviado à Sua Excelência o Ministro."
+    ],
+    "subject": "portugues",
+    "text": "O Comando: **As bancas de concurso consideram o domínio do acento grave (crase) eliminatório. Assinale a afirmativa em que o uso da crase é OBRIGATÓRIO e CORRETO:**",
+    "year": 2021,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 3,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Concordância verbal com sujeito paciente na sintaxe de apassivação com a partícula 'se' (pronome apassivador). O verbo concorda com o sujeito gramatical da oração passiva sintética.\n\n**A 'Pegadinha':** Confundir pronome apassivador ('se', anexado a VTD) com índice de indeterminação do sujeito ('se', anexado a VTI), onde o verbo ficaria obrigatoriamente no singular.\n\n**Resolução Direta:** Verbo alugar é Transitivo Direto. Quem aluga, aluga algo. 'Alugam-se apartamentos' equivale a 'Apartamentos são alugados'. Como 'apartamentos' está no plural, o verbo deve ir para o plural.",
+    "options": [
+      "Vende-se casas populares nesta região.",
+      "Precisa-se de novos analistas de TI.",
+      "Trata-se de questões constitucionais muito complexas.",
+      "Alugam-se excelentes salas comerciais no centro empresarial.",
+      "Assiste-se aos desfiles de 7 de setembro pela televisão."
+    ],
+    "subject": "portugues",
+    "text": "O Comando: **De acordo com as regras de concordância verbal estritas da Vunesp, assinale a oração passiva sintética corretamente flexionada:**",
+    "year": 2023,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 2,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Colocação Pronominal (Próclise, Mesóclise, Ênclise). A próclise é obrigatória quando há palavras atrativas, como palavras de sentido negativo ('nunca', 'não') e pronomes relativos ('que').\n\n**A 'Pegadinha':** Iniciar uma frase com o pronome oblíquo (ex: 'Me empreste...'), o que é aceito na fala, mas erro gramatical grave na norma culta.\n\n**Resolução Direta:** 'Me entregaram o relatório' está errado por início de frase. O correto com pronome relativo atraindo é: 'Foi a secretária que me entregou o memorando'.",
+    "options": [
+      "Me disseram que o concurso seria cancelado pelo governador.",
+      "Ninguém importou-se com as denúncias anônimas.",
+      "Foi a testemunha que o denunciou ao Ministério Público.",
+      "Darei-te a sentença assim que o juiz terminar de redigir.",
+      "Os deputados teriam reunido-se em caráter de urgência administrativa."
+    ],
+    "subject": "portugues",
+    "text": "O Comando: **Observe a gramática prescritiva sobre Colocação Pronominal. Em qual das alternativas a próclise justifica-se por uma palavra atrativa de maneira IRREPREENSÍVEL?**",
+    "year": 2020,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 4,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Análise morfossintática avançada (classificação da palavra 'que'). O 'que' pode ser pronome relativo (substituível por o qual), conjunção integrante (substitui a oração por 'isso'), conjunção explicativa, etc.\n\n**A 'Pegadinha':** Dificuldade orgânica em distinguir C.I. (introduz oração substantiva) de P.R. (introduz oração adjetiva e retoma termo antecedente).\n\n**Resolução Direta:** Na frase 'Tenho certeza de que...', a expressão 'de que seremos aprovados' pode ser substituída por 'disso' ('Tenho certeza DISSO'). Logo, é uma conjunção integrante que introduz uma oração subordinada substantiva completiva nominal.",
+    "options": [
+      "O documento que você assinou foi contestado. (Conjunção Integrante)",
+      "Diga a ele que não irei ao tribunal amanhã. (Pronome Relativo)",
+      "Que absurdo essa nova licitação da prefeitura! (Pronome Interrogativo)",
+      "Tanto estudou, que gabaritou todas as questões de Direito. (Conjunção Concessiva)",
+      "É necessário que a emenda seja aprovada pelos senadores. (Conjunção Integrante)"
+    ],
+    "subject": "portugues",
+    "text": "O Comando: **As Bancas Examinadoras, como a FCC, adoram cobrar a classificação morfossintática do vocábulo 'que'. Assinale a alternativa com a classificação CORRETA evidenciada entre parênteses:**",
+    "year": 2022,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 0,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Pontuação (Emprego da vírgula). Não se separa Sujeito de Predicado, nem Verbo de seu Objeto com uma única vírgula, mesmo que o sujeito seja extenso.\n\n**A 'Pegadinha':** Os alunos tendem a colocar vírgula para 'dar um respiro' na leitura em sujeitos longos.\n\n**Resolução Direta:** 'O presidente e todos os ministros do Superior Tribunal, votaram...' O 'O presidente e todos os ministros' é o sujeito. A vírgula ali incorre em erro gravíssimo. A opção correta obedece a ordem direta sem interrupções ilegais, usando adequadamente o aposto isolado.",
+    "options": [
+      "Brasília, capital do Brasil, será palco das próximas negociações salariais.",
+      "Os fiscais da alfândega, realizaram uma grande apreensão durante a noite.",
+      "Fica determinado aos estados que, organizem suas secretarias de segurança.",
+      "Especialistas em economia acreditam, que a inflação diminuirá.",
+      "Encontramos na sala do juiz, pastas sigilosas sobre o consórcio."
+    ],
+    "subject": "portugues",
+    "text": "O Comando: **Com base nas severas regras de pontuação para redação oficial em concursos, indique a única sentença redigida de forma INATACÁVEL:**",
+    "year": 2023,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 1,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Verbos defectivos e conjugações de verbos anômalos (Pôr, Caber, Reaver, Mediar). 'Reaver', 'mediar', 'ansiar', 'incendiar' causam extrema confusão conjugal. Os verbos MARIO (Mediar, Ansiar, Remediar, Incendiar, Odiar) recebem 'e' no radical.\n\n**A 'Pegadinha':** Conjugar verbos anômalos como se fossem regulares. 'Eu ansio' ou 'Eu reavi' estão completamente equivocados.\n\n**Resolução Direta:** Mediar (Eu medeio). O verbo Reaver só tem as formas do presente em que 'Haver' tem 'v' (nós reavemos, vós reaveis). No pretérito perfeito: 'nós reouvemos, ele reouve'. O verbo intervir é derivado de vir: 'ele interveio'. Letra B é certa: 'O promotor interveio' (correto de intervir).",
+    "options": [
+      "O advogado reaveu os arquivos processuais perdidos na inundação.",
+      "O mediador interveio no conflito sindical para evitar uma greve geral.",
+      "Eu freio o carro sempre que me deparo com blitze policiais.",
+      "É possível que o sindicato requeise uma nova audiência com a câmara.",
+      "Eu magio que não haja problemas no despacho judicial da corregedoria."
+    ],
+    "subject": "portugues",
+    "text": "O Comando: **O Domínio da Conjugação de Verbos Irregulares refina o nível do candidato. Avaliando os tempos do indicativo e do subjuntivo, indique a conjugação que NÃO FERE a norma culta:**",
+    "year": 2021,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 2,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Art. 37, II da CF/88. A investidura em cargo ou emprego público depende de aprovação prévia em concurso público de provas ou de provas e títulos.\n\n**A 'Pegadinha':** Confundir com cargos em comissão, que são de livre nomeação e exoneração, mas o enunciado fala em \"emprego público\" (CLT nas Sociedades de Economia Mista/Empresas Públicas) que EXIGE concurso.\n\n**Resolução Direta:** Todas as entidades da Administração Indireta Federal (Fundações, Autarquias, Empresas Públicas e Sociedades de Economia Mista) exigem concurso público para o preenchimento regular de seu quadro permanente.",
+    "options": [
+      "não depende de concurso público, pois são entidades de direito privado.",
+      "depende de concurso apenas para cargos de diretoria e chefia executiva.",
+      "depende de aprovação prévia em concurso público, de provas ou de provas e títulos.",
+      "é realizada por indicação política direta do Ministro de Estado responsável.",
+      "depende de processo seletivo simplificado exclusivo para análise de currículo."
+    ],
+    "subject": "historia",
+    "text": "O Comando: **Segundo a Constituição Federal e a doutrina majoritária, a contratação de pessoal permanente por uma Sociedade de Economia Mista Federal:**",
+    "year": 2021,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 0,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Princípio da Autotutela (Súmula 473 do STF). A Administração Pública PODE anular seus próprios atos quando eivados de vícios (ilegais) e PODE revogá-los por motivo de conveniência ou oportunidade.\n\n**A 'Pegadinha':** Os candidatos comumente trocam os verbos: achar que a administração 'revoga' atos ilegais e 'anula' atos inconvenientes. É o oposto.\n\n**Resolução Direta:** Ilegalidade = ANULAÇÃO (efeito ex tunc). Inconveniência/Inoportunidade = REVOGAÇÃO (efeito ex nunc).",
+    "options": [
+      "anular seus próprios atos, quando eivados de vícios que os tornam ilegais, porque deles não se originam direitos.",
+      "revogar seus próprios atos, quando eivados de vícios que os tornam ilegais na sua origem.",
+      "anular seus próprios atos estritamente por motivos de conveniência ou oportunidade administrativa.",
+      "convalidar atos discricionários declarados absolutamente nulos pelo Poder Judiciário Federal.",
+      "delegar ao Supremo Tribunal Federal a cassação de atos administrativos ilegais originários do executivo."
+    ],
+    "subject": "historia",
+    "text": "O Comando: **O Princípio da Autotutela, consagrado pela súmula 473 do STF e constantemente cobrado pela FCC, estabelece que a Administração Pública pode:**",
+    "year": 2023,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 4,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Art. 5º, XI, CF/88: A casa é asilo inviolável, ninguém nela podendo penetrar sem consentimento, SALVO em flagrante delito, desastre, para prestar socorro, ou, durante o dia, por determinação judicial.\n\n**A 'Pegadinha':** Achar que ordem judicial permite entrada noturna (não permite), ou que não se pode entrar à noite nem para salvar alguém.\n\n**Resolução Direta:** Ordem de juiz só durante o dia. Flagrante delito, desastre e socorro a qualquer hora do dia ou da noite.",
+    "options": [
+      "durante a noite, apenas com determinação judicial expressa expedida pelo juiz corregedor.",
+      "a qualquer hora do dia ou da noite, para cumprir mandado de busca e apreensão federal.",
+      "durante o dia, em caso de flagrante delito, mas nunca durante o período noturno sem o dono.",
+      "apenas com consentimento dos moradores, sendo o mandado judicial válido apenas para áreas externas.",
+      "a qualquer hora do dia ou da noite, nos casos de flagrante delito, desastre ou para prestar socorro."
+    ],
+    "subject": "historia",
+    "text": "O Comando: **Em relação ao direito fundamental da Inviolabilidade Domiciliar previsto no Art. 5º da Constituição Federal, o ingresso na casa sem o consentimento do morador é permitido:**",
+    "year": 2020,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 1,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** O abuso de poder subdivide-se em Excesso de Poder (vício de competência - atuar além do que a lei permite) e Desvio de Poder/Finalidade (vício de finalidade - busca um fim diverso do previsto em lei, como a perseguição pessoal).\n\n**A 'Pegadinha':** Confundir 'Excesso de Poder' com 'Desvio de Finalidade'. Ao remover o servidor por vingança, a autoridade tem competência para remover, mas desviou do fim público.\n\n**Resolução Direta:** Remover servidor por punição/vingança não atende ao fim legal do instituto da remoção, configurando vício de finalidade, conhecido como Desvio de Poder.",
+    "options": [
+      "Excesso de poder, pois o Prefeito atuou em matéria hierarquicamente reservada à União.",
+      "Desvio de finalidade (ou de poder), visto que o ato não atendeu ao interesse público motivador da norma.",
+      "Omissão administrativa, já que a remoção deveria ter sido acompanhada de um inquérito punitivo.",
+      "Usurpação de função punitiva, um tipo penal incondicionado segundo o código civil.",
+      "Atuação regular discricionária, não havendo qualquer nulidade caso houvesse previsão no orçamento."
+    ],
+    "subject": "historia",
+    "text": "O Comando: **Um Prefeito, buscando vingança contra um fiscal de posturas que multou um aliado político seu, determina a remoção do servidor para o distrito mais distante do município. Na classificação dos abusos de poder, tal ato configura:**",
+    "year": 2022,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 3,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Art. 37, § 6º, CF/88. A responsabilidade civil do Estado (Pessoas Jurídicas de Direito Público e de Direito Privado prestadoras de serviços públicos) é OBJETIVA (Teoria do Risco Administrativo).\n\n**A 'Pegadinha':** Assumir que o Estado responde subjetivamente ou que empresas privadas (mesmo prestadoras de serviço público, como concessionárias de ônibus) não respondem objetivamente.\n\n**Resolução Direta:** O passageiro (ou até o não passageiro, decidiu o STF) atropelado pelo ônibus da concessionária só precisa provar o nexo causal, não a culpa do motorista. Responsabilidade Objetiva.",
+    "options": [
+      "Responsabilidade subjetiva e exclusiva do motorista pela teoria da culpa in eligendo.",
+      "Responsabilidade subsidiária do Estado de imediato, eximindo a concessionária por força de contrato.",
+      "Responsabilidade civil integral, não admitindo atenuantes mesmo em caso de força maior.",
+      "Responsabilidade civil objetiva, independente do usuário comprovar culpa ou dolo do motorista.",
+      "Responsabilidade subjetiva, dependendo de condenação penal transitada em julgado contra o motorista."
+    ],
+    "subject": "historia",
+    "text": "O Comando: **Em relação à Responsabilidade Civil do Estado (e Concessionárias), no caso de um ônibus de uma concessionária municipal atropelar um pedestre prestando serviço de transporte, incide a:**",
+    "year": 2021,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 2,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Mandado de Injunção (Art. 5º, LXXI, CF) é o remédio constitucional cabível sempre que a falta de norma regulamentadora torne inviável o exercício dos direitos e liberdades constitucionais.\n\n**A 'Pegadinha':** Confundir com a Ação Direta de Inconstitucionalidade por Omissão (ADO), que é controle objetivo concentrado e julgada pelo STF, e não um remédio individual clássico; ou Ação Popular.\n\n**Resolução Direta:** Faltou lei regulamentadora para gozar de um direito? Mandado de Injunção.",
+    "options": [
+      "Habeas Data",
+      "Ação Civil Pública",
+      "Mandado de Injunção",
+      "Ação Popular perante Vara Federal",
+      "Mandado de Segurança Coletivo"
+    ],
+    "subject": "historia",
+    "text": "O Comando: **Qual é o Remédio Constitucional adequado quando a ausência de uma norma regulamentadora torna inviável o exercício dos direitos e liberdades previstos na Constituição?**",
+    "year": 2019,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 0,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Artigos de Atributos do Ato Administrativo. O atributo da Presunção de Legitimidade (certas vezes Presunção de Veracidade) dita que os atos nascem válidos e verdadeiros até prova em contrário.\n\n**A 'Pegadinha':** Confundir Presunção com Imperatividade (obrigar a todos independentemente de concordância) ou Autoexecutoriedade (executar sem ordem judicial).\n\n**Resolução Direta:** Se a multa de trânsito foi expedida, presumimos legal e verdadeira, e o ônus da prova para derrubá-la é exclusivo do particular (Cidadão).",
+    "options": [
+      "Presunção de Legitimidade e Veracidade, cabendo ao particular o ônus de provar o contrário.",
+      "Autoexecutoriedade irrestrita, justificando que a multa seja paga antes de qualquer defesa.",
+      "Imperatividade condicionada, dependendo que o cidadão ateste a multa com sua assinatura.",
+      "Tipicidade legal coercitiva, transferindo a prova material exclusivamente ao agente de trânsito.",
+      "Discricionariedade moderada, pois a infração depende do julgamento de mérito do policial."
+    ],
+    "subject": "historia",
+    "text": "O Comando: **Quando um agente de trânsito lavra um auto de infração, esse ato é considerado válido até que se prove o contrário, refletindo diretamente qual Atributo do Ato Administrativo?**",
+    "year": 2023,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 4,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Improbidade Administrativa (Lei 8.429/92 alterada). Somente se pune Improbidade Administrativa na modalidade DOLOSA.\n\n**A 'Pegadinha':** Nas antigas provas, a modalidade de Improbidade por 'prejuízo ao erário' aceitava DOLO ou CULPA. Em 2021, a lei mudou extinguindo a modalidade culposa em todas as hipóteses.\n\n**Resolução Direta:** Dano ou prejuízo que não advieram de dolo (intenção específica) não configuram Lei de Improbidade, ainda que caiba ressarcimento civil/penal. A resposta exige que o ato seja estritamente doloso.",
+    "options": [
+      "o Superior Tribunal de Justiça condene tacitamente a gestão pública municipal.",
+      "haja culpa estrita (negligência, imperícia, imprudência), caso haja prejuízo explícito ao erário público.",
+      "ocorra um ganho financeiro lícito pelo Prefeito atestado pelo Ministério do Controle da União.",
+      "a conduta seja eivada de culpa gravíssima perante o Tribunal de Contas respectivo.",
+      "fique configurado estritamente o dolo (vontade livre e consciente de alcançar o fim ilícito) na conduta do agente."
+    ],
+    "subject": "historia",
+    "text": "O Comando: **Após as profundas alterações na Lei de Improbidade Administrativa em 2021 (Lei 14.230), para que um agente público seja condenado pela prática de ato de improbidade é indispensável que:**",
+    "year": 2022,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Na segurança da informação, *Ransomware* é um software malicioso que sequestra dados, criptografando-os, para então cobrar um resgate (ransom) via criptomoedas.\n\n**A 'Pegadinha':** Confundir com Phishing (pescaria de senhas por e-mail falso), Keylogger (captura de digitação) ou Trojan (Cavalo de Troia com portas abertas).\n\n**Resolução Direta:** Criptografou arquivos da repartição pública e pediu dinheiro em troca da chave? É Ransomware.",
+    "options": [
+      "Um Keylogger, que rastreou toda a digitação de senhas criptográficas no servidor local.",
+      "Um Ransomware, projetado estritamente para bloquear o acesso aos dados através de criptografia e cobrar resgate.",
+      "Um Spyware avançado, cuja função primária é vender os arquivos no mercado negro e destruir os HDs.",
+      "Um Adware de força bruta, focado em consumir larguras de banda enviando spam publicitário irreversível.",
+      "Um Phishing sistêmico, provocado após o clique num link que apagou permanentemente os dados do sistema."
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Um tribunal sofre um ataque cibernético massivo onde todos os PDFs de processos amanhecem ilegíveis. O setor de TI é informado pelo hacker que só receberão a chave de decodificação se pagarem 5 Bitcoins. Essa técnica criminal específica denomina-se:**",
+    "year": 2021,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 3,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Planilhas MS Excel e LibreOffice Calc. A referência absoluta ($) congela (trava) a linha ou a coluna quando arrastamos a fórmula para outra célula usando a alça de preenchimento.\n\n**A 'Pegadinha':** Achar que $ serve como máscara de moeda (que é uma formatação de célula, e não o caracter usado na barra de fórmulas) ou que serve para apagar dados.\n\n**Resolução Direta:** Célula =$A$1 * B2. Quando copiada para a linha de baixo, A1 permanece intacta, protegida contra incrementações. É a Referência Absoluta.",
+    "options": [
+      "Formatar condicionalmente a célula para destacar todos os cifrões financeiros presentes no banco de dados.",
+      "Converter os valores do preenchimento da linha referenciada para o padrão monetário americano (Dólares).",
+      "Omitir o resultado do cálculo sempre que a variável anterior na planilha original constar zerada ou nula.",
+      "Travar a referência de linha e/ou coluna, criando uma referência absoluta que não se desloca ao ser arrastada pela alça.",
+      "Impor uma validação de dados restritiva, não permitindo edições textuais dentro da tabela subjacente."
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **No Microsoft Excel (e Calc), o uso reiterado do símbolo do cifrão ($) dentro da escrita formal das funções, como em =SOMA($A$1:B5), tem a finalidade técnica de:**",
+    "year": 2022,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 0,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Conceito de Intranet e Extranet. Intranet = Rede interna com perfil da web privada de uma corporação. Extranet = Uma porção da Intranet corporativa que é disponibilizada remotamente a parceiros comerciais, filiais ou clientes externos mediante autenticação e VPN segura.\n\n**A 'Pegadinha':** Pensar que a Extranet não usa os protocolos TCP/IP (como HTTP/HTTPS) mas outra linguagem de rede arcaica ou que trata-se apenas da própria Internet pública.\n\n**Resolução Direta:** É o acesso externo, autorizado, à Intranet da empresa.",
+    "options": [
+      "Uma extensão da infraestrutura e dos recursos da Intranet da empresa para parceiros, fornecedores e clientes externos autorizados.",
+      "A rede mundial de computadores pública livre de senhas mas blindada apenas a provedores corporativos de grande porte.",
+      "Um modelo obsoleto de transmissão a rádio, anterior aos protocolos TCP/IP padronizados em data centers na nuvem.",
+      "A tecnologia de hardware específica responsável por blindar uma máquina desconectada totalmente (Air-gapped).",
+      "Um software antivírus instalado nos roteadores de saída (Gateway) monitorando transações do firewall contra o tráfego escuso."
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Nas questões de topologia e arquitetura web, a Fundação Getúlio Vargas diferencia Internet, Intranet e Extranet. Assinale o conceito doutrinário perfeitamente alinhado a \"Extranet\":**",
+    "year": 2020,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 2,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** Hardware, tipos de memórias. A Memória RAM é classificada como memória principal volátil. Apagou a luz (ou fechou os processos), perdeu o dado armazenado ali.\n\n**A 'Pegadinha':** Os iniciantes confundem com ROM (Read-Only Memory), que é gravada na placa mãe e é não-volátil (não apaga quando desliga, pois guarda e inicia a BIOS).\n\n**Resolução Direta:** RAM é Rápida e Volátil. O dado se perde permanentemente em caso de interrupção de energia.",
+    "options": [
+      "É do tipo ROM e destina-se basicamente à inicialização do Sistema (boot).",
+      "Consiste num armazenamento secundário não volátil idêntico ou superior ao SSD contemporâneo.",
+      "É a memória de acesso aleatório principal, volátil, perdendo seu conteúdo caso ocorra interrupção na energia elétrica.",
+      "Gerencia exclusivamente as transações da Placa de Vídeo on-board em processos estritamente tridimensionais (VRAM).",
+      "Gera um backup magnético persistente de segurança de tudo que o usuário estampa com Ctrl+C (área de transferência)."
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Qual é a definição conceitual precisa para a Memória RAM presente num computador pessoal moderno que equipa repartições públicas?**",
+    "year": 2023,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 4,
+    "difficulty": "dificil",
+    "explanation": "**Fundamentação:** Windows e Arquivos. A extensão \".exe\" indica um arquivo EXECUTÁVEL primário ou binário de programa. A extensão \".bat\" indica lotes num prompt (batch). Mas atalhos possuem a extensão oculta exclusiva do Windows: \".LNK\".\n\n**A 'Pegadinha':** Responder \".exe\", confundindo o atalho apontador da aba da área de trabalho com o verdadeiro núcleo do programa no C:.\n\n**Resolução Direta:** Ícones que são meros atalhos com aquela setinha curvada para facilitar acesso a executáveis são arquivos do tipo .LNK (Link).",
+    "options": [
+      ".SYS",
+      ".BAT",
+      ".COM",
+      ".EXE",
+      ".LNK"
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Quando um usuário arrasta um aplicativo para a Área de Trabalho e forma um \"Atalho\" provido de uma setinha azul no Windows 10/11, qual é a extensão correta técnica desse arquivo propriamente dito?**",
+    "year": 2019,
+    "type": "CONCURSO"
+  },
+  {
+    "correct": 1,
+    "difficulty": "media",
+    "explanation": "**Fundamentação:** O campo CCo ou Bcc no envio de e-mails significa 'Com Cópia Oculta'. Pessoas inseridas neste campo recebem a mensagem, mas os demais destinatários que estão em 'Para' e 'Cc' não enxergam este endereço.\n\n**A 'Pegadinha':** Achar que as pessoas no 'Cc' conseguem debloquear ocultos por falha ou acreditar que se CCo responder, continuará invisível.\n\n**Resolução Direta:** Cópia Oculta serve exatamente para blindar a privacidade daquele e-mail em específico perante os outros envolvidos listados.",
+    "options": [
+      "Permite que um robô interno leia e armazene silenciosamente todos os anexos antes da devida entrega aos servidores externos.",
+      "Realiza o envio de uma cópia oculta do e-mail de modo que os demais destinatários não tomem conhecimento deste endereçamento.",
+      "Configura protocolo em que a mensagem desaparece da base de dados do provedor (POP3) assim que exauridas as visualizações na tela.",
+      "Cancela irremediavelmente os rascunhos sem arquivá-los perante desconexões e cortes abruptos da Intranet institucional.",
+      "Garante criptografia ponta a ponta que é indecifrável sem senhas criptográficas pessoais validadas em dispositivos Token."
+    ],
+    "subject": "matematica",
+    "text": "O Comando: **Nas diretivas do uso correto de e-mail corporativo em repartições públicas (Outlook/Webmail), o preenchimento de diversos diretores no campo \"Cco\" (Bcc em Inglês) possibilita a finalidade principal de:**",
+    "year": 2021,
+    "type": "CONCURSO"
+  }
+]

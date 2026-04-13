@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  
+  <!-- PWA & Mobile Meta -->
+  <meta name="theme-color" content="#020617">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://tixfiukvvyokgaxflxdr.supabase.co; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://tixfiukvvyokgaxflxdr.supabase.co https://images.unsplash.com https://i.ytimg.com; media-src 'self' data: https://www.soundjay.com https://*.soundjay.com; connect-src 'self' https://tixfiukvvyokgaxflxdr.supabase.co wss://tixfiukvvyokgaxflxdr.supabase.co https://openrouter.ai;">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" href="assets/icon-192.png">
+
+  <title>EduHub Brasil – Sua Jornada Elite</title>
+  <meta name="description"
+    content="Aplicativo completo de estudos para ENEM, concursos e vestibulares. Simulados, vídeos, Pomodoro e muito mais." />
+
+  <!-- Tailwind CSS -->
+  <link rel="stylesheet" href="css/tailwind.css" />
+  
+  <!-- Fonts -->
+  <link rel="stylesheet" href="css/lexend.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/material-symbols.css" />
+
+  <!-- Document Parsing Libraries -->
+  <script src="js/vendor/pdf.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/vendor/pdf.worker.min.js';</script>
+  <script src="js/vendor/mammoth.browser.min.js"></script>
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    /* CSS Variables for theme-aware colors */
+    :root {
+      /* ── STITCH DESIGN TOKENS ── */
+      --primary: #009688;         /* Teal Primary */
+      --secondary: #712ae2;       /* Deep Purple Secondary */
+      --on-surface: #191c1e;
+      --on-surface-variant: #3d4a51;
+      
+      --color-primary: var(--primary);
+      --color-secondary: var(--secondary);
+      --color-bg-light: #ffffff; /* Pure White for Maximum Brilliance */
+      --color-surface: #ffffff;
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      
+      --ambient-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+      --premium-shadow: 0 12px 40px rgba(0, 150, 136, 0.08);
+      
+      --font-headline: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Manrope', sans-serif;
+    }
+
+    .dark {
+      --color-primary: #10b981; /* Emerald for dark mode */
+      --color-bg-dark: #15191d;
+      --color-surface: #1e293b;
+      --color-surface-alt: #0f172a;
+      --color-text-primary: #f1f5f9;
+      --color-text-secondary: #cbd5e1;
+      --color-text-muted: #94a3b8;
+      --color-border: rgba(255, 255, 255, 0.1);
+      --ambient-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    body {
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    h1, h2, h3, h4, .font-headline {
+      font-family: var(--font-headline);
+    }
+
+    mjx-container svg {
+      display: inline !important;
+    }
+
+    /* ── THEME TRANSITION OVERRIDE ── */
+    /* Applies smooth transition when toggling .dark class */
+    body, #app-pages, .page, .glass-card, header, #bottom-nav, button, .pomo-capsule, div[id^="page-"], main, section, nav {
+      transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                  border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                  color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+
+  <!-- POST-TAILWIND: Light Mode overrides for Tailwind JIT arbitrary values -->
+  <!-- Must be AFTER Tailwind CDN and app.css to override generated classes -->
+  <style id="light-mode-overrides">
+    /* ── STITCH DESIGN SYSTEM: LIGHT MODE ── */
+    
+    /* 1. Global Reset & Performance Fixes */
+    html:not(.dark) body {
+      background-color: var(--color-bg-light) !important;
+      color: var(--color-text-primary) !important;
+    }
+
+    /* 2. Page & Layout Containers */
+    html:not(.dark) .page,
+    html:not(.dark) #app-pages,
+    html:not(.dark) [id^="page-"] > div,
+    html:not(.dark) main {
+      background-color: var(--color-bg-light) !important;
+    }
+
+    /* 3. Cards & Surfaces (Grounded Academic Style) */
+    html:not(.dark) .glass-card,
+    html:not(.dark) [class*="bg-[#0f172a]"],
+    html:not(.dark) [class*="bg-[#020617]"],
+    html:not(.dark) [class*="bg-slate-9"],
+    html:not(.dark) [class*="bg-slate-8"],
+    html:not(.dark) [class*="bg-white/"],
+    html:not(.dark) [class*="bg-teal-"],
+    html:not(.dark) [class*="bg-emerald-"],
+    html:not(.dark) [class*="bg-indigo-"],
+    html:not(.dark) [class*="bg-violet-"],
+    html:not(.dark) [class*="bg-orange-"],
+    html:not(.dark) [class*="bg-cyan-"],
+    html:not(.dark) [class*="bg-"][class*="/"] {
+      background-color: #ffffff !important;
+      background-image: none !important;
+      opacity: 1 !important;
+      border: 1px solid #e2e8f0 !important; /* Solid Slate-200 */
+      box-shadow: var(--ambient-shadow) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      color: #0f172a !important; /* Slate-900 */
+    }
+
+    /* 3.1 Modal Overlays (Only visible when active to prevent dimming) */
+    html:not(.dark) .modal-overlay,
+    html:not(.dark) .bottom-sheet-overlay {
+      display: none !important;
+      background-color: rgba(30, 41, 59, 0.4) !important; /* Semi-transparent Slate-800 */
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      z-index: 100 !important;
+    }
+
+    html:not(.dark) .modal-overlay.active,
+    html:not(.dark) .bottom-sheet-overlay.active {
+      display: flex !important;
+    }
+    
+    /* 3.2 Kill decorative blurry blobs in Light Mode */
+    html:not(.dark) [class*="blur-3xl"] {
+      display: none !important;
+    }
+    
+    html:not(.dark) [class*="border-white/"] {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* 4. Typography & Icons (High Contrast) */
+    html:not(.dark) h1, 
+    html:not(.dark) h2, 
+    html:not(.dark) h3, 
+    html:not(.dark) .text-white,
+    html:not(.dark) .text-slate-100,
+    html:not(.dark) .text-slate-200,
+    html:not(.dark) .text-slate-300 {
+      color: #0f172a !important; /* Force visibility for ghost text */
+      opacity: 1 !important;
+    }
+    
+    html:not(.dark) p,
+    html:not(.dark) span,
+    html:not(.dark) div:not([class*="bg-"]),
+    html:not(.dark) .text-slate-400,
+    html:not(.dark) .text-slate-500,
+    html:not(.dark) .text-slate-600 {
+      color: #334155 !important;
+      opacity: 1 !important;
+    }
+
+    /* 5. Navigation & Headers */
+    html:not(.dark) header,
+    html:not(.dark) .glass-header {
+      background: #ffffff !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      backdrop-filter: none !important;
+    }
+    
+    html:not(.dark) #bottom-nav {
+      background: #ffffff !important;
+      border-top: 1px solid #e2e8f0 !important;
+      box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.05) !important;
+    }
+
+    /* 6. Dynamic Stats Card (Specific Dashboard Logic) */
+    html:not(.dark) .stats-dashboard {
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%) !important;
+      border: 1px solid rgba(0, 150, 136, 0.15) !important;
+      box-shadow: var(--premium-shadow) !important;
+    }
+    
+    html:not(.dark) .stats-dashboard h2,
+    html:not(.dark) .stats-dashboard .text-white {
+      color: var(--color-primary) !important;
+    }
+    
+    html:not(.dark) .stats-dashboard .text-slate-400 {
+      color: #0d9488 !important;
+      opacity: 1 !important;
+    }
+    
+    html:not(.dark) .quest-card.completed .text-slate-400 {
+      color: #16a34a !important;
+    }
+
+    html:not(.dark) .subj-opt {
+      background-color: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #475569 !important;
+    }
+
+    /* 10. Pomodoro Page - High Contrast & Layout Fixes */
+    html:not(.dark) #page-pomodoro {
+      background-color: #ffffff !important;
+    }
+
+    html:not(.dark) #page-pomodoro main {
+      margin-top: 0 !important;
+      padding-top: 20px !important;
+    }
+
+    html:not(.dark) #page-pomodoro .pomo-tab {
+      color: #64748b !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+      overflow: visible !important;
+    }
+
+    html:not(.dark) #page-pomodoro .pomo-tab.bg-indigo-500\/10 {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+      border: 1px solid #e2e8f0 !important;
+      font-weight: 800 !important;
+    }
+
+    html:not(.dark) #page-pomodoro .bg-\[#0f172a\]\/20 {
+      background-color: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+
+    html:not(.dark) #pomo-time {
+      color: #0f172a !important; 
+    }
+
+    html:not(.dark) .subj-opt:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+
+    /* 11. Profile, Progress & Simulados - High Contrast Overrides */
+    html:not(.dark) #page-perfil .text-white,
+    html:not(.dark) #page-progresso .text-white,
+    html:not(.dark) #page-simulados .text-white,
+    html:not(.dark) #page-premium .text-white,
+    html:not(.dark) #page-perfil .glass-card .text-slate-300,
+    html:not(.dark) #page-progresso .glass-card .text-slate-300,
+    html:not(.dark) #page-simulados .glass-card .text-slate-300 {
+      color: #0f172a !important;
+    }
+
+    html:not(.dark) #page-perfil .glass-card,
+    html:not(.dark) #page-progresso .glass-card,
+    html:not(.dark) #page-simulados .glass-card {
+      background-color: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: var(--ambient-shadow) !important;
+    }
+
+    html:not(.dark) #page-perfil .bg-white\/5,
+    html:not(.dark) #page-progresso .bg-white\/5,
+    html:not(.dark) #page-simulados .bg-white\/5 {
+      background-color: #f1f5f9 !important;
+    }
+
+    html:not(.dark) #page-perfil .text-slate-500,
+    html:not(.dark) #page-progresso .text-slate-500,
+    html:not(.dark) #page-simulados .text-slate-500 {
+      color: #64748b !important;
+    }
+
+    /* Radar Chart Overrides */
+    html:not(.dark) #page-progresso svg text {
+      fill: #475569 !important;
+      font-weight: 900 !important;
+    }
+
+    html:not(.dark) #page-progresso svg polygon[stroke^="rgba(255,255,255"] {
+      stroke: rgba(15, 23, 42, 0.1) !important;
+    }
+
+    /* 7. Questions & Alternatives */
+    html:not(.dark) [id^="question-card"],
+    html:not(.dark) .question-card,
+    html:not(.dark) .alternative-card {
+      background: #ffffff !important;
+      border: 2px solid #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+
+    html:not(.dark) .alternative-card:hover {
+      background: #f8fafc !important;
+      border-color: var(--color-primary) !important;
+    }
+    
+    html:not(.dark) .alternative-card.selected {
+      background: #f0fdfa !important;
+      border-color: var(--color-primary) !important;
+    }
+
+    /* 7. Buttons & Interactive */
+    html:not(.dark) .bg-emerald-500,
+    html:not(.dark) .bg-primary {
+      background-color: var(--color-primary) !important;
+      color: white !important;
+    }
+    
+    html:not(.dark) .text-emerald-400,
+    html:not(.dark) .text-cyan-400,
+    html:not(.dark) .text-emerald-500 {
+      color: var(--color-primary) !important;
+    }
+    
+    /* 8. Forms & Inputs */
+    html:not(.dark) input,
+    html:not(.dark) textarea {
+      background-color: white !important;
+      border: 1px solid rgba(0, 150, 136, 0.1) !important;
+      color: var(--color-text-primary) !important;
+    }
+    
+    html:not(.dark) input:focus {
+      border-color: var(--color-primary) !important;
+      box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.1) !important;
+    }
+
+    /* 9. Specialized UI Blocks */
+    html:not(.dark) .quest-card {
+      background-color: white !important;
+      border: 1px solid rgba(0, 150, 136, 0.1) !important;
+    }
+    
+    html:not(.dark) .quest-card.completed {
+      background-color: #f0fdf4 !important;
+      border-color: #4ade80 !important;
+    }
+
+    /* Filter Buttons Fix */
+    html:not(.dark) #simulado-category-filters button:not(.active-category-filter) {
+      background-color: #f1f5f9 !important;
+      color: #64748b !important;
+      border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* 10. Scrollbar Refinement */
+    html:not(.dark) ::-webkit-scrollbar-thumb {
+      background: rgba(0, 150, 136, 0.15) !important;
+    }
+    
+    /* Upgrade Button Correction */
+    html:not(.dark) .bg-emerald-500\/10 {
+      background-color: rgba(0, 150, 136, 0.15) !important;
+      border: 1px solid rgba(0, 150, 136, 0.1) !important;
+      color: var(--color-primary) !important;
+    }
+    
+    /* Countdown Section (Orange Urgency) */
+    html:not(.dark) .bg-orange-500\/10 {
+      background-color: rgba(249, 115, 22, 0.12) !important;
+    }
+    html:not(.dark) .text-orange-400 {
+      color: #ea580c !important;
+    }
+    
+    /* Rank Shields & Badges */
+    html:not(.dark) .rank-shield {
+      border: 1px solid rgba(0, 150, 136, 0.1) !important;
+    }
+
+    /* Stats cards icons */
+    html:not(.dark) .w-14.h-14.rounded-2xl.bg-orange-50,
+    html:not(.dark) [class*="bg-[#0f172a]"] .material-symbols-outlined {
+       color: inherit !important;
+    }
+    
+    /* 11. Specific Dashboard Labels & High-Contrast Adjustments */
+    html:not(.dark) .text-indigo-300,
+    html:not(.dark) .text-cyan-300,
+    html:not(.dark) .text-emerald-300 {
+      color: var(--color-primary) !important;
+    }
+
+    html:not(.dark) [class*="bg-indigo-500/20"],
+    html:not(.dark) [class*="bg-cyan-500/20"],
+    html:not(.dark) [class*="bg-emerald-500/20"] {
+      background-color: #f1f5f9 !important; /* Grounded Slate-100 tag */
+      border: 1px solid #e2e8f0 !important;
+      background-image: none !important;
+    }
+
+    html:not(.dark) [class*="bg-[#0f172a]"] {
+       background-color: #ffffff !important;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+
+  <!-- Page Container -->
+  <div id="app-pages"></div>
+
+  <!-- ═══ UNIFIED BOTTOM NAVIGATION BAR ═══ -->
+  <nav id="bottom-nav"
+    class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-primary/10 dark:border-white/10 px-4 py-2 pb-[max(1.5rem,env(safe-area-inset-bottom))] z-50">
+    <div class="max-w-2xl mx-auto flex items-center justify-between">
+      <a data-route="/home" onclick="Router.navigate('/home')"
+        class="flex flex-col items-center gap-0.5 text-emerald-500 transition-colors cursor-pointer">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">home</span>
+        <span class="text-[10px] font-bold">Início</span>
+      </a>
+      <a data-route="/simulados" onclick="Router.navigate('/simulados')"
+        class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-primary transition-colors cursor-pointer">
+        <span class="material-symbols-outlined">assignment</span>
+        <span class="text-[10px] font-medium">Simulados</span>
+      </a>
+      <a data-route="/pomodoro" onclick="Router.navigate('/pomodoro')"
+        class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-primary transition-colors cursor-pointer">
+        <span class="material-symbols-outlined">timer</span>
+        <span class="text-[10px] font-medium">Foco</span>
+      </a>
+      <a data-route="/videos" onclick="Router.navigate('/videos')"
+        class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-primary transition-colors cursor-pointer">
+        <span class="material-symbols-outlined">video_library</span>
+        <span class="text-[10px] font-medium">Vídeos</span>
+      </a>
+      <a data-route="/progresso" onclick="Router.navigate('/progresso')"
+        class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-primary transition-colors cursor-pointer">
+        <span class="material-symbols-outlined">trending_up</span>
+        <span class="text-[10px] font-medium">Progresso</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ═══ UPGRADE MODAL (Bottom Sheet) ═══ -->
+  <div id="upgrade-modal" class="modal-overlay" onclick="if(event.target===this)App.hideUpgradeModal()">
+    <div class="modal-sheet">
+      <div class="flex h-6 w-full items-center justify-center">
+        <div class="h-1.5 w-12 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+      </div>
+      <div class="px-6 pt-2 pb-8">
+        <div class="flex justify-center mb-6">
+          <div class="relative">
+            <div class="h-24 w-24 bg-primary/10 rounded-full flex items-center justify-center">
+              <span class="material-symbols-outlined text-5xl text-primary fill-icon">lock_open</span>
+            </div>
+            <div
+              class="absolute -top-1 -right-1 h-8 w-8 bg-yellow-400 rounded-full flex items-center justify-center border-4 border-background-light dark:border-background-dark">
+              <span class="material-symbols-outlined text-white text-sm fill-icon">grade</span>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mb-8">
+          <h3 class="text-2xl font-bold leading-tight mb-3">Desbloqueie mais recursos!</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-base leading-relaxed">Upgrade a partir do Plano Básico e
+            desbloqueie o Domínio por Área, banco de questões ampliado e simulados exclusivos.</p>
+        </div>
+        <div class="flex flex-col gap-3 mt-2">
+          <button onclick="App.hideUpgradeModal();Router.navigate('/premium')"
+            class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl text-lg flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+            Ver Planos <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+          <button onclick="App.hideUpgradeModal()"
+            class="w-full text-slate-400 dark:text-slate-500 font-bold py-3 rounded-lg text-sm hover:text-white dark:hover:text-white transition-colors">
+            Agora não, obrigado
+          </button>
+        </div>
+      </div>
+      <div class="h-6 bg-background-light dark:bg-background-dark"></div>
+    </div>
+  </div>
+
+  <!-- Inline Markdown Parser (no CDN dependency) + MathJax LaTeX -->
+  <script>
+    // Improved Markdown Parser with Table Support
+    window.renderMD = function(text) {
+      if (!text) return '';
+      
+      // Step 0: normalize literal \n strings to real newlines
+      text = text.replace(/\\n/g, '\n');
+      
+      // Step 1: protect LaTeX blocks
+      const latexBlocks = [];
+      text = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, m) => { latexBlocks.push('$$' + m + '$$'); return '\x00LATEX' + (latexBlocks.length-1) + '\x00'; });
+      text = text.replace(/\$([^$\n]+?)\$/g, (_, m) => { latexBlocks.push('$' + m + '$'); return '\x00LATEX' + (latexBlocks.length-1) + '\x00'; });
+      
+      // Step 2: HTML entities
+      text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      // Step 3: Markdown formatting
+      // Headings
+      text = text.replace(/^### (.+)$/gm, '\x01H3\x02$1\x03');
+      text = text.replace(/^## (.+)$/gm, '\x01H2\x02$1\x03');
+      text = text.replace(/^# (.+)$/gm, '\x01H1\x02$1\x03');
+      
+      // Lists - capture entire list blocks
+      text = text.replace(/(?:^[\*\-] .+(\r?\n|$))+/gm, (match) => {
+        const items = match.trim().split(/\n/).map(li => li.replace(/^[\*\-] /, ''));
+        return '\x01UL\x02' + items.join('\x04') + '\x03';
+      });
+      
+      // Tables - handle AI-generated tables with varying spacing
+      const tableRegex = /(?:^\|.+\|\r?\n(?:^\|[-: ]+\|\r?\n)?(?:^\|.+\|(?:\r?\n|$))+)/gm;
+      text = text.replace(tableRegex, (match) => {
+        const lines = match.trim().split(/\n/).filter(r => r.trim().startsWith('|') && r.trim().endsWith('|'));
+        const bodyContent = lines.map((row, idx) => {
+          if (idx === 1 && row.includes('---')) return '';
+          const cells = row.split('|').filter((c, i, a) => i > 0 && i < a.length - 1).map(c => c.trim());
+          return cells.join('\x04');
+        }).filter(r => r).join('\x05');
+        return '\x01TABLE\x02' + bodyContent + '\x03';
+      });
+
+      // Horizontal Rule
+      text = text.replace(/^---+$/gm, '\x01HR\x02\x03');
+      
+      // Bold/Italic
+      text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
+      text = text.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+      text = text.replace(/_([^_\n]+)_/g, '<em>$1</em>');
+
+      // Premium Structure Labels Styling
+      text = text.replace(/Contextualização:/g, '<span class="text-blue-400 font-bold">Contextualização:</span>');
+      text = text.replace(/Dados e Parâmetros:/g, '<span class="text-amber-400 font-bold">Dados e Parâmetros:</span>');
+      text = text.replace(/Dados:/g, '<span class="text-amber-400 font-bold">Dados:</span>');
+      text = text.replace(/O Comando:/g, '<span class="text-rose-400 font-bold">O Comando:</span>');
+      text = text.replace(/Fundamentação e Fórmulas:/g, '<span class="text-indigo-400 font-bold">Fundamentação e Fórmulas:</span>');
+      text = text.replace(/Fundamentação:/g, '<span class="text-indigo-400 font-bold">Fundamentação:</span>');
+      text = text.replace(/Resolução Integrada:/g, '<span class="text-emerald-400 font-bold">Resolução Integrada:</span>');
+      text = text.replace(/Resolução:/g, '<span class="text-emerald-400 font-bold">Resolução:</span>');
+      
+      // Code blocks
+      text = text.replace(/```([\s\S]*?)```/g, '\x01PRE\x02$1\x03');
+      text = text.replace(/`([^`]+)`/g, '<code class="bg-white/10 px-1 rounded text-emerald-300">$1</code>');
+      
+      // Step 4: Paragraphs and Reconstruction
+      let htmlOutput = '';
+      const parts = text.split('\n\n');
+      parts.forEach(part => {
+        let trimmed = part.trim();
+        if (!trimmed) return;
+        
+        if (trimmed.startsWith('\x01')) {
+          htmlOutput += trimmed;
+        } else {
+          // Keep internal newlines as <br> for better layout of step-by-step
+          let pContent = trimmed.replace(/\n/g, '<br>');
+          htmlOutput += `<div class="mb-4 text-white/90 leading-relaxed text-sm">${pContent}</div>`;
+        }
+      });
+
+      // Final transformation of markers to real HTML
+      htmlOutput = htmlOutput
+        .replace(/\x01H3\x02(.+?)\x03/g, '<h3 class="text-base font-black text-emerald-400 mt-4 mb-2">$1</h3>')
+        .replace(/\x01H2\x02(.+?)\x03/g, '<h2 class="text-lg font-black text-white mt-5 mb-3">$1</h2>')
+        .replace(/\x01H1\x02(.+?)\x03/g, '<h1 class="text-xl font-black text-white mt-6 mb-4">$1</h1>')
+        .replace(/\x01UL\x02(.+?)\x03/g, (_, items) => {
+          const listHtml = items.split('\x04').map(it => `<li class="ml-4 list-disc text-white/90">${it}</li>`).join('');
+          return `<ul class="mb-4 space-y-1">${listHtml}</ul>`;
+        })
+        .replace(/\x01TABLE\x02(.+?)\x03/g, (_, rows) => {
+          let tableHtml = '<div class="overflow-x-auto my-4"><table class="w-full text-sm border-collapse border border-white/10 text-white/80 rounded-lg overflow-hidden">';
+          rows.split('\x05').forEach((row, idx) => {
+            const cells = row.split('\x04');
+            const isHeader = idx === 0;
+            const tag = isHeader ? 'th' : 'td';
+            const bg = isHeader ? 'bg-slate-800 font-bold text-white' : 'border-t border-white/5';
+            tableHtml += '<tr>' + cells.map(c => `<${tag} class="px-3 py-2 ${bg}">${c}</${tag}>`).join('') + '</tr>';
+          });
+          tableHtml += '</table></div>';
+          return tableHtml;
+        })
+        .replace(/\x01PRE\x02([\s\S]+?)\x03/g, '<pre class="bg-slate-900 rounded p-4 my-2 overflow-x-auto text-[10px] border border-white/10"><code>$1</code></pre>')
+        .replace(/\x01HR\x02\x03/g, '<hr class="border-white/20 my-4">');
+
+      // Step 5: restore LaTeX
+      htmlOutput = htmlOutput.replace(/\x00LATEX(\d+)\x00/g, (_, i) => latexBlocks[i]);
+      
+      return htmlOutput;
+    }
+
+    window.renderMDInline = function(text) {
+      if (!text) return '';
+      text = text.replace(/\\n/g, '\n');
+      const latexBlocks = [];
+      text = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, m) => { latexBlocks.push('$$' + m + '$$'); return '\x00LATEX' + (latexBlocks.length-1) + '\x00'; });
+      text = text.replace(/\$([^$\n]+)\$/g, (_, m) => { latexBlocks.push('$' + m + '$'); return '\x00LATEX' + (latexBlocks.length-1) + '\x00'; });
+      text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      text = text
+        .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/__([^_\n]+)__/g, '<strong>$1</strong>')
+        .replace(/\*([^*\n]+)\*/g, '<em>$1</em>')
+        .replace(/_([^_\n]+)_/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\n/g, ' '); 
+      text = text.replace(/\x00LATEX(\d+)\x00/g, (_, i) => latexBlocks[i]);
+      return text;
+    }
+
+    window.typesetMath = function(el) {
+      if (!el) return;
+      // Enhanced retry logic for MathJax initialization
+      const tryTypeset = (count = 0) => {
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([el]).catch(err => {
+            console.warn('MathJax error:', err);
+            if (count < 2) setTimeout(() => tryTypeset(count + 1), 300);
+          });
+        } else if (count < 5) {
+          // Wait longer if MathJax script is still loading
+          setTimeout(() => tryTypeset(count + 1), 500);
+        }
+      };
+      
+      // Delay to ensure DOM is absolutely ready
+      setTimeout(tryTypeset, 200);
+    }
+  </script>
+  <script>
+    window.MathJax = {
+      tex: { 
+        inlineMath: [['$', '$'], ['\\(', '\\)']], 
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      },
+      svg: { fontCache: 'global' },
+      startup: { 
+        typeset: false
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="js/vendor/mathjax.js"></script>
+
+  <!-- Scripts (order matters) -->
+  <script src="js/data.js?v=28"></script>
+  <script src="js/router.js?v=28"></script>
+  <script src="js/pages-core.js?v=28"></script>
+  <script src="js/pages-extra.js?v=28"></script>
+  <script src="js/pages-more.js?v=28"></script>
+  <script src="js/sound-manager.js?v=28"></script>
+  <script src="js/vendor/supabase.js"></script>
+  <script src="js/security-utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/ai-service.js?v=28"></script>
+  <script src="js/app.js?v=28"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => App.init());</script>
+</body>
+
+</html>

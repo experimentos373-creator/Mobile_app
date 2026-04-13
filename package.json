@@ -1,0 +1,22 @@
+{
+  "name": "app_android",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test_md.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.11",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}
