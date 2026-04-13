@@ -20,20 +20,21 @@
   <meta name="description"
     content="Aplicativo completo de estudos para ENEM, concursos e vestibulares. Simulados, vídeos, Pomodoro e muito mais." />
 
-  <!-- Tailwind CSS -->
-  <link rel="stylesheet" href="css/tailwind.css" />
-  
-  <!-- Fonts -->
-  <link rel="stylesheet" href="css/lexend.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/material-symbols.css" />
+  <!-- Preconnect to font servers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- Document Parsing Libraries -->
-  <script src="js/vendor/pdf.min.js"></script>
-  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/vendor/pdf.worker.min.js';</script>
-  <script src="js/vendor/mammoth.browser.min.js"></script>
-  <!-- App CSS -->
+  <!-- Critical CSS (render-blocking, kept minimal) -->
+  <link rel="stylesheet" href="css/tailwind.css" />
   <link rel="stylesheet" href="css/app.css" />
+  
+  <!-- Fonts (non-blocking) -->
+  <link rel="stylesheet" href="css/lexend.css" />
+  <link rel="stylesheet" href="css/material-symbols.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+
+  <!-- PDF/Mammoth libraries loaded on-demand via JS (not here) -->
   <style>
     /* CSS Variables for theme-aware colors */
     :root {
@@ -658,18 +659,18 @@
   </script>
   <script id="MathJax-script" async src="js/vendor/mathjax.js"></script>
 
-  <!-- Scripts (order matters) -->
-  <script src="js/data.js?v=28"></script>
-  <script src="js/router.js?v=28"></script>
-  <script src="js/pages-core.js?v=28"></script>
-  <script src="js/pages-extra.js?v=28"></script>
-  <script src="js/pages-more.js?v=28"></script>
-  <script src="js/sound-manager.js?v=28"></script>
-  <script src="js/vendor/supabase.js"></script>
-  <script src="js/security-utils.js"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/ai-service.js?v=28"></script>
-  <script src="js/app.js?v=28"></script>
+  <!-- Scripts (defer preserves order but doesn't block rendering) -->
+  <script defer src="js/data.js?v=29"></script>
+  <script defer src="js/router.js?v=29"></script>
+  <script defer src="js/pages-core.js?v=29"></script>
+  <script defer src="js/pages-extra.js?v=29"></script>
+  <script defer src="js/pages-more.js?v=29"></script>
+  <script defer src="js/sound-manager.js?v=29"></script>
+  <script defer src="js/vendor/supabase.js"></script>
+  <script defer src="js/security-utils.js"></script>
+  <script defer src="js/supabase.js"></script>
+  <script defer src="js/ai-service.js?v=29"></script>
+  <script defer src="js/app.js?v=29"></script>
   <script>document.addEventListener("DOMContentLoaded", () => App.init());</script>
 </body>
 

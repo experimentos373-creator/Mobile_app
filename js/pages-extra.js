@@ -2,6 +2,17 @@
 // EduHub Brasil - Page Renderers (Part 2: Simulados, Pomodoro, Progresso)
 // ============================================================
 
+// ── Lazy Script Loader (for on-demand vendor libs) ──
+function _loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error(`Failed to load ${src}`));
+    document.head.appendChild(s);
+  });
+}
 // ── SIMULADOS PAGE ──
 Pages.simulados = () => {
   const completedCount = APP_DATA.simulados.filter(s => s.completed).length;
@@ -1746,6 +1757,11 @@ PageEvents["ia-tutor"] = (page) => {
       // Parse Document
       try {
         if (file.name.endsWith(".pdf")) {
+          // Lazy load PDF.js only when needed
+          if (!window.pdfjsLib) {
+            await _loadScript('js/vendor/pdf.min.js');
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/vendor/pdf.worker.min.js';
+          }
           const arrayBuffer = await file.arrayBuffer();
           const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
           let fullText = "";
@@ -1756,6 +1772,10 @@ PageEvents["ia-tutor"] = (page) => {
           }
           currentFileText = fullText;
         } else if (file.name.endsWith(".docx") || file.name.endsWith(".doc")) {
+          // Lazy load Mammoth only when needed
+          if (!window.mammoth) {
+            await _loadScript('js/vendor/mammoth.browser.min.js');
+          }
           const arrayBuffer = await file.arrayBuffer();
           const result = await mammoth.extractRawText({ arrayBuffer });
           currentFileText = result.value;
