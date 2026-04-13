@@ -749,9 +749,33 @@ PageEvents.pomodoro = (page) => {
     if (running) { clearInterval(interval); running = false; startBtn.querySelector("span").textContent = "play_arrow"; }
     else {
       running = true; startBtn.querySelector("span").textContent = "pause";
+      let ticker = 0;
       interval = setInterval(() => {
         timeLeft--;
+        ticker++;
+
+        // Rastreio acumulativo a cada 1 minuto (60 segundos)
+        if (ticker >= 60) {
+          ticker = 0;
+          if (mode === "focus") {
+            const currentTotal = AppState.get("studyTimeMinutes") || 0;
+            AppState.set("studyTimeMinutes", currentTotal + 1);
+            
+            // Também atualizar o dado semanal (hoje)
+            const weekly = AppState.get("weeklyStudyData") || [0,0,0,0,0,0,0];
+            const today = new Date().getDay(); // 0-6
+            weekly[today] += 1;
+            AppState.set("weeklyStudyData", weekly);
+          } else {
+            const currentRest = AppState.get("restTimeMinutes") || 0;
+            AppState.set("restTimeMinutes", currentRest + 1);
+          }
+          AppState.saveToCloud(); // Sincronizar com Supabase se necessário
+        }
+
         if (timeLeft <= 0) {
+          // Finalizou a sessão, garantir que o ticker restante seja contabilizado se > 30s? 
+          // Por simplicidade, mantemos o ticker por minuto.
           clearInterval(interval); running = false;
           startBtn.querySelector("span").textContent = "play_arrow";
           SoundManager.play("timer_end");
@@ -943,10 +967,10 @@ Pages.progresso = () => {
   const accValues = Object.values(acc);
   const avgAcc = accValues.length > 0 ? Math.round(accValues.reduce((a,b)=>a+b,0)/accValues.length) : 0;
 
-  // New Data for Flow Chart (Mocked or calculated)
-  const totalStudyTime = weekly.reduce((a,b)=>a+b,0);
-  const totalRestTime = Math.round(totalStudyTime * 0.25); // Assume 25% rest
-  const focusEfficiency = totalStudyTime > 0 ? Math.round((totalStudyTime / (totalStudyTime + totalRestTime)) * 100) : 0;
+  // Data for Flow Chart (Using real cumulative tracked data)
+  const totalStudyTime = AppState.get("studyTimeMinutes") || 0;
+  const totalRestTime = AppState.get("restTimeMinutes") || 0;
+  const focusEfficiency = (totalStudyTime + totalRestTime) > 0 ? Math.round((totalStudyTime / (totalStudyTime + totalRestTime)) * 100) : 0;
 
   // Line chart data -- derived from weekly study data
   const lineData = weekly.map((v, i) => ({ l: days[i], v: v }));

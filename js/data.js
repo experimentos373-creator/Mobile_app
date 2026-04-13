@@ -214,11 +214,11 @@ const APP_DATA = {
 // ============================================================
 const AppState = {
   _defaults: {
-    onboardingDone: true,
-    userName: "Gabriel",
+    onboardingDone: false,
+    userName: "",
     userEmail: "",
     userAge: "",
-    userPlan: "plus", // gratis, pro, plus
+    userPlan: "gratis", // gratis, pro, plus
     darkMode: true,
     studyGoal: "enem", // enem, concurso, medio
     targetExam: "ENEM", // Specific exam name
@@ -226,11 +226,12 @@ const AppState = {
     difficultSubject: "matematica",
     studyCommitment: "2h",
     mainDifficulty: "foco", // foco, inicio, erros, disciplina
-    favoriteSubjects: ["matematica", "historia", "portugues"],
+    favoriteSubjects: [],
     questionsAnsweredToday: 0,
     totalQuestionsAnswered: 0,
     correctAnswers: 0,
     studyTimeMinutes: 0,
+    restTimeMinutes: 0, // [NOVO] Acumulado de descanso do Pomodoro
     pomodoroStudyMin: 25,
     pomodoroLongBreak: 15,
     weeklyStudyData: [0, 0, 0, 0, 0, 0, 0], // Sun-Sat in minutes
