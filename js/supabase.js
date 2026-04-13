@@ -32,10 +32,17 @@ const Supabase = {
     async signInWithGoogle() {
         const client = this.getClient();
         if (!client) return { error: { message: "Conexão não configurada." } };
+
+        // Use the correct app URL depending on environment
+        const isProd = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        const redirectTo = isProd
+            ? 'https://mobileapp-taupe.vercel.app/'
+            : window.location.origin + '/index.html';
+
         return await client.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin
+                redirectTo
             }
         });
     },
