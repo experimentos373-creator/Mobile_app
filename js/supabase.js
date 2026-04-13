@@ -267,5 +267,11 @@ const Supabase = {
             return [];
         }
         return data;
+    },
+
+    async deleteAccount() {
+        const client = this.getClient();
+        if (!client) return { error: { message: "Client not initialized" } };
+        return await client.rpc('delete_own_account');
     }
 };

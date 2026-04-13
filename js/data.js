@@ -237,6 +237,7 @@ const AppState = {
     weeklyStudyData: [0, 0, 0, 0, 0, 0, 0], // Sun-Sat in minutes
     subjectAccuracy: {},
     missionProgress: { m1: 0, m2: 0, m3: 0, m4: 0 },
+    completedSimulados: [], // [NOVO] Histórico de simulados do usuário
     hasUsedFreePredictor: false,
     aiDailyUsage: 0,
     aiDailyUsageDate: "",
@@ -267,9 +268,36 @@ const AppState = {
         const profile = await Supabase.getProfile(session.user.id);
         if (profile) {
           // Merge critical cloud state
-          if (profile.userPlan) this.set("userPlan", profile.userPlan);
-          if (profile.hasUsedFreePredictor !== undefined) this.set("hasUsedFreePredictor", profile.hasUsedFreePredictor);
-          if (profile.userName) this.set("userName", profile.userName);
+          // Merge FULL cloud state (Strict: reset local if cloud is empty/null)
+          const fields = [
+            "userName", "userPlan", "onboardingDone", "studyGoal", "targetExam", 
+            "totalQuestionsAnswered", "correctAnswers", "studyTimeMinutes", "restTimeMinutes",
+            "hasUsedFreePredictor", "subjectAccuracy", "missionProgress", "weeklyStudyData"
+          ];
+          
+          fields.forEach(field => {
+            if (profile[field] !== undefined && profile[field] !== null) {
+              this.set(field, profile[field]);
+            } else {
+              // If cloud is null/undefined, revert to default to clean stale local data
+              this.set(field, this._defaults[field]);
+            }
+          });
+
+          // Sync Simulado History
+          const history = await Supabase.getSimuladoHistory(session.user.id);
+          if (history && history.length > 0) {
+              const formattedHistory = history.map(h => ({
+                  type: h.simulado_type,
+                  score: h.score,
+                  total: h.total_questions,
+                  date: h.completed_at
+              }));
+              this.set("completedSimulados", formattedHistory);
+          } else {
+              // If cloud history is empty, ensure local is also empty
+              this.set("completedSimulados", []);
+          }
         } else {
           // If no profile exists, save current local state to cloud
           await this.saveToCloud();
@@ -286,10 +314,21 @@ const AppState = {
       const { data: { session } } = await Supabase.getClient().auth.getSession();
       if (session && session.user) {
         // Save critical state that defines restrictions
+        // Save FULL app state (excluding sensitive/local-only keys)
         await Supabase.saveProfile(session.user.id, {
+          userName: this.get("userName"),
           userPlan: this.get("userPlan"),
+          onboardingDone: this.get("onboardingDone"),
+          studyGoal: this.get("studyGoal"),
+          targetExam: this.get("targetExam"),
+          totalQuestionsAnswered: this.get("totalQuestionsAnswered"),
+          correctAnswers: this.get("correctAnswers"),
+          studyTimeMinutes: this.get("studyTimeMinutes"),
+          restTimeMinutes: this.get("restTimeMinutes"),
           hasUsedFreePredictor: this.get("hasUsedFreePredictor"),
-          userName: this.get("userName")
+          subjectAccuracy: this.get("subjectAccuracy"),
+          missionProgress: this.get("missionProgress"),
+          weeklyStudyData: this.get("weeklyStudyData")
         });
       }
     } catch (e) {

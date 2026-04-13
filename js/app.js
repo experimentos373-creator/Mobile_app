@@ -254,6 +254,20 @@ const App = {
     AppState.reset();
     // Clear hash first, then navigate to login without reload
     window.location.hash = "/login";
+  },
+  async deleteAccount() {
+    try {
+      const { error } = await Supabase.deleteAccount();
+      if (error) throw error;
+      
+      AppState.reset();
+      SoundManager.play("success");
+      window.location.hash = "/login";
+      window.location.reload(); // Force full reload after deletion
+    } catch (e) {
+      console.error("Delete account error:", e);
+      alert("Erro ao excluir conta. Tente novamente mais tarde.");
+    }
   }
 };
 

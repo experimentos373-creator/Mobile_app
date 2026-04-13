@@ -108,7 +108,7 @@ Pages.home = () => {
             <span class="text-white/90">${xpInLevel}/500 XP</span>
           </div>
           <div class="w-full bg-slate-900/50 h-3 rounded-full overflow-hidden p-0.5 border border-white/5">
-            <div class="bg-gradient-to-r from-cyan-500 to-emerald-500 h-full rounded-full animate-bar" style="width:${Math.max(5, (xpInLevel / 500) * 100)}%"></div>
+            <div class="bg-gradient-to-r from-cyan-500 to-emerald-500 h-full rounded-full animate-bar" style="width:${(xpInLevel / 500) * 100}%"></div>
           </div>
         </div>
 

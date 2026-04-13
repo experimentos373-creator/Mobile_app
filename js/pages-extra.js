@@ -15,8 +15,9 @@ function _loadScript(src) {
 }
 // ── SIMULADOS PAGE ──
 Pages.simulados = () => {
-  const completedCount = APP_DATA.simulados.filter(s => s.completed).length;
-  const avgScore = Math.round(APP_DATA.simulados.filter(s => s.completed).reduce((a, b) => a + (b.score || 0), 0) / (completedCount || 1));
+  const userSims = AppState.get("completedSimulados") || [];
+  const completedCount = userSims.length;
+  const avgScore = completedCount > 0 ? Math.round(userSims.reduce((acc, s) => acc + (s.score / s.total), 0) / completedCount * 100) : 0;
   const readinessScore = Math.min(100, Math.round((completedCount * 10) + (avgScore / 2)));
 
   return `
@@ -1101,7 +1102,7 @@ Pages.progresso = () => {
               <span class="text-xs font-black text-emerald-400">${totalStudyTime}m</span>
             </div>
             <div class="w-full h-4 bg-slate-900/50 rounded-full overflow-hidden p-0.5 border border-white/5">
-              <div class="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]" style="width: 100%"></div>
+              <div class="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]" style="width: ${totalStudyTime > 0 ? Math.min(100, (totalStudyTime / 60) * 100) : 0}%"></div>
             </div>
           </div>
           <div class="space-y-2">
@@ -1150,7 +1151,7 @@ Pages.progresso = () => {
           <div>
             <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Chance de Aprovação</h4>
             <div class="flex items-baseline gap-2">
-              <p class="text-2xl font-black text-white transition-all">${AppState.get("userPlan") === 'gratis' ? '??%' : Math.round(avgAcc * 0.95 + 5) + '%'}</p>
+              <p class="text-2xl font-black text-white transition-all">${AppState.get("userPlan") === 'gratis' ? '??%' : (avgAcc > 0 ? Math.round(avgAcc * 0.95 + 5) + '%' : '0%')}</p>
               ${AppState.get("userPlan") === 'gratis' ? '<span class="text-[10px] font-black text-amber-500 uppercase opacity-40">Bloqueado</span>' : ''}
             </div>
           </div>
@@ -1235,7 +1236,11 @@ Pages.progresso = () => {
             <!-- Weekly Data Logic -->
             ${(() => {
               const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-              const weeklyScores = weekDays.map((d, i) => ({ l: d, v: Math.round(50 + Math.random() * 40) })); // Simulated performance per day
+              // Use real study data scaled to a 60min daily goal for bar height
+              const weeklyScores = weekDays.map((d, i) => {
+                const mins = weekly[i] || 0;
+                return { l: d, v: Math.min(100, Math.round((mins / 60) * 100)) };
+              });
               const barW = 28;
               const spacing = (cW - (7 * barW)) / 6;
               
@@ -1247,10 +1252,12 @@ Pages.progresso = () => {
                 
                 return `
                   <g class="animate-in group/bar" style="--delay: ${600 + (i * 100)}ms">
-                    <rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="url(#barGradPRO)" rx="6" 
-                          class="group-hover/bar:brightness-125 transition-all cursor-pointer" />
-                    <rect x="${x}" y="${y}" width="${barW}" height="5" fill="#6ee7b7" rx="2.5" 
-                          filter="${isToday ? 'url(#barGlowPRO)' : ''}" />
+                    ${h > 0 ? `
+                      <rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="url(#barGradPRO)" rx="6" 
+                            class="group-hover/bar:brightness-125 transition-all cursor-pointer" />
+                      <rect x="${x}" y="${y}" width="${barW}" height="5" fill="#6ee7b7" rx="2.5" 
+                            filter="${isToday ? 'url(#barGlowPRO)' : ''}" />
+                    ` : ''}
                     <!-- Label per bar -->
                     <text x="${x + barW/2}" y="${y - 10}" fill="white" font-size="8" font-weight="900" 
                           text-anchor="middle" class="opacity-0 group-hover/bar:opacity-100 transition-opacity">${d.v}%</text>
@@ -2904,10 +2911,27 @@ PageEvents["simulado-runner"] = async (page, params) => {
     const finalTotalEl = document.getElementById("simulado-final-total");
     if (finalTotalEl) finalTotalEl.textContent = simuladoState.questions.length;
 
+    // Save to AppState (Local)
+    const currentSims = AppState.get("completedSimulados") || [];
+    currentSims.push({
+      type: type,
+      score: simuladoState.score,
+      total: simuladoState.questions.length,
+      date: new Date().toISOString()
+    });
+    AppState.set("completedSimulados", currentSims);
+
     // Save to DB
-    if (currentUser) {
-      await Supabase.saveSimuladoHistory(currentUser.id, type, simuladoState.score, simuladoState.questions.length);
-    }
+    try {
+      if (currentUser) {
+        await Supabase.saveSimuladoHistory(currentUser.id, type, simuladoState.score, simuladoState.questions.length);
+      }
+    } catch (e) { console.warn("Supabase History Save failed:", e); }
+
+    // Sync cloud metrics
+    try {
+      AppState.saveToCloud();
+    } catch (e) { console.warn("AppState Cloud Sync failed:", e); }
   };
 
   const loadQuestion = () => {
@@ -3015,7 +3039,21 @@ PageEvents["simulado-runner"] = async (page, params) => {
     
     console.log(`[Simulado] Q#${simuladoState.currentIndex+1} - Selected: ${selectedIndex}, Correct: ${correctIdx}, Status: ${isCorrect ? 'OK' : 'FAIL'}`);
     
-    if (isCorrect) simuladoState.score++;
+    if (isCorrect) {
+      simuladoState.score++;
+      const currentCorrect = AppState.get("correctAnswers") || 0;
+      AppState.set("correctAnswers", currentCorrect + 1);
+    }
+
+    // Update Subject Accuracy Metric
+    try {
+      const subject = q.subject || 'geral';
+      const accuracy = AppState.get("subjectAccuracy") || {};
+      if (!accuracy[subject]) accuracy[subject] = { correct: 0, total: 0 };
+      if (isCorrect) accuracy[subject].correct++;
+      accuracy[subject].total++;
+      AppState.set("subjectAccuracy", accuracy);
+    } catch (e) { console.warn("Subject accuracy update failed:", e); }
 
     // Increment daily tracking (Qualquer tentativa conta)
     const todayCount = AppState.get("questionsAnsweredToday") || 0;

@@ -572,14 +572,37 @@ Pages.perfil = () => {
         </button>
       </div>
 
-      <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-8 ml-2">Conta</p>
+      <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-8 ml-2">Conta e Suporte</p>
       <div class="glass-card rounded-2xl overflow-hidden divide-y divide-white/5 border border-white/5">
-        <button onclick="App.logout()" class="flex items-center w-full p-5 gap-4 text-left hover:bg-red-500/10 transition-colors group">
-          <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-            <span class="material-symbols-outlined text-red-400">logout</span>
+        <button onclick="AppState.syncFull().then(() => { SoundManager.play('success'); Router.navigate('/progresso', false, true); })" 
+                class="flex items-center w-full p-5 gap-4 text-left hover:bg-white/5 transition-colors group">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
+            <span class="material-symbols-outlined text-indigo-400">sync</span>
+          </div>
+          <div class="flex-1">
+            <span class="block text-sm font-bold text-white">Sincronizar Agora</span>
+            <span class="block text-[9px] text-slate-500 font-medium">Forçar atualização dos dados da nuvem</span>
+          </div>
+          <span class="material-symbols-outlined text-slate-600">chevron_right</span>
+        </button>
+
+        <button onclick="App.logout()" class="flex items-center w-full p-5 gap-4 text-left hover:bg-slate-500/10 transition-colors group">
+          <div class="w-10 h-10 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:bg-slate-500/20 transition-colors">
+            <span class="material-symbols-outlined text-slate-400">logout</span>
           </div>
           <div class="flex-1">
             <span class="block text-sm font-bold text-white">Sair da Conta</span>
+          </div>
+          <span class="material-symbols-outlined text-slate-600">chevron_right</span>
+        </button>
+
+        <button id="delete-account-trigger" class="flex items-center w-full p-5 gap-4 text-left hover:bg-red-500/10 transition-colors group">
+          <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+            <span class="material-symbols-outlined text-red-400">delete_forever</span>
+          </div>
+          <div class="flex-1">
+            <span class="block text-sm font-bold text-white">Apagar Conta</span>
+            <span class="block text-[9px] text-red-500 font-black uppercase tracking-tighter">Ação Irreversível</span>
           </div>
           <span class="material-symbols-outlined text-slate-600">chevron_right</span>
         </button>
@@ -623,10 +646,62 @@ Pages.perfil = () => {
       </button>
     </div>
 
+    </div>
+    
+    <!-- Account Deletion Modal -->
+    <div id="delete-account-modal" class="fixed inset-0 z-[100] hidden">
+       <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"></div>
+       <div class="absolute inset-0 flex items-center justify-center p-6">
+          <div class="glass-card w-full max-w-sm rounded-3xl p-8 space-y-6 border border-red-500/20 shadow-2xl shadow-red-500/10 animate-scale-up">
+             <div class="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto border border-red-500/20">
+                <span class="material-symbols-outlined text-red-400 text-4xl">warning</span>
+             </div>
+             <div class="text-center space-y-2">
+                <h3 class="text-xl font-black text-white uppercase tracking-tight">Apagar sua Conta?</h3>
+                <p class="text-xs font-medium text-slate-400 leading-relaxed italic">Esta ação é permanente. Todos os seus simulados, acertos, XP e horas de estudo serão deletados para sempre dos nossos servidores.</p>
+             </div>
+             <div class="space-y-3">
+                <button id="confirm-delete-account-btn" class="w-full h-14 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 active:scale-95 transition-all">
+                   Sim, Apagar Tudo
+                </button>
+                <button id="cancel-delete-account-btn" class="w-full py-4 text-slate-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors">
+                   Cancelar e Voltar
+                </button>
+             </div>
+          </div>
+       </div>
+    </div>
+
     <div class="text-center pt-8 pb-10">
       <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">EduHub Brasil • Versão 1.2.0</p>
     </div>
   </main>`;
+};
+
+PageEvents.perfil = (page) => {
+    const trigger = page.querySelector("#delete-account-trigger");
+    const modal = page.querySelector("#delete-account-modal");
+    const confirmBtn = page.querySelector("#confirm-delete-account-btn");
+    const cancelBtn = page.querySelector("#cancel-delete-account-btn");
+
+    if (!trigger || !modal) return;
+
+    trigger.addEventListener("click", () => {
+        SoundManager.play("tap");
+        modal.classList.remove("hidden");
+    });
+
+    cancelBtn.addEventListener("click", () => {
+        SoundManager.play("tap");
+        modal.classList.add("hidden");
+    });
+
+    confirmBtn.addEventListener("click", async () => {
+        SoundManager.play("tap");
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<span class="animate-spin material-symbols-outlined">sync</span> APAGANDO...';
+        await App.deleteAccount();
+    });
 };
 
 // ── LEGAL PAGES ──
