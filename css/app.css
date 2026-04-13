@@ -1,10 +1,11 @@
 html, body {
-  height: 100%;
+  position: fixed;
+  inset: 0;
   width: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  position: relative;
+  background-color: var(--color-bg-dark, #020617);
 }
 
 /* ============================================================
@@ -16,8 +17,8 @@ html, body {
 .page {
   display: none;
   opacity: 0;
-  height: 100%;
-  width: 100%;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   will-change: transform, opacity;
 }
