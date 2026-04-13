@@ -964,8 +964,38 @@ Pages.progresso = () => {
   const maxW = Math.max(...weekly, 1);
   const subjColors = { matematica: "#3B82F6", fisica: "#8B5CF6", quimica: "#EF4444", biologia: "#22C55E", portugues: "#F59E0B", historia: "#F97316", geografia: "#06B6D4" };
   
-  // Calculate Global average
-  const accValues = Object.values(acc);
+  // Configuração dos Totais Reais por Matéria (Baseado no Banco de Dados)
+  const SUBJECT_TOTALS = {
+    matematica: 104, geografia: 91, biologia: 87, historia: 85, fisica: 84, 
+    portugues: 79, quimica: 60, informatica: 55, direito: 43, rlm: 42, 
+    literatura: 35, geral: 30, filosofia: 25, sociologia: 25, artes: 17
+  };
+
+  // Normalização Avançada: Sistema de Pontos (+2 Acerto, -1 Erro)
+  // Meta 100% = 80% das questões da DB respondidas corretamente (pontuação máxima teórica)
+  const normalizedAcc = {};
+  const normalizedPoints = {}; // Para exibição de texto
+
+  APP_DATA.subjects.forEach(s => {
+    const entry = acc[s.id] || { correct: 0, total: 0 };
+    const dbTotal = SUBJECT_TOTALS[s.id] || 50;
+    const targetPoints = (dbTotal * 0.8) * 2;
+    
+    // Suporte a dado legado (número) ou novo (objeto)
+    const correct = typeof entry === 'number' ? Math.round(entry * dbTotal / 100) : (entry.correct || 0);
+    const total = typeof entry === 'number' ? dbTotal : (entry.total || 0);
+    const wrong = Math.max(0, total - correct);
+    
+    // Cálculo de Pontos: +2 por acerto, -1 por erro
+    const score = (correct * 2) - (wrong * 1);
+    const finalScore = Math.max(0, score);
+    
+    normalizedAcc[s.id] = Math.max(0, Math.min(100, Math.round((finalScore / targetPoints) * 100)));
+    normalizedPoints[s.id] = `${Math.round(finalScore)} / ${Math.round(targetPoints)} pts`;
+  });
+
+  // Média Global baseada na nova maestria ponderada
+  const accValues = Object.values(normalizedAcc);
   const avgAcc = accValues.length > 0 ? Math.round(accValues.reduce((a,b)=>a+b,0)/accValues.length) : 0;
 
   // Data for Flow Chart (Using real cumulative tracked data)
@@ -1048,7 +1078,7 @@ Pages.progresso = () => {
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
             <h2 class="text-xs font-black text-white uppercase tracking-[0.2em]">Nível de Maestria</h2>
           </div>
-          <p class="text-[10px] font-bold text-slate-400">Você domina ${APP_DATA.subjects.filter(s=>(acc[s.id]||0)>75).length} de ${APP_DATA.subjects.length} áreas com excelência</p>
+          <p class="text-[10px] font-bold text-slate-400">Você domina ${APP_DATA.subjects.filter(s=>(normalizedAcc[s.id]||0)>75).length} de ${APP_DATA.subjects.length} áreas com excelência</p>
         </div>
       </div>
 
@@ -1095,14 +1125,13 @@ Pages.progresso = () => {
           </div>
         </div>
 
-        <div class="w-full space-y-4">
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tempo de Estudo</span>
-              <span class="text-xs font-black text-emerald-400">${totalStudyTime}m</span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tempo de Estudo (Meta: 90m)</span>
+              <span class="text-xs font-black text-emerald-400">${totalStudyTime}m / 90m</span>
             </div>
             <div class="w-full h-4 bg-slate-900/50 rounded-full overflow-hidden p-0.5 border border-white/5">
-              <div class="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]" style="width: ${totalStudyTime > 0 ? Math.min(100, (totalStudyTime / 60) * 100) : 0}%"></div>
+              <div class="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]" style="width: ${totalStudyTime > 0 ? Math.min(100, (totalStudyTime / 90) * 100) : 0}%"></div>
             </div>
           </div>
           <div class="space-y-2">
@@ -1111,7 +1140,7 @@ Pages.progresso = () => {
               <span class="text-xs font-black text-amber-400">${totalRestTime}m</span>
             </div>
             <div class="w-full h-4 bg-slate-900/50 rounded-full overflow-hidden p-0.5 border border-white/5">
-              <div class="h-full bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.3)]" style="width: ${totalStudyTime > 0 ? Math.round((totalRestTime/totalStudyTime)*100) : 0}%"></div>
+              <div class="h-full bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.3)]" style="width: ${totalRestTime > 0 ? Math.min(100, (totalRestTime / 20) * 100) : 0}%"></div>
             </div>
           </div>
           <p class="text-[9px] text-slate-500 font-bold italic mt-2 text-center opacity-60 italic">Dica: O descanso estratégico aumenta sua retenção em até 40%.</p>
@@ -1239,7 +1268,7 @@ Pages.progresso = () => {
               // Use real study data scaled to a 60min daily goal for bar height
               const weeklyScores = weekDays.map((d, i) => {
                 const mins = weekly[i] || 0;
-                return { l: d, v: Math.min(100, Math.round((mins / 60) * 100)) };
+                return { l: d, v: Math.min(100, Math.round((mins / 90) * 100)) };
               });
               const barW = 28;
               const spacing = (cW - (7 * barW)) / 6;
@@ -1323,7 +1352,8 @@ Pages.progresso = () => {
 
       <div class="grid grid-cols-1 gap-6 ${AppState.get("userPlan") === "gratis" ? 'blur-[2px] opacity-20 pointer-events-none' : ''}">
         ${APP_DATA.subjects.map(s => {
-          const score = acc[s.id] || 0;
+          const score = normalizedAcc[s.id] || 0;
+          const pointsStr = normalizedPoints[s.id] || "0 / 0 pts";
           return `
           <div class="flex items-center gap-5 group">
             <div class="w-11 h-11 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-emerald-500/30 transition-all shadow-lg hover:shadow-emerald-500/5">
@@ -1393,9 +1423,27 @@ PageEvents.progresso = (page) => {
       // Update Radar Chart SVG
       if (radarContainer) {
         // Regenerate radar SVG with new goal data
-        const stats = AppState.get("stats") || {};
-        const acc = stats.accuracyBySubject || {};
-        radarContainer.innerHTML = renderRadarChart(acc, goalInfo.data);
+        // Normalização de Pontos para o Radar
+        const SUBJECT_TOTALS_RADAR = {
+          matematica: 104, geografia: 91, biologia: 87, historia: 85, fisica: 84, 
+          portugues: 79, quimica: 60, informatica: 55, direito: 43, rlm: 42, 
+          literatura: 35, geral: 30, filosofia: 25, sociologia: 25, artes: 17
+        };
+        const rawAcc = AppState.get("subjectAccuracy") || {};
+        const norm = {};
+        APP_DATA.subjects.forEach(s => {
+          const entry = rawAcc[s.id] || { correct: 0, total: 0 };
+          const dbTotal = SUBJECT_TOTALS_RADAR[s.id] || 50;
+          const targetPoints = (dbTotal * 0.8) * 2;
+          
+          const correct = typeof entry === 'number' ? Math.round(entry * dbTotal / 100) : (entry.correct || 0);
+          const total = typeof entry === 'number' ? dbTotal : (entry.total || 0);
+          const wrong = Math.max(0, total - correct);
+          const score = (correct * 2) - (wrong * 1);
+          
+          norm[s.id] = Math.max(0, Math.min(100, Math.round((Math.max(0, score) / targetPoints) * 100)));
+        });
+        radarContainer.innerHTML = renderRadarChart(norm, goalInfo.data);
       }
     });
   });
