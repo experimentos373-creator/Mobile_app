@@ -260,6 +260,60 @@ const AppState = {
     Object.keys(this._defaults).forEach(k => localStorage.removeItem("eduhub_" + k));
   },
 
+  // [NEW] Migration Engine: Normaliza dados antigos para as novas versões da App
+  migrate() {
+    const version = localStorage.getItem("eduhub_state_version") || "1";
+    
+    // Configurações de Totais para migrar acurácia numérica
+    const SUBJECT_TOTALS = { matematica: 104, geografia: 91, biologia: 87, historia: 85, fisica: 84, portugues: 79, quimica: 60 };
+
+    if (version < "3") {
+      console.log("[AppState] Executando Migração v3...");
+      
+      // 1. Normalizar subjectAccuracy (Número -> Objeto)
+      const acc = this.get("subjectAccuracy") || {};
+      const newAcc = {};
+      Object.keys(acc).forEach(id => {
+        const val = acc[id];
+        if (typeof val === 'number') {
+          const total = SUBJECT_TOTALS[id] || 50;
+          newAcc[id] = { correct: Math.round((val / 100) * total), total: total };
+        } else {
+          newAcc[id] = val;
+        }
+      });
+      this.set("subjectAccuracy", newAcc);
+
+      // 2. Garantir weeklyStudyData compatível
+      const weekly = this.get("weeklyStudyData");
+      if (!Array.isArray(weekly) || weekly.length !== 7) {
+        this.set("weeklyStudyData", [0, 0, 0, 0, 0, 0, 0]);
+      }
+
+      localStorage.setItem("eduhub_state_version", "3");
+    }
+  },
+
+  normalize(field, value) {
+    if (field === 'subjectAccuracy' && typeof value === 'object') {
+      // Garante que se vier do cloud algo quebrado, a gente arruma
+      const SUBJECT_TOTALS = { matematica: 104, geografia: 91, biologia: 87, historia: 85, fisica: 84, portugues: 79, quimica: 60 };
+      const newAcc = {};
+      Object.keys(value).forEach(id => {
+        const entry = value[id];
+        if (typeof entry === 'number') {
+          const total = SUBJECT_TOTALS[id] || 50;
+          newAcc[id] = { correct: Math.round((entry / 100) * total), total: total };
+        } else {
+          newAcc[id] = entry;
+        }
+      });
+      return newAcc;
+    }
+    return value;
+  },
+
+
   async syncFull() {
     if (typeof Supabase === "undefined" || !Supabase.getClient()) return Promise.resolve();
     try {
@@ -277,12 +331,15 @@ const AppState = {
           
           fields.forEach(field => {
             if (profile[field] !== undefined && profile[field] !== null) {
-              this.set(field, profile[field]);
+              const normalizedValue = this.normalize(field, profile[field]);
+              this.set(field, normalizedValue);
             } else {
               // If cloud is null/undefined, revert to default to clean stale local data
               this.set(field, this._defaults[field]);
             }
           });
+          
+          this.migrate(); // Run any final local migrations
 
           // Sync Simulado History
           const history = await Supabase.getSimuladoHistory(session.user.id);

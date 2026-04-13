@@ -6,10 +6,10 @@ const App = {
   async init() {
     this.checkDailyReset();
 
-    // One-time data reset (v2): wipe old cached data so all users start fresh
-    if (localStorage.getItem("eduhub_data_version") !== "v2") {
-      AppState.reset();
-      localStorage.setItem("eduhub_data_version", "v2");
+    // One-time data reset or migration (v3): ensure all users have the new state structure
+    if (localStorage.getItem("eduhub_data_version") !== "v3") {
+      AppState.migrate();
+      localStorage.setItem("eduhub_data_version", "v3");
     }
 
     // Handle Supabase auth state changes (especially after Google redirect)
