@@ -383,7 +383,7 @@ PageEvents.simulados = async (page) => {
 // ── NOTA ENEM PAGE ──
 Pages["nota-enem"] = () => {
   return `
-  <div class="min-h-screen bg-[#020617] flex flex-col font-lexend overflow-hidden relative">
+  <div class="h-full w-full bg-[#020617] flex flex-col font-lexend overflow-hidden relative">
     <!-- Background Orbs -->
     <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
@@ -508,7 +508,7 @@ Pages.pomodoro = () => {
   const maxLong = isFree ? 15 : 25;
 
   return `
-  <div id="page-pomodoro" class="min-h-screen bg-background-dark flex flex-col font-lexend">
+  <div id="page-pomodoro" class="h-full w-full bg-background-dark flex flex-col font-lexend">
   <!-- Header -->
   <header class="px-5 pt-8 pb-4">
     <div class="max-w-2xl mx-auto">
@@ -1492,7 +1492,7 @@ Pages["ia-tutor"] = () => {
   // Blocked state for free users
   if (isFree) {
     return `
-    <div class="min-h-screen bg-[#020617] flex flex-col font-lexend overflow-hidden relative">
+    <div class="h-full w-full bg-[#020617] flex flex-col font-lexend overflow-hidden relative">
       <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-600/10 blur-[120px] rounded-full"></div>
       <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full"></div>
 
@@ -1536,7 +1536,7 @@ Pages["ia-tutor"] = () => {
   const defaultModel = models[0]?.key || "step-3-5";
 
   return `
-  <div class="min-h-screen bg-[#020617] flex flex-col font-lexend overflow-hidden relative">
+  <div class="h-full w-full bg-[#020617] flex flex-col font-lexend overflow-hidden relative">
     <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-600/8 blur-[120px] rounded-full"></div>
 
     <header class="sticky top-0 z-30 bg-[#020617]/90 backdrop-blur-2xl border-b border-white/5 px-6 py-4 safe-top">
@@ -2282,7 +2282,7 @@ Pages.ranking = () => {
   const progressPercent = nextLeague ? Math.min(100, Math.max(5, (xpInLeague / xpToNext) * 100)) : 100;
 
   return `
-  <div class="min-h-screen bg-[#020617] flex flex-col font-lexend relative overflow-hidden">
+  <div class="h-full w-full bg-[#020617] flex flex-col font-lexend relative overflow-hidden">
     <!-- Animated background elements -->
     <div class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
     <div class="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full"></div>

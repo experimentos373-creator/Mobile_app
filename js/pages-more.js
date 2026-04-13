@@ -269,7 +269,7 @@ Pages.premium = () => {
   }
 
   return `
-  <div id="premium-page" class="relative flex min-h-screen flex-col bg-slate-950 overflow-x-hidden">
+  <div id="premium-page" class="relative flex min-h-full flex-col bg-slate-950 overflow-x-hidden">
     <main class="flex-1 scroll-area px-6 safe-bottom relative z-20 space-y-8">
       <!-- Premium Glass Header -->
       <header class="pt-12 pb-6 text-white relative overflow-hidden">
@@ -1105,7 +1105,7 @@ Pages["onboarding-loading"] = () => {
     }
 
     return `
-  <main class="flex-1 scroll-area bg-slate-950 flex flex-col items-center justify-center p-6 text-white relative min-h-screen">
+  <main class="flex-1 scroll-area bg-slate-950 flex flex-col items-center justify-center p-6 text-white relative min-h-full">
     <!-- Animated Gradients -->
     <div class="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/30 rounded-full blur-[120px] animate-float-slow"></div>
