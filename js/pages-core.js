@@ -322,10 +322,10 @@ Pages.home = () => {
       </div>
       <div class="horizontal-scroll pr-6">
         <div class="w-7 shrink-0"></div>
-        ${videos.map(v => `
+        ${videos.map((v, index) => `
           <div onclick="window.open('${v.youtubeUrl}', '_blank')" class="w-64 glass-card rounded-2xl overflow-hidden touch-card hover-float group transition-all" style="border-left: 4px solid #10b981">
             <div class="relative aspect-video">
-              <img src="${v.thumbnail}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="${v.title}">
+              <img src="${v.thumbnail}" ${index > 1 ? 'loading="lazy"' : ''} class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="${v.title}">
               <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
               <div class="absolute bottom-2 right-2 bg-black/70 text-[10px] font-black text-white px-2 py-0.5 rounded backdrop-blur">
                 PROF. ${v.professor}

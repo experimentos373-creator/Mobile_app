@@ -298,7 +298,7 @@ function videoCard(v, featured) {
       <!-- Immersive Image Layer -->
       <div class="relative aspect-[16/10] w-full bg-slate-900 overflow-hidden">
         <img class="h-full w-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" 
-             src="${thumbUrl}" alt="${v.title}" loading="lazy" 
+             src="${thumbUrl}" alt="${v.title}" 
              onerror="if(!this.src.includes('mqdefault')) this.src='${mqFallback}';" />
         
         <!-- Premium Overlays -->
