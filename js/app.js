@@ -70,10 +70,12 @@ const App = {
     }
     // Initialize Sound
     SoundManager.init();
+    this._bindShellUI();
+    this._registerServiceWorker();
 
     // Global Action Button Feedback
     document.addEventListener("click", (e) => {
-      const target = e.target.closest("button, a[onclick], .touch-card, #bottom-nav a");
+      const target = e.target.closest("button, a, .touch-card, #bottom-nav a");
       if (target) {
         SoundManager.play("tap");
       }
@@ -118,16 +120,24 @@ const App = {
 
     // Render content
     const renderer = Pages[name];
-    if (renderer) {
-      // Sanitize and render
-      page.innerHTML = Security.sanitize(renderer(params));
-      // Attach events after render
-      requestAnimationFrame(() => {
-        if (PageEvents[name]) PageEvents[name](page, params);
-        // Setup pull-to-refresh on scrollable pages
-        this._setupPullToRefresh(page, name, params);
-      });
+    if (!renderer) {
+      page.innerHTML = Security.sanitize(
+        '<div class="p-6 text-center text-slate-500">Pagina indisponivel no momento.</div>'
+      );
+      if (typeof Router !== "undefined") {
+        setTimeout(() => Router.navigate("/home", false), 0);
+      }
+      return;
     }
+
+    // Sanitize and render
+    page.innerHTML = Security.sanitize(renderer(params));
+    // Attach events after render
+    requestAnimationFrame(() => {
+      if (PageEvents[name]) PageEvents[name](page, params);
+      // Setup pull-to-refresh on scrollable pages
+      this._setupPullToRefresh(page, name, params);
+    });
   },
 
   // Pull-to-refresh on scroll areas
@@ -179,6 +189,56 @@ const App = {
     }, { passive: true });
   },
 
+  _bindShellUI() {
+    const nav = document.getElementById("bottom-nav");
+    if (nav && !nav.dataset.bound) {
+      nav.dataset.bound = "true";
+      nav.addEventListener("click", (event) => {
+        const link = event.target.closest("a[data-route]");
+        if (!link) return;
+        event.preventDefault();
+        const route = link.getAttribute("data-route");
+        if (route) Router.navigate(route);
+      });
+    }
+
+    const upgradeModal = document.getElementById("upgrade-modal");
+    if (upgradeModal && !upgradeModal.dataset.bound) {
+      upgradeModal.dataset.bound = "true";
+      upgradeModal.addEventListener("click", (event) => {
+        if (event.target === upgradeModal) {
+          this.hideUpgradeModal();
+          return;
+        }
+
+        const actionEl = event.target.closest("[data-upgrade-action]");
+        if (!actionEl) return;
+
+        const action = actionEl.getAttribute("data-upgrade-action");
+        if (action === "plans") {
+          this.hideUpgradeModal();
+          Router.navigate("/premium");
+          return;
+        }
+
+        if (action === "dismiss") {
+          this.hideUpgradeModal();
+        }
+      });
+    }
+  },
+
+  async _registerServiceWorker() {
+    if (!("serviceWorker" in navigator) || window.location.protocol === "file:") return;
+
+    try {
+      await navigator.serviceWorker.register("/sw.js");
+    } catch (error) {
+      AppState.set("_swDisabled", true);
+      console.warn("Service worker registration failed, online-only mode enabled:", error);
+    }
+  },
+
   showUpgradeModal(customMsg) {
     const m = document.getElementById("upgrade-modal");
     if (customMsg) {
@@ -213,7 +273,17 @@ const App = {
     const toast = document.createElement("div");
     toast.id = "app-toast";
     toast.className = `fixed top-6 left-4 right-4 z-[9999] flex items-center gap-3 px-5 py-4 rounded-2xl bg-gradient-to-r ${colors[type] || colors.info} border text-white text-sm font-bold shadow-2xl transition-all duration-500 animate-in fade-in slide-in-from-top-4`;
-    toast.innerHTML = `<span class="material-symbols-outlined text-lg">${icons[type] || icons.info}</span><span class="flex-1">${Security.sanitize(message)}</span>`;
+
+    const icon = document.createElement("span");
+    icon.className = "material-symbols-outlined text-lg";
+    icon.textContent = icons[type] || icons.info;
+
+    const label = document.createElement("span");
+    label.className = "flex-1";
+    label.textContent = message;
+
+    toast.appendChild(icon);
+    toast.appendChild(label);
     document.body.appendChild(toast);
 
     setTimeout(() => {
@@ -270,6 +340,12 @@ const App = {
     }
   }
 };
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => App.init());
+} else {
+  App.init();
+}
 
 // ============================================================
 // Utility helpers

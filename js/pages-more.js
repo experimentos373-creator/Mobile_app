@@ -201,6 +201,7 @@ const handlePlanSelect = (tierId) => {
     const plan = APP_DATA.plans[tierId];
     const isSemestral = document.querySelector("#premium-page")?.classList.contains("is-semestral");
     const cycleLabel = isSemestral ? "SEMESTRAL" : "MENSAL";
+  const billingCycle = isSemestral ? "semestral" : "monthly";
 
     // Create Premium Overlay
     const overlay = document.createElement("div");
@@ -218,12 +219,34 @@ const handlePlanSelect = (tierId) => {
     SoundManager.play("success");
 
     // Set Plan & Navigate using the centralized App.switchPlan
-    setTimeout(() => {
-        AppState.set("billingCycle", isSemestral ? "semestral" : "monthly");
-        App.switchPlan(tierId, "/progresso");
-        setTimeout(() => overlay.remove(), 500);
+    setTimeout(async () => {
+      AppState.set("billingCycle", billingCycle);
+
+      try {
+        if (tierId !== "gratis" && typeof BillingService !== "undefined") {
+          await BillingService.startCheckout(tierId, billingCycle);
+          if (typeof App !== "undefined" && typeof App.showToast === "function") {
+            App.showToast(
+              "Checkout aberto. Apos pagar, seu plano sera liberado automaticamente.",
+              "success"
+            );
+          }
+          setTimeout(() => overlay.remove(), 500);
+          return;
+        }
+      } catch (error) {
+        console.warn("[Premium] Checkout indisponivel, usando fallback local:", error.message);
+        if (typeof App !== "undefined" && typeof App.showToast === "function") {
+          App.showToast("Gateway indisponivel agora. Modo teste local ativado.", "warning");
+        }
+      }
+
+      App.switchPlan(tierId, "/progresso");
+      setTimeout(() => overlay.remove(), 500);
     }, 1800);
 };
+
+  App.handlePlanSelect = handlePlanSelect;
 
 // ── PREMIUM PAGE ──
 Pages.premium = () => {
@@ -395,7 +418,7 @@ Pages.premium = () => {
               <p class="text-[10px] font-black text-${color}-400 uppercase tracking-widest -mt-1">Evolução acelerada</p>
             </div>
             
-            <button onclick="handlePlanSelect('${tier}')" 
+            <button onclick="App.handlePlanSelect('${tier}')" 
                     class="w-full py-5 rounded-3xl bg-${color}-600 text-white font-black text-[11px] uppercase tracking-[0.2em] mb-8 shadow-xl shadow-${color}-600/30 hover:brightness-110 active:scale-95 transition-all outline-none border border-${color}-400/20">
               ${currentPlan === tier ? "Seu Plano Atual" : `Assinar ${info.name}`}
             </button>

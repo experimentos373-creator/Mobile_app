@@ -1966,7 +1966,11 @@ PageEvents["ia-tutor"] = (page) => {
         </div>
         <div class="ai-bubble glass-card ${isError ? "bg-red-500/5 border-red-500/20" : "bg-[#0f172a]/60 border-white/5"} rounded-2xl rounded-tl-md p-4 border max-w-[85%]">
           <div class="ai-content-parsed text-sm ${isError ? "text-red-300" : "text-slate-200"} leading-relaxed">
-            ${isError ? escapeHtml(text) : (window.renderMD ? window.renderMD(text) : escapeHtml(text))}
+            ${isError
+              ? escapeHtml(text)
+              : (window.renderMD
+                  ? Security.sanitizeRichHTML(window.renderMD(text))
+                  : escapeHtml(text))}
           </div>
         </div>`;
     } else {
@@ -2686,28 +2690,34 @@ PageEvents.redacaoAI = (page) => {
     resultView.classList.remove("hidden");
     SoundManager.play("success");
 
-    page.querySelector("#final-score").textContent = data.nota;
-    
+    page.querySelector("#final-score").textContent = String(data.nota || 0);
+
     const compList = page.querySelector("#competency-list");
-    compList.innerHTML = data.competencias.map(c => `
+    const competencias = Array.isArray(data.competencias) ? data.competencias : [];
+    compList.innerHTML = competencias.map(c => {
+      const score = Math.max(0, Math.min(200, Number(c?.nota) || 0));
+      const label = Security.escapeHTML(String(c?.c || "Competencia"));
+      const feedback = Security.escapeHTML(String(c?.feedback || ""));
+      return `
       <div class="glass-card p-5 rounded-3xl border border-white/5 space-y-2">
          <div class="flex justify-between items-center">
-            <span class="text-xs font-black text-white uppercase tracking-widest">${c.c}</span>
-            <span class="text-sm font-black text-emerald-400">${c.nota}/200</span>
+            <span class="text-xs font-black text-white uppercase tracking-widest">${label}</span>
+            <span class="text-sm font-black text-emerald-400">${score}/200</span>
          </div>
-         <p class="text-[11px] text-slate-500 leading-relaxed">${c.feedback}</p>
+         <p class="text-[11px] text-slate-500 leading-relaxed">${feedback}</p>
          <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-            <div class="h-full bg-emerald-500" style="width: ${(c.nota / 200) * 100}%"></div>
+            <div class="h-full bg-emerald-500" style="width: ${(score / 200) * 100}%"></div>
          </div>
       </div>
-    `).join("");
+    `;
+    }).join("");
 
     page.querySelector("#ai-feedback").innerHTML = `
       <div class="flex items-center gap-2 mb-2">
         <span class="material-symbols-outlined text-emerald-400 text-sm">tips_and_updates</span>
         <h4 class="text-[10px] font-black text-white uppercase tracking-widest">Conselho do Mentor</h4>
       </div>
-      <p>${data.melhoria}</p>
+      <div class="text-slate-200 leading-relaxed">${window.renderMD ? window.renderMD(String(data.melhoria || "")) : Security.escapeHTML(String(data.melhoria || ""))}</div>
     `;
 
     document.getElementById("redacao-main").scrollTop = 0;
@@ -3025,7 +3035,7 @@ PageEvents["simulado-runner"] = async (page, params) => {
         'geografia': 'Geografia'
     };
     const sName = subjectMap[q.subject] || (q.subject ? q.subject.charAt(0).toUpperCase() + q.subject.slice(1) : 'Geral');
-    
+
     const headerHtml = `
       <div class="mb-8 flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-700">
         <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-black uppercase tracking-[0.2em]">Questão ${simuladoState.currentIndex + 1}</span>

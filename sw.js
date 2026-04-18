@@ -1,32 +1,110 @@
-const CACHE_NAME = 'eduhub-cache-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/css/style.css',
-  '/js/main.js',
-  '/js/app.js',
-  '/js/pages-core.js',
-  '/js/pages-extra.js',
-  '/js/pages-more.js',
-  '/js/supabase.js',
-  '/js/state.js',
-  '/js/router.js',
-  '/assets/icon-192.png',
-  '/assets/icon-512.png'
+const CACHE_NAME = "eduhub-shell-v41";
+const APP_SHELL = [
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "/termos.html",
+  "/privacidade.html",
+  "/css/tailwind.css",
+  "/css/app.css?v=41",
+  "/css/lexend.css",
+  "/css/material-symbols.css",
+  "/js/data.js?v=41",
+  "/js/router.js?v=41",
+  "/js/pages-core.js?v=41",
+  "/js/pages-extra.js?v=41",
+  "/js/pages-more.js?v=41",
+  "/js/sound-manager.js?v=41",
+  "/js/security-utils.js",
+  "/js/supabase.js",
+  "/js/ai-service.js?v=41",
+  "/js/app.js?v=41",
+  "/js/vendor/supabase.js",
+  "/js/vendor/purify.min.js",
+  "/js/vendor/mathjax.js",
+  "/js/vendor/pdf.min.js",
+  "/js/vendor/pdf.worker.min.js",
+  "/js/vendor/mammoth.browser.min.js",
+  "/assets/icon-192.png",
+  "/assets/icon-512.png"
 ];
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
+      )
+      .then(() => self.clients.claim())
   );
+});
+
+function isStaticAsset(pathname) {
+  return (
+    pathname.startsWith("/assets/") ||
+    pathname.startsWith("/css/") ||
+    pathname.startsWith("/js/") ||
+    pathname === "/manifest.json" ||
+    pathname.endsWith(".html")
+  );
+}
+
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    const shellFallback = await cache.match("/index.html");
+    if (shellFallback) return shellFallback;
+
+    return new Response(
+      "<!doctype html><html><body><h1>Offline</h1><p>Sem conexao e sem cache local disponivel.</p></body></html>",
+      {
+        status: 503,
+        headers: { "Content-Type": "text/html; charset=utf-8" }
+      }
+    );
+  }
+}
+
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+
+  const response = await fetch(request);
+  if (response && response.ok) {
+    cache.put(request, response.clone());
+  }
+  return response;
+}
+
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (event.request.mode === "navigate") {
+    event.respondWith(networkFirst(event.request));
+    return;
+  }
+
+  if (isStaticAsset(url.pathname)) {
+    event.respondWith(cacheFirst(event.request));
+  }
 });
