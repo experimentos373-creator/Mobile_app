@@ -24,3 +24,6 @@ backups/
 # Auth/Security
 security_audit_report.json
 security_audit_findings.md
+
+.vercel
+.env*.local

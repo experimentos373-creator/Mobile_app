@@ -34,6 +34,22 @@ const PLAN_FIELD_BY_KEY = {
   plus_semestral: "STRIPE_PRICE_PLUS_SEMESTRAL"
 };
 
+// Fallback inline prices (BRL cents) used when STRIPE_PRICE_* env vars are not configured.
+const INLINE_PRICE_CENTS_BY_PLAN = {
+  basico: {
+    monthly: 1990,
+    semestral: 7960
+  },
+  pro: {
+    monthly: 4990,
+    semestral: 19960
+  },
+  plus: {
+    monthly: 6490,
+    semestral: 25960
+  }
+};
+
 let stripeClient = null;
 
 function getStripe() {
@@ -219,17 +235,65 @@ function getCheckoutMode() {
   return "subscription";
 }
 
+function getCheckoutPaymentMethodTypes() {
+  const configured = String(process.env.STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES || "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (configured.length > 0) return configured;
+
+  // Safe default for most accounts while preserving ability to override via env.
+  return ["card"];
+}
+
+function buildStripeLineItem(planId, billingCycle, checkoutMode, priceId) {
+  if (priceId) {
+    return {
+      price: priceId,
+      quantity: 1
+    };
+  }
+
+  const normalizedPlan = String(planId || "").trim().toLowerCase();
+  const normalizedCycle = normalizeBillingCycle(billingCycle);
+  const amount = INLINE_PRICE_CENTS_BY_PLAN?.[normalizedPlan]?.[normalizedCycle] || null;
+
+  if (!amount) {
+    throw new Error(`Price ID nao configurado para ${planId}/${billingCycle}.`);
+  }
+
+  const productLabel = `EduHub ${normalizedPlan.toUpperCase()} ${normalizedCycle}`;
+  const recurring = checkoutMode === "subscription"
+    ? {
+        interval: "month",
+        interval_count: normalizedCycle === "semestral" ? 6 : 1
+      }
+    : undefined;
+
+  return {
+    quantity: 1,
+    price_data: {
+      currency: "brl",
+      unit_amount: amount,
+      recurring,
+      product_data: {
+        name: productLabel
+      }
+    }
+  };
+}
+
 async function createStripeCheckoutSession(req, user, payload) {
   const { planId, billingCycle } = payload;
   const priceId = getPriceId(planId, billingCycle);
-  if (!priceId) {
-    throw new Error(`Price ID nao configurado para ${planId}/${billingCycle}.`);
-  }
 
   const appBaseUrl = getAppBaseUrl(req);
   const successUrl = process.env.STRIPE_SUCCESS_URL || `${appBaseUrl}/#/premium`;
   const cancelUrl = process.env.STRIPE_CANCEL_URL || `${appBaseUrl}/#/premium`;
   const checkoutMode = getCheckoutMode();
+  const paymentMethodTypes = getCheckoutPaymentMethodTypes();
+  const lineItem = buildStripeLineItem(planId, billingCycle, checkoutMode, priceId);
 
   const metadata = {
     user_id: user.id,
@@ -239,13 +303,9 @@ async function createStripeCheckoutSession(req, user, payload) {
 
   const session = await getStripe().checkout.sessions.create({
     mode: checkoutMode,
+    payment_method_types: paymentMethodTypes,
     customer_email: user.email || undefined,
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1
-      }
-    ],
+    line_items: [lineItem],
     success_url: successUrl,
     cancel_url: cancelUrl,
     metadata,
@@ -322,7 +382,7 @@ async function applyStripeEvent(event) {
     return { applied: true, userId, planId, source: type };
   }
 
-  if (type === "invoice.paid") {
+  if (type === "invoice.paid" || type === "invoice.payment_succeeded") {
     const metadata = object.parent?.subscription_details?.metadata || object.lines?.data?.[0]?.metadata || {};
     const userId = String(metadata.user_id || "");
     const planId = String(metadata.plan_id || "").toLowerCase();
@@ -333,7 +393,7 @@ async function applyStripeEvent(event) {
     return { applied: true, userId, planId, source: type };
   }
 
-  if (type === "customer.subscription.deleted") {
+  if (type === "customer.subscription.deleted" || type === "subscription.deleted") {
     const metadata = object.metadata || {};
     const userId = String(metadata.user_id || "");
     if (!userId) return { applied: false, reason: "missing-metadata" };
@@ -342,7 +402,7 @@ async function applyStripeEvent(event) {
     return { applied: true, userId, planId: "gratis", source: type };
   }
 
-  if (type === "customer.subscription.updated") {
+  if (type === "customer.subscription.updated" || type === "subscription.updated") {
     const metadata = object.metadata || {};
     const userId = String(metadata.user_id || "");
     const planId = String(metadata.plan_id || "").toLowerCase();
