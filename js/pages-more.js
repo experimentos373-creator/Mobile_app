@@ -1070,6 +1070,9 @@ PageEvents.onboarding = (page) => {
         if (currentStep > TOTAL_STEPS) {
             SoundManager.play("success");
             AppState.set("onboardingDone", true);
+          AppState.saveToCloud().catch((error) => {
+            console.warn("Falha ao salvar onboarding na nuvem:", error);
+          });
             Router.navigate("/onboarding-loading", false);
         } else {
             renderStep(currentStep - 1);

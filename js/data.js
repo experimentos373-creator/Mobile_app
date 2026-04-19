@@ -324,7 +324,7 @@ const AppState = {
           // Merge critical cloud state
           // Merge FULL cloud state (Strict: reset local if cloud is empty/null)
           const fields = [
-            "userName", "userPlan", "onboardingDone", "studyGoal", "targetExam", 
+            "userName", "userAge", "userPlan", "onboardingDone", "studyGoal", "targetExam", 
             "totalQuestionsAnswered", "correctAnswers", "studyTimeMinutes", "restTimeMinutes",
             "hasUsedFreePredictor", "subjectAccuracy", "missionProgress", "weeklyStudyData"
           ];
@@ -389,6 +389,7 @@ const AppState = {
         // Save FULL app state (excluding sensitive/local-only keys)
         await Supabase.saveProfile(session.user.id, {
           userName: this.get("userName"),
+          userAge: this.get("userAge"),
           userPlan: this.get("userPlan"),
           onboardingDone: this.get("onboardingDone"),
           studyGoal: this.get("studyGoal"),

@@ -65,6 +65,19 @@ const Router = {
     const path = hash.split("?")[0];
     const params = {};
 
+    const onboardingRoutes = new Set(["/onboarding", "/onboarding-loading"]);
+    const canForceOnboarding =
+      typeof App !== "undefined" &&
+      App &&
+      App._hasSession &&
+      typeof App.needsOnboarding === "function";
+
+    // Hard guard: authenticated users with incomplete profile cannot enter app tabs/home.
+    if (canForceOnboarding && App.needsOnboarding() && !onboardingRoutes.has(path)) {
+      this.navigate("/onboarding", false, true);
+      return;
+    }
+
     // Parse query params from hash
     const queryStr = hash.split("?")[1];
     if (queryStr) {

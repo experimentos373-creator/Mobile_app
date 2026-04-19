@@ -4,6 +4,7 @@
 
 const App = {
   _authHandled: false,
+  _hasSession: false,
 
   needsOnboarding() {
     const onboardingDone = Boolean(AppState.get("onboardingDone"));
@@ -14,6 +15,7 @@ const App = {
 
   async init() {
     this._authHandled = false;
+    this._hasSession = false;
     localStorage.removeItem("eduhub__authHandled");
     this.checkDailyReset();
 
@@ -27,19 +29,23 @@ const App = {
     const client = Supabase.getClient();
     if (client) {
       client.auth.onAuthStateChange(async (event, session) => {
+        this._hasSession = Boolean(session);
+
         // Handle sign-in and OAuth restore exactly once per app boot.
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !this._authHandled) {
           this._authHandled = true;
           await AppState.syncFull();
 
           if (this.needsOnboarding()) {
-            Router.navigate("/onboarding");
+            AppState.set("onboardingDone", false);
+            Router.navigate("/onboarding", false, true);
           } else {
-            Router.navigate("/home");
+            Router.navigate("/home", false, true);
           }
         }
         if (event === 'SIGNED_OUT') {
           this._authHandled = false;
+          this._hasSession = false;
         }
       });
     }
