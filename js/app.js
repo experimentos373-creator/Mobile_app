@@ -8,9 +8,14 @@ const App = {
 
   needsOnboarding() {
     const onboardingDone = Boolean(AppState.get("onboardingDone"));
+
+    // Do not lock legacy users out of the app because optional profile fields
+    // were not historically persisted in cloud profiles.
+    if (onboardingDone) return false;
+
     const userName = String(AppState.get("userName") || "").trim();
     const userAge = String(AppState.get("userAge") || "").trim();
-    return !onboardingDone || !userName || !userAge;
+    return !userName || !userAge;
   },
 
   async init() {
