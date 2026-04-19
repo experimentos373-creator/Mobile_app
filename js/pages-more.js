@@ -246,7 +246,7 @@ const handlePlanSelect = (tierId) => {
     }, 1800);
 };
 
-  App.handlePlanSelect = handlePlanSelect;
+  window.handlePlanSelect = handlePlanSelect;
 
 // ── PREMIUM PAGE ──
 Pages.premium = () => {
@@ -418,7 +418,7 @@ Pages.premium = () => {
               <p class="text-[10px] font-black text-${color}-400 uppercase tracking-widest -mt-1">Evolução acelerada</p>
             </div>
             
-            <button onclick="App.handlePlanSelect('${tier}')" 
+            <button onclick="handlePlanSelect('${tier}')" 
                     class="w-full py-5 rounded-3xl bg-${color}-600 text-white font-black text-[11px] uppercase tracking-[0.2em] mb-8 shadow-xl shadow-${color}-600/30 hover:brightness-110 active:scale-95 transition-all outline-none border border-${color}-400/20">
               ${currentPlan === tier ? "Seu Plano Atual" : `Assinar ${info.name}`}
             </button>
