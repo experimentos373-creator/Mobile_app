@@ -91,7 +91,11 @@ PageEvents.login = (page) => {
             // Sucesso real no Supabase
             AppState.set("_authHandled", true);
             await AppState.syncFull();
-            Router.navigate("/home");
+          const shouldOnboard =
+            typeof App !== "undefined" && typeof App.needsOnboarding === "function"
+              ? App.needsOnboarding()
+              : !AppState.get("onboardingDone");
+          Router.navigate(shouldOnboard ? "/onboarding" : "/home");
         } catch (e) {
             showError("Sem conexão com o servidor. Tente novamente.");
         }

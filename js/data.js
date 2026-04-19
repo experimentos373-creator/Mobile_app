@@ -356,7 +356,22 @@ const AppState = {
               this.set("completedSimulados", []);
           }
         } else {
-          // If no profile exists, save current local state to cloud
+          // New cloud account/profile: reset stale local state from previous users on this device.
+          Object.entries(this._defaults).forEach(([key, defaultValue]) => {
+            this.set(key, defaultValue);
+          });
+
+          const metadata = session.user.user_metadata || {};
+          const inferredName = String(
+            metadata.full_name || metadata.name || metadata.given_name || ""
+          ).trim();
+
+          this.set("userEmail", String(session.user.email || "").trim());
+          this.set("userName", inferredName);
+          this.set("userAge", "");
+          this.set("onboardingDone", false);
+
+          // Save a clean baseline profile to cloud (no carry-over from old local sessions).
           await this.saveToCloud();
         }
       }

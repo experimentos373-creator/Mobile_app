@@ -3,6 +3,13 @@
 // ============================================================
 
 const App = {
+  needsOnboarding() {
+    const onboardingDone = Boolean(AppState.get("onboardingDone"));
+    const userName = String(AppState.get("userName") || "").trim();
+    const userAge = String(AppState.get("userAge") || "").trim();
+    return !onboardingDone || !userName || !userAge;
+  },
+
   async init() {
     this.checkDailyReset();
 
@@ -21,10 +28,7 @@ const App = {
           AppState.set("_authHandled", true);
           await AppState.syncFull();
 
-          const { user } = session;
-          const isNewUser = user.created_at === user.last_sign_in_at;
-
-          if (isNewUser && !AppState.get("onboardingDone")) {
+          if (this.needsOnboarding()) {
             Router.navigate("/onboarding");
           } else {
             Router.navigate("/home");
