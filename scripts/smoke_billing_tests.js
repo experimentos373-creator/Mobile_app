@@ -1,8 +1,33 @@
 process.env.SUPABASE_URL = "https://supabase.test.local";
 process.env.SUPABASE_ANON_KEY = "anon-test-key";
 process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-test-key";
-process.env.MERCADOPAGO_ACCESS_TOKEN = "mp-access-token-test";
+process.env.STRIPE_SECRET_KEY = "sk_test_mock_key";
+process.env.STRIPE_WEBHOOK_SECRET = "whsec_mock_key";
+process.env.STRIPE_PRICE_PRO_MONTHLY = "price_pro_monthly_mock";
 process.env.ALLOWED_ORIGINS = "https://eduhub.vercel.app,http://localhost:4173";
+
+const stripeShared = require("../api/_shared/stripe-billing.js");
+
+stripeShared.createStripeCheckoutSession = async (_req, user, payload) => ({
+  checkoutUrl: "https://checkout.stripe.com/c/pay_mock",
+  checkoutSessionId: "cs_test_mock",
+  planId: payload.planId,
+  billingCycle: payload.billingCycle,
+  userId: user.id
+});
+
+stripeShared.constructStripeEvent = async () => ({
+  type: "checkout.session.completed",
+  data: {
+    object: {
+      metadata: {
+        user_id: "user-123",
+        plan_id: "pro",
+        billing_cycle: "monthly"
+      }
+    }
+  }
+});
 
 const checkoutHandler = require("../api/billing/create-checkout.js");
 const webhookHandler = require("../api/billing/webhook.js");
@@ -32,34 +57,6 @@ function installFetchMock() {
         return jsonResponse({ error: "invalid token" }, 401);
       }
       return jsonResponse({ id: "user-123", email: "student@test.local" }, 200);
-    }
-
-    if (urlString.includes("/checkout/preferences")) {
-      const body = JSON.parse(options.body || "{}");
-      return jsonResponse(
-        {
-          id: "pref-abc",
-          init_point: "https://checkout.mercadopago.com/pref-abc",
-          metadata: body.metadata || {}
-        },
-        200
-      );
-    }
-
-    if (urlString.includes("/v1/payments/987")) {
-      return jsonResponse(
-        {
-          id: 987,
-          status: "approved",
-          external_reference: "user-123",
-          metadata: {
-            user_id: "user-123",
-            plan_id: "pro",
-            billing_cycle: "monthly"
-          }
-        },
-        200
-      );
     }
 
     if (urlString.includes("/rest/v1/profiles?id=eq.user-123")) {
@@ -145,7 +142,7 @@ async function run() {
       }
     },
     {
-      name: "checkout returns init point",
+      name: "checkout returns stripe checkout url",
       run: async () => {
         const result = await invoke(
           checkoutHandler,
@@ -156,23 +153,18 @@ async function run() {
         );
         assertEqual(result.statusCode, 200, "Expected 200 for valid checkout creation");
         assertEqual(
-          result.json && result.json.preferenceId,
-          "pref-abc",
-          "Expected preference id from gateway"
+          result.json && result.json.checkoutSessionId,
+          "cs_test_mock",
+          "Expected checkout session id"
         );
       }
     },
     {
-      name: "webhook applies approved payment to profile",
+      name: "webhook applies stripe event to profile",
       run: async () => {
         const result = await invoke(
           webhookHandler,
-          makeReq({
-            body: {
-              type: "payment",
-              data: { id: 987 }
-            }
-          })
+          makeReq({ body: { mock: true } })
         );
         assertEqual(result.statusCode, 200, "Expected 200 on webhook processing");
         assertEqual(global.__updatedPlanPayload.userPlan, "pro", "Expected profile plan update to pro");

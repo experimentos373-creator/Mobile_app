@@ -1,12 +1,11 @@
 const {
-  createMercadoPagoPreference,
+  createStripeCheckoutSession,
   getAuthenticatedUser,
-  getPlanOffer,
   guardCors,
   missingCheckoutEnv,
   readBody,
   sendJson
-} = require("../_shared/billing");
+} = require("../_shared/stripe-billing");
 
 module.exports = async (req, res) => {
   if (!guardCors(req, res)) return;
@@ -37,21 +36,13 @@ module.exports = async (req, res) => {
   const planId = String(body.planId || "").trim().toLowerCase();
   const billingCycle = String(body.billingCycle || "monthly").trim().toLowerCase();
 
-  const offer = getPlanOffer(planId, billingCycle);
-  if (!offer) {
-    sendJson(res, 400, { error: "Plano ou ciclo invalido para checkout." });
-    return;
-  }
-
   try {
-    const preference = await createMercadoPagoPreference(req, auth.user, offer);
-    sendJson(res, 200, {
-      checkoutUrl: preference.init_point || "",
-      sandboxCheckoutUrl: preference.sandbox_init_point || "",
-      preferenceId: preference.id || "",
-      planId: offer.planId,
-      billingCycle: offer.billingCycle
+    const session = await createStripeCheckoutSession(req, auth.user, {
+      planId,
+      billingCycle
     });
+
+    sendJson(res, 200, session);
   } catch (error) {
     sendJson(res, error.status || 502, {
       error: error.message || "Falha ao criar checkout no gateway."
