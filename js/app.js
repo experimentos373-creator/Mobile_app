@@ -3,6 +3,8 @@
 // ============================================================
 
 const App = {
+  _authHandled: false,
+
   needsOnboarding() {
     const onboardingDone = Boolean(AppState.get("onboardingDone"));
     const userName = String(AppState.get("userName") || "").trim();
@@ -11,6 +13,8 @@ const App = {
   },
 
   async init() {
+    this._authHandled = false;
+    localStorage.removeItem("eduhub__authHandled");
     this.checkDailyReset();
 
     // One-time data reset or migration (v3): ensure all users have the new state structure
@@ -23,9 +27,9 @@ const App = {
     const client = Supabase.getClient();
     if (client) {
       client.auth.onAuthStateChange(async (event, session) => {
-        // Only redirect on explicit sign-in (e.g. Google OAuth callback), not on initial session restore
-        if (event === 'SIGNED_IN' && session && !AppState.get("_authHandled")) {
-          AppState.set("_authHandled", true);
+        // Handle sign-in and OAuth restore exactly once per app boot.
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !this._authHandled) {
+          this._authHandled = true;
           await AppState.syncFull();
 
           if (this.needsOnboarding()) {
@@ -35,7 +39,7 @@ const App = {
           }
         }
         if (event === 'SIGNED_OUT') {
-          AppState.set("_authHandled", false);
+          this._authHandled = false;
         }
       });
     }

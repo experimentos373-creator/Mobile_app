@@ -89,7 +89,6 @@ PageEvents.login = (page) => {
                 return showError(friendlyError(error.message));
             }
             // Sucesso real no Supabase
-            AppState.set("_authHandled", true);
             await AppState.syncFull();
           const shouldOnboard =
             typeof App !== "undefined" && typeof App.needsOnboarding === "function"
