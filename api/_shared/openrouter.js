@@ -5,7 +5,9 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://eduhub.vercel.app",
   "https://www.eduhub.com.br",
-  "http://localhost:3000"
+  "https://mobileapp-taupe.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:4173"
 ];
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || DEFAULT_ALLOWED_ORIGINS.join(","))

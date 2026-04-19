@@ -8,6 +8,27 @@ const SupabaseConfig = {
     ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpeGZpdWt2dnlva2dheGZseGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MDYxNTEsImV4cCI6MjA4OTI4MjE1MX0.0FpUCJaH7LE47roOp1tStdhqZDCTyT2dQBeo33W9uCw"
 };
 
+const PROD_APP_ORIGIN = "https://mobileapp-taupe.vercel.app";
+
+function getOAuthRedirectTo() {
+    const origin = String(window.location?.origin || "").trim();
+    const hostname = String(window.location?.hostname || "").trim().toLowerCase();
+    const protocol = String(window.location?.protocol || "").trim().toLowerCase();
+
+    // On webviews/local wrappers, OAuth should always return to the public app URL.
+    if (
+        protocol === "file:" ||
+        protocol === "capacitor:" ||
+        protocol === "ionic:" ||
+        hostname === "localhost" ||
+        hostname === "127.0.0.1"
+    ) {
+        return PROD_APP_ORIGIN;
+    }
+
+    return origin || PROD_APP_ORIGIN;
+}
+
 // Initialize Supabase Client (lazy loaded once keys are available)
 let supabaseClient = null;
 
@@ -33,8 +54,7 @@ const Supabase = {
         const client = this.getClient();
         if (!client) return { error: { message: "Conexão não configurada." } };
 
-        // Use current origin to ensure compatibility with any Vercel URL or local environment
-        const redirectTo = window.location.origin;
+        const redirectTo = getOAuthRedirectTo();
 
         return await client.auth.signInWithOAuth({
             provider: 'google',
