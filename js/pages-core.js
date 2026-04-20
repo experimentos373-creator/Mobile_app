@@ -142,7 +142,7 @@ Pages.home = () => {
 
     <!-- Countdown Section (Compact Glass) -->
     <section class="max-w-2xl mx-auto px-6">
-      <div id="countdown-card" class="glass-card rounded-2xl p-4 flex items-center justify-between border border-white/5 shimmer-effect cursor-pointer active:scale-[0.99] transition-all" role="button" aria-label="Alterar data do exame">
+      <div id="countdown-card" onclick="window.openExamDatePicker && window.openExamDatePicker()" class="glass-card rounded-2xl p-4 flex items-center justify-between border border-white/5 shimmer-effect cursor-pointer active:scale-[0.99] transition-all" role="button" aria-label="Alterar data do exame" tabindex="0">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center glow-orange shrink-0">
             <span class="material-symbols-outlined text-orange-400">timer</span>
@@ -484,9 +484,16 @@ PageEvents.home = (page) => {
   };
 
   const countdownCard = page.querySelector("#countdown-card");
+  window.openExamDatePicker = openExamDateModal;
   if (countdownCard && !countdownCard.dataset.bound) {
     countdownCard.dataset.bound = "true";
     countdownCard.addEventListener("click", openExamDateModal);
+    countdownCard.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openExamDateModal();
+      }
+    });
   }
 
   update();

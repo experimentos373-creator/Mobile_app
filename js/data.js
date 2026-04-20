@@ -328,11 +328,19 @@ const AppState = {
             "totalQuestionsAnswered", "correctAnswers", "studyTimeMinutes", "restTimeMinutes",
             "hasUsedFreePredictor", "subjectAccuracy", "missionProgress", "weeklyStudyData"
           ];
+          const preserveWhenMissing = new Set(["userName", "userAge", "onboardingDone", "studyGoal", "targetExam", "userPlan"]);
           
           fields.forEach(field => {
             if (profile[field] !== undefined && profile[field] !== null) {
-              const normalizedValue = this.normalize(field, profile[field]);
+              const normalizedValue = this.normalize(
+                field,
+                field === "onboardingDone" ? Boolean(profile[field]) : profile[field]
+              );
               this.set(field, normalizedValue);
+            } else if (preserveWhenMissing.has(field)) {
+              // Keep local onboarding-critical fields when cloud payload is partial.
+              const localValue = this.get(field);
+              this.set(field, localValue);
             } else {
               // If cloud is null/undefined, revert to default to clean stale local data
               this.set(field, this._defaults[field]);

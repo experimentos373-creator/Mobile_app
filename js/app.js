@@ -21,7 +21,6 @@ const App = {
   async init() {
     this._authHandled = false;
     this._hasSession = false;
-    localStorage.removeItem("eduhub__authHandled");
     this.checkDailyReset();
 
     // One-time data reset or migration (v3): ensure all users have the new state structure
@@ -39,21 +38,22 @@ const App = {
         // Handle sign-in and OAuth restore exactly once per app boot.
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !this._authHandled) {
           this._authHandled = true;
-          await AppState.syncFull();
+          const currentUserId = String(session.user?.id || "");
+          const previousUserId = String(localStorage.getItem("eduhub_last_user_id") || "");
 
-          const forceGoogleOnboarding =
-            localStorage.getItem("eduhub_force_google_onboarding") === "1";
-
-          if (forceGoogleOnboarding) {
-            localStorage.removeItem("eduhub_force_google_onboarding");
-            AppState.set("onboardingDone", false);
-            AppState.set("userAge", "");
-            Router.navigate("/onboarding", false, true);
-            return;
+          // If another user signs in on the same device, clear stale local data before syncing.
+          if (previousUserId && currentUserId && previousUserId !== currentUserId) {
+            AppState.reset();
+            AppState.migrate();
           }
 
+          if (currentUserId) {
+            localStorage.setItem("eduhub_last_user_id", currentUserId);
+          }
+
+          await AppState.syncFull();
+
           if (this.needsOnboarding()) {
-            AppState.set("onboardingDone", false);
             Router.navigate("/onboarding", false, true);
           } else {
             Router.navigate("/home", false, true);
@@ -62,7 +62,6 @@ const App = {
         if (event === 'SIGNED_OUT') {
           this._authHandled = false;
           this._hasSession = false;
-          localStorage.removeItem("eduhub_force_google_onboarding");
         }
       });
     }
