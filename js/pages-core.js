@@ -380,16 +380,16 @@ PageEvents.home = (page) => {
       <div id="exam-date-panel" class="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
         <div class="w-12 h-1 rounded-full bg-white/15 mx-auto mb-5"></div>
 
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-3">
           <h3 class="text-[11px] font-black text-white uppercase tracking-[0.15em]">Escolher Data do Exame</h3>
           <button id="exam-date-close" class="w-9 h-9 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all">
             <span class="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
-        <p class="text-xs text-slate-400 mb-5 leading-relaxed">Atualize sua data alvo e o contador D-Day será recalculado.</p>
+        <p class="text-xs text-slate-400 mb-3 leading-relaxed">Atualize sua data alvo e o contador D-Day será recalculado.</p>
 
-        <div class="mb-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-3 text-center">
+        <div class="mb-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-center">
           <span class="text-[10px] font-black uppercase tracking-[0.12em] text-emerald-300">Data selecionada: </span>
           <span id="exam-date-selected-label" class="text-[11px] font-black text-white"></span>
         </div>
