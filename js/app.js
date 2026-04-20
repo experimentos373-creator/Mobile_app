@@ -2,8 +2,8 @@
 // EduHub Brasil - Main App Controller
 // ============================================================
 
-const GOOGLE_OAUTH_PENDING_KEY = "eduhub_google_oauth_pending";
-const GOOGLE_OAUTH_INTENT_PARAM = "eduhub_oauth";
+const APP_GOOGLE_OAUTH_PENDING_KEY = "eduhub_google_oauth_pending";
+const APP_GOOGLE_OAUTH_INTENT_PARAM = "eduhub_oauth";
 
 const App = {
   _authHandled: false,
@@ -24,11 +24,11 @@ const App = {
   _consumeGoogleOAuthIntentFromUrl() {
     try {
       const url = new URL(window.location.href);
-      const provider = String(url.searchParams.get(GOOGLE_OAUTH_INTENT_PARAM) || "").toLowerCase();
+      const provider = String(url.searchParams.get(APP_GOOGLE_OAUTH_INTENT_PARAM) || "").toLowerCase();
       const hasGoogleIntent = provider === "google";
 
       if (hasGoogleIntent) {
-        url.searchParams.delete(GOOGLE_OAUTH_INTENT_PARAM);
+        url.searchParams.delete(APP_GOOGLE_OAUTH_INTENT_PARAM);
         const cleanUrl = `${url.pathname}${url.search}${url.hash}`;
         window.history.replaceState(window.history.state, "", cleanUrl);
       }
@@ -40,14 +40,14 @@ const App = {
   },
 
   _resolveGoogleOAuthIntent() {
-    const googleOAuthPendingAt = Number(localStorage.getItem(GOOGLE_OAUTH_PENDING_KEY) || "0");
+    const googleOAuthPendingAt = Number(localStorage.getItem(APP_GOOGLE_OAUTH_PENDING_KEY) || "0");
     const hasFreshLocalIntent =
       Number.isFinite(googleOAuthPendingAt) &&
       googleOAuthPendingAt > 0 &&
       (Date.now() - googleOAuthPendingAt) < 30 * 60 * 1000;
 
     if (googleOAuthPendingAt > 0) {
-      localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+      localStorage.removeItem(APP_GOOGLE_OAUTH_PENDING_KEY);
     }
 
     const hasUrlIntent = this._consumeGoogleOAuthIntentFromUrl();
@@ -114,7 +114,7 @@ const App = {
         if (event === 'SIGNED_OUT') {
           this._authHandled = false;
           this._hasSession = false;
-          localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+          localStorage.removeItem(APP_GOOGLE_OAUTH_PENDING_KEY);
           if (window.location.hash !== "#/login") {
             Router.navigate("/login", false, true);
           }
@@ -333,7 +333,7 @@ const App = {
     if (!("serviceWorker" in navigator) || window.location.protocol === "file:") return;
 
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js?v=54", {
+      const registration = await navigator.serviceWorker.register("/sw.js?v=55", {
         updateViaCache: "none"
       });
       registration.update().catch(() => {});
@@ -465,7 +465,7 @@ const App = {
     clearSupabaseStorage();
     AppState.reset();
     localStorage.removeItem("eduhub_last_user_id");
-    localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+    localStorage.removeItem(APP_GOOGLE_OAUTH_PENDING_KEY);
 
     // Ensure tab cache from authenticated screens does not bleed into login state.
     if (typeof Router !== "undefined" && Router && Router.TAB_ROUTES) {
