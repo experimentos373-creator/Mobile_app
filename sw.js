@@ -1,4 +1,4 @@
-const CACHE_NAME = "eduhub-shell-v55";
+const CACHE_NAME = "eduhub-shell-v57";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -9,16 +9,16 @@ const APP_SHELL = [
   "/css/app.css?v=54",
   "/css/lexend.css",
   "/css/material-symbols.css",
-  "/js/data.js?v=54",
+  "/js/data.js?v=55",
   "/js/router.js?v=54",
-  "/js/pages-core.js?v=54",
+  "/js/pages-core.js?v=55",
   "/js/pages-extra.js?v=54",
-  "/js/pages-more.js?v=54",
+  "/js/pages-more.js?v=55",
   "/js/sound-manager.js?v=53",
   "/js/security-utils.js?v=54",
-  "/js/supabase.js?v=54",
+  "/js/supabase.js?v=55",
   "/js/ai-service.js?v=54",
-  "/js/app.js?v=55",
+  "/js/app.js?v=57",
   "/js/vendor/supabase.js",
   "/js/vendor/purify.min.js",
   "/js/vendor/mathjax.js",

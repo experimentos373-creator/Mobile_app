@@ -48,6 +48,14 @@ function buildGoogleOAuthRedirectTo() {
 let supabaseClient = null;
 
 const Supabase = {
+    _extractMissingColumnName(error) {
+        const raw = [error?.message, error?.details, error?.hint]
+            .filter(Boolean)
+            .join(" ");
+        const match = raw.match(/column\s+"?([A-Za-z0-9_]+)"?\s+does\s+not\s+exist/i);
+        return match ? match[1] : "";
+    },
+
     getClient() {
         if (!SupabaseConfig.URL || !SupabaseConfig.ANON_KEY) {
             console.warn("Supabase keys are missing. Cloud sync disabled.");
@@ -167,14 +175,40 @@ const Supabase = {
 
         await this.ensureProfile(userId);
 
-        const { data, error } = await client
-            .from('profiles')
-            .upsert(
-                { id: userId, ...profileData, updated_at: new Date().toISOString() },
-                { onConflict: 'id' }
+        // Retry once per missing column so critical fields (e.g., onboardingDone/userPlan)
+        // still persist even when optional columns are absent in older DB schemas.
+        const payload = { id: userId, ...profileData, updated_at: new Date().toISOString() };
+        let retries = 0;
+        let lastError = null;
+
+        while (retries <= 4) {
+            const { data, error } = await client
+                .from('profiles')
+                .upsert(payload, { onConflict: 'id' });
+
+            if (!error) {
+                return { data, error: null };
+            }
+
+            lastError = error;
+            const missingColumn = this._extractMissingColumnName(error);
+            const missingKey = Object.keys(payload).find(
+                (key) => key.toLowerCase() === String(missingColumn || "").toLowerCase()
             );
-        if (error) console.error("Error saving profile:", error);
-        return { data, error };
+
+            if (!missingKey || missingKey === "id") {
+                break;
+            }
+
+            delete payload[missingKey];
+            retries += 1;
+            console.warn(`[Supabase] Retrying saveProfile without unsupported column: ${missingKey}`);
+        }
+
+        if (lastError) {
+            console.error("Error saving profile:", lastError);
+        }
+        return { data: null, error: lastError };
     },
 
     async getProfile(userId) {
@@ -184,12 +218,12 @@ const Supabase = {
             .from('profiles')
             .select('*')
             .eq('id', userId)
-            .single();
+            .maybeSingle();
         if (error) {
             console.error("Error fetching profile:", error);
-            return null;
+            throw error;
         }
-        return data;
+        return data || null;
     },
 
     // --- SIMULADOS API ---

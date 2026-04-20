@@ -4,10 +4,14 @@
 
 const APP_GOOGLE_OAUTH_PENDING_KEY = "eduhub_google_oauth_pending";
 const APP_GOOGLE_OAUTH_INTENT_PARAM = "eduhub_oauth";
+const USER_SEEN_KEY_PREFIX = "eduhub_seen_user_";
+const USER_ONBOARDING_DONE_KEY_PREFIX = "eduhub_onboarding_done_user_";
 
 const App = {
   _authHandled: false,
   _hasSession: false,
+  _cloudSyncInFlight: null,
+  _lastCloudSyncAt: 0,
 
   needsOnboarding() {
     const onboardingDone = Boolean(AppState.get("onboardingDone"));
@@ -19,6 +23,78 @@ const App = {
     const userName = String(AppState.get("userName") || "").trim();
     const userAge = String(AppState.get("userAge") || "").trim();
     return !userName || !userAge;
+  },
+
+  _userScopedKey(prefix, userId) {
+    const id = String(userId || "").trim();
+    if (!id) return "";
+    return `${prefix}${id}`;
+  },
+
+  async _refreshCloudSessionState(reason = "manual") {
+    if (!this._hasSession) return null;
+    if (this._cloudSyncInFlight) return this._cloudSyncInFlight;
+
+    const now = Date.now();
+    const shouldThrottle = reason !== "manual";
+    if (shouldThrottle && (now - this._lastCloudSyncAt) < 8000) {
+      return null;
+    }
+
+    const prevPlan = String(AppState.get("userPlan") || "");
+    const prevName = String(AppState.get("userName") || "");
+
+    this._cloudSyncInFlight = (async () => {
+      const syncMeta = await AppState.syncFull();
+      this._lastCloudSyncAt = Date.now();
+
+      const nextPlan = String(AppState.get("userPlan") || "");
+      const nextName = String(AppState.get("userName") || "");
+
+      if (prevPlan !== nextPlan || prevName !== nextName) {
+        const route = (window.location.hash.slice(1) || "/home").split("?")[0] || "/home";
+        const pageName = route.replace("/", "").split("/")[0] || "home";
+        const blockedRefreshRoutes = new Set(["/login", "/cadastro", "/onboarding", "/onboarding-loading"]);
+
+        if (blockedRefreshRoutes.has(route)) {
+          return syncMeta;
+        }
+
+        if (typeof Router !== "undefined" && Router && typeof Router.invalidateTab === "function") {
+          Router.invalidateTab(pageName);
+        }
+
+        if (typeof Router !== "undefined" && Router && typeof Router.navigate === "function") {
+          Router.navigate(route, false, true);
+        }
+      }
+
+      return syncMeta;
+    })()
+      .catch((error) => {
+        console.warn("Cloud refresh failed:", error);
+        return null;
+      })
+      .finally(() => {
+        this._cloudSyncInFlight = null;
+      });
+
+    return this._cloudSyncInFlight;
+  },
+
+  _bindCloudSyncListeners() {
+    if (window.__eduhubCloudSyncBound) return;
+    window.__eduhubCloudSyncBound = "1";
+
+    window.addEventListener("focus", () => {
+      this._refreshCloudSessionState("focus");
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        this._refreshCloudSessionState("visibility");
+      }
+    });
   },
 
   _consumeGoogleOAuthIntentFromUrl() {
@@ -59,6 +135,12 @@ const App = {
 
     const currentUserId = String(session.user?.id || "");
     const previousUserId = String(localStorage.getItem("eduhub_last_user_id") || "");
+    const seenUserKey = this._userScopedKey(USER_SEEN_KEY_PREFIX, currentUserId);
+    const localOnboardingDoneKey = this._userScopedKey(USER_ONBOARDING_DONE_KEY_PREFIX, currentUserId);
+    const hasSeenCurrentUser = Boolean(seenUserKey && localStorage.getItem(seenUserKey) === "1");
+    const hasLocalOnboardingDone = Boolean(
+      localOnboardingDoneKey && localStorage.getItem(localOnboardingDoneKey) === "1"
+    );
 
     // If another user signs in on the same device, clear stale local data before syncing.
     if (previousUserId && currentUserId && previousUserId !== currentUserId) {
@@ -68,6 +150,7 @@ const App = {
 
     if (currentUserId) {
       localStorage.setItem("eduhub_last_user_id", currentUserId);
+      if (seenUserKey) localStorage.setItem(seenUserKey, "1");
     }
 
     // Defensive fallback: keep one profile row per auth user even if DB trigger is missing.
@@ -81,11 +164,29 @@ const App = {
     const syncMeta = await AppState.syncFull();
     const hasFreshGoogleOAuthIntent = this._resolveGoogleOAuthIntent();
 
-    const hasResolvedCloudOnboardingDone = Boolean(syncMeta?.resolvedOnboardingDone);
+    let hasResolvedCloudOnboardingDone = Boolean(syncMeta?.resolvedOnboardingDone);
+    if (hasResolvedCloudOnboardingDone && localOnboardingDoneKey) {
+      localStorage.setItem(localOnboardingDoneKey, "1");
+    }
 
-    // If this auth cycle started from Google button and cloud does not explicitly confirm
-    // onboarding completion, send user to onboarding instead of home.
-    if (hasFreshGoogleOAuthIntent && !hasResolvedCloudOnboardingDone) {
+    const hasLocalProfileBasics =
+      String(AppState.get("userName") || "").trim().length > 0 &&
+      String(AppState.get("userAge") || "").trim().length > 0;
+
+    // Fallback for legacy users: if onboarding was already completed locally, avoid loops.
+    if (!hasResolvedCloudOnboardingDone && (hasLocalOnboardingDone || (hasSeenCurrentUser && hasLocalProfileBasics))) {
+      AppState.set("onboardingDone", true);
+      if (localOnboardingDoneKey) {
+        localStorage.setItem(localOnboardingDoneKey, "1");
+      }
+      AppState.saveToCloud().catch((error) => {
+        console.warn("Failed to persist legacy onboarding fallback:", error);
+      });
+      hasResolvedCloudOnboardingDone = true;
+    }
+
+    // First observed Google auth should go through onboarding, but returning users should not loop.
+    if (hasFreshGoogleOAuthIntent && !hasResolvedCloudOnboardingDone && !hasSeenCurrentUser) {
       AppState.set("onboardingDone", false);
       Router.navigate("/onboarding", false, true);
       return;
@@ -181,6 +282,7 @@ const App = {
     SoundManager.init();
     this._bindShellUI();
     this._registerServiceWorker();
+    this._bindCloudSyncListeners();
 
     // Global Action Button Feedback
     document.addEventListener("click", (e) => {
@@ -341,7 +443,7 @@ const App = {
     if (!("serviceWorker" in navigator) || window.location.protocol === "file:") return;
 
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js?v=55", {
+      const registration = await navigator.serviceWorker.register("/sw.js?v=57", {
         updateViaCache: "none"
       });
       registration.update().catch(() => {});

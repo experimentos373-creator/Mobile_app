@@ -295,6 +295,15 @@ const AppState = {
   },
 
   normalize(field, value) {
+    if (field === "userPlan") {
+      const raw = String(value || "").trim().toLowerCase();
+      if (raw === "gratis") return "gratis";
+      if (raw === "basico" || raw === "básico" || raw === "basic") return "basico";
+      if (raw === "pro") return "pro";
+      if (raw === "plus" || raw === "plus+" || raw === "premium") return "plus";
+      return this._defaults.userPlan;
+    }
+
     if (field === 'subjectAccuracy' && typeof value === 'object') {
       // Garante que se vier do cloud algo quebrado, a gente arruma
       const SUBJECT_TOTALS = { matematica: 104, geografia: 91, biologia: 87, historia: 85, fisica: 84, portugues: 79, quimica: 60 };
@@ -348,6 +357,10 @@ const AppState = {
               ""
           ).trim();
           const cloudUserAge = String(getCloudValue("userAge", "user_age") ?? "").trim();
+          const localUserName = String(this.get("userName") || "").trim();
+          const localUserAge = String(this.get("userAge") || "").trim();
+          const resolvedUserName = cloudUserName || localUserName;
+          const resolvedUserAge = cloudUserAge || localUserAge;
           const cloudOnboardingDone = getCloudValue("onboardingDone", "onboarding_done");
           syncMeta.hasExplicitOnboardingDone = typeof cloudOnboardingDone === "boolean";
 
@@ -356,12 +369,12 @@ const AppState = {
           const resolvedOnboardingDone =
             typeof cloudOnboardingDone === "boolean"
               ? cloudOnboardingDone
-              : Boolean(cloudUserName && cloudUserAge);
+              : Boolean(resolvedUserName && resolvedUserAge);
           syncMeta.resolvedOnboardingDone = resolvedOnboardingDone;
 
           this.set("userEmail", String(session.user.email || "").trim());
-          this.set("userName", cloudUserName);
-          this.set("userAge", cloudUserAge);
+          this.set("userName", resolvedUserName);
+          this.set("userAge", resolvedUserAge);
           this.set("onboardingDone", resolvedOnboardingDone);
 
           // Merge remaining cloud state (strict mode for non-auth identity fields).
@@ -379,9 +392,6 @@ const AppState = {
             if (cloudValue !== undefined && cloudValue !== null) {
               const normalizedValue = this.normalize(field, cloudValue);
               this.set(field, normalizedValue);
-            } else {
-              // If cloud is missing, use defaults to avoid stale local carry-over.
-              this.set(field, this._defaults[field]);
             }
           });
           
@@ -402,10 +412,18 @@ const AppState = {
               this.set("completedSimulados", []);
           }
         } else {
+          const hadMeaningfulLocalState =
+            Boolean(String(this.get("userName") || "").trim()) ||
+            Boolean(String(this.get("userAge") || "").trim()) ||
+            Boolean(this.get("onboardingDone")) ||
+            Number(this.get("totalQuestionsAnswered") || 0) > 0;
+
           // New cloud account/profile: reset stale local state from previous users on this device.
-          Object.entries(this._defaults).forEach(([key, defaultValue]) => {
-            this.set(key, defaultValue);
-          });
+          if (!hadMeaningfulLocalState) {
+            Object.entries(this._defaults).forEach(([key, defaultValue]) => {
+              this.set(key, defaultValue);
+            });
+          }
 
           const metadata = session.user.user_metadata || {};
           const inferredName = String(
@@ -413,10 +431,16 @@ const AppState = {
           ).trim();
 
           this.set("userEmail", String(session.user.email || "").trim());
-          this.set("userName", inferredName);
-          this.set("userAge", "");
-          this.set("onboardingDone", false);
-          syncMeta.resolvedOnboardingDone = false;
+          if (inferredName || !String(this.get("userName") || "").trim()) {
+            this.set("userName", inferredName);
+          }
+          if (!String(this.get("userAge") || "").trim()) {
+            this.set("userAge", "");
+          }
+
+          const localOnboardingDone = Boolean(this.get("onboardingDone"));
+          this.set("onboardingDone", localOnboardingDone);
+          syncMeta.resolvedOnboardingDone = localOnboardingDone;
 
           // Save a clean baseline profile to cloud (no carry-over from old local sessions).
           await this.saveToCloud();

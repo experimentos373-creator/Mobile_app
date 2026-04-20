@@ -25,7 +25,9 @@ const getPlanBadge = (plan) => {
 // ── HOME PAGE ──
 Pages.home = () => {
   const c = enemCountdown();
-  const name = AppState.get("userName");
+  const safeName = String(AppState.get("userName") || "").trim() || "Estudante";
+  const avatarInitial = safeName.charAt(0).toUpperCase();
+  const firstName = safeName.split(' ')[0] || "Estudante";
   const plan = AppState.get("userPlan");
   const planLabels = {
     gratis: "Plano Grátis",
@@ -59,14 +61,14 @@ Pages.home = () => {
       <div class="flex items-center gap-4">
         <div class="relative">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-emerald-500/20">
-            ${name[0]}
+            ${avatarInitial}
           </div>
           <div class="absolute -bottom-1 -right-1 rank-shield ${planBadge.class} w-6 h-6">
              <span class="material-symbols-outlined text-[12px] text-white font-normal">${planBadge.icon}</span>
           </div>
         </div>
         <div>
-          <h1 class="text-lg font-black text-white tracking-tight-compact">${name.split(' ')[0]}</h1>
+          <h1 class="text-lg font-black text-white tracking-tight-compact">${firstName}</h1>
           <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${planBadge.name}</p>
         </div>
       </div>

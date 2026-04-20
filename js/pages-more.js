@@ -492,7 +492,8 @@ PageEvents.premium = (page) => {
 
 // ── PERFIL PAGE ──
 Pages.perfil = () => {
-  const name = AppState.get("userName");
+  const safeName = String(AppState.get("userName") || "").trim() || "Estudante";
+  const avatarInitial = safeName.charAt(0).toUpperCase();
   const plan = AppState.get("userPlan");
   const dark = AppState.get("darkMode");
   const totalQ = AppState.get("totalQuestionsAnswered");
@@ -528,14 +529,14 @@ Pages.perfil = () => {
     <section class="flex flex-col items-center text-center relative">
       <div class="relative mb-6">
         <div class="w-28 h-28 rounded-3xl bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center text-white font-black text-4xl shadow-2xl shadow-emerald-500/20">
-          ${name[0]}
+          ${avatarInitial}
         </div>
         <div class="absolute -bottom-2 -right-2 rank-shield ${planBadge.class} w-10 h-10 shadow-xl">
            <span class="material-symbols-outlined text-xl text-white font-normal">${planBadge.icon}</span>
         </div>
       </div>
       
-      <h2 class="text-2xl font-black text-white tracking-tight-compact mb-1">${name}</h2>
+      <h2 class="text-2xl font-black text-white tracking-tight-compact mb-1">${safeName}</h2>
       <div class="flex items-center gap-2 justify-center">
         <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">${rank.name}</span>
         <span class="w-1 h-1 rounded-full bg-slate-700"></span>
@@ -1096,15 +1097,35 @@ PageEvents.onboarding = (page) => {
         }
     }
 
-    function nextStep() {
+    async function nextStep() {
         currentStep++;
         SoundManager.play("transition");
         if (currentStep > TOTAL_STEPS) {
             SoundManager.play("success");
             AppState.set("onboardingDone", true);
-          AppState.saveToCloud().catch((error) => {
-            console.warn("Falha ao salvar onboarding na nuvem:", error);
-          });
+            const localUserOnboardingKeyPrefix = "eduhub_onboarding_done_user_";
+
+        try {
+          if (typeof Supabase !== "undefined" && typeof Supabase.ensureProfileFromSession === "function") {
+            await Supabase.ensureProfileFromSession(AppState.get("userName"));
+          }
+
+          if (typeof Supabase !== "undefined" && typeof Supabase.getClient === "function") {
+            const client = Supabase.getClient();
+            if (client) {
+              const { data: { session } } = await client.auth.getSession();
+              const userId = String(session?.user?.id || "").trim();
+              if (userId) {
+                localStorage.setItem(`${localUserOnboardingKeyPrefix}${userId}`, "1");
+              }
+            }
+          }
+
+          await AppState.saveToCloud();
+        } catch (error) {
+          console.warn("Falha ao salvar onboarding na nuvem:", error);
+        }
+
             Router.navigate("/onboarding-loading", false);
         } else {
             renderStep(currentStep - 1);
