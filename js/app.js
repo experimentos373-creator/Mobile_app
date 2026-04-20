@@ -62,6 +62,9 @@ const App = {
         if (event === 'SIGNED_OUT') {
           this._authHandled = false;
           this._hasSession = false;
+          if (window.location.hash !== "#/login") {
+            Router.navigate("/login", false, true);
+          }
         }
       });
     }
