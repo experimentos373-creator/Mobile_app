@@ -3,6 +3,7 @@
 // ============================================================
 
 const GOOGLE_OAUTH_PENDING_KEY = "eduhub_google_oauth_pending";
+const GOOGLE_OAUTH_INTENT_PARAM = "eduhub_oauth";
 
 const App = {
   _authHandled: false,
@@ -18,6 +19,76 @@ const App = {
     const userName = String(AppState.get("userName") || "").trim();
     const userAge = String(AppState.get("userAge") || "").trim();
     return !userName || !userAge;
+  },
+
+  _consumeGoogleOAuthIntentFromUrl() {
+    try {
+      const url = new URL(window.location.href);
+      const provider = String(url.searchParams.get(GOOGLE_OAUTH_INTENT_PARAM) || "").toLowerCase();
+      const hasGoogleIntent = provider === "google";
+
+      if (hasGoogleIntent) {
+        url.searchParams.delete(GOOGLE_OAUTH_INTENT_PARAM);
+        const cleanUrl = `${url.pathname}${url.search}${url.hash}`;
+        window.history.replaceState(window.history.state, "", cleanUrl);
+      }
+
+      return hasGoogleIntent;
+    } catch (_error) {
+      return false;
+    }
+  },
+
+  _resolveGoogleOAuthIntent() {
+    const googleOAuthPendingAt = Number(localStorage.getItem(GOOGLE_OAUTH_PENDING_KEY) || "0");
+    const hasFreshLocalIntent =
+      Number.isFinite(googleOAuthPendingAt) &&
+      googleOAuthPendingAt > 0 &&
+      (Date.now() - googleOAuthPendingAt) < 30 * 60 * 1000;
+
+    if (googleOAuthPendingAt > 0) {
+      localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+    }
+
+    const hasUrlIntent = this._consumeGoogleOAuthIntentFromUrl();
+    return hasFreshLocalIntent || hasUrlIntent;
+  },
+
+  async _handleAuthenticatedSession(session) {
+    this._authHandled = true;
+
+    const currentUserId = String(session.user?.id || "");
+    const previousUserId = String(localStorage.getItem("eduhub_last_user_id") || "");
+
+    // If another user signs in on the same device, clear stale local data before syncing.
+    if (previousUserId && currentUserId && previousUserId !== currentUserId) {
+      AppState.reset();
+      AppState.migrate();
+    }
+
+    if (currentUserId) {
+      localStorage.setItem("eduhub_last_user_id", currentUserId);
+    }
+
+    const syncMeta = await AppState.syncFull();
+    const hasFreshGoogleOAuthIntent = this._resolveGoogleOAuthIntent();
+
+    const hasExplicitCloudOnboardingDone =
+      Boolean(syncMeta?.hasExplicitOnboardingDone) && Boolean(syncMeta?.resolvedOnboardingDone);
+
+    // If this auth cycle started from Google button and cloud does not explicitly confirm
+    // onboarding completion, send user to onboarding instead of home.
+    if (hasFreshGoogleOAuthIntent && !hasExplicitCloudOnboardingDone) {
+      AppState.set("onboardingDone", false);
+      Router.navigate("/onboarding", false, true);
+      return;
+    }
+
+    if (this.needsOnboarding()) {
+      Router.navigate("/onboarding", false, true);
+    } else {
+      Router.navigate("/home", false, true);
+    }
   },
 
   async init() {
@@ -39,48 +110,7 @@ const App = {
 
         // Handle sign-in and OAuth restore exactly once per app boot.
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !this._authHandled) {
-          this._authHandled = true;
-          const currentUserId = String(session.user?.id || "");
-          const previousUserId = String(localStorage.getItem("eduhub_last_user_id") || "");
-
-          // If another user signs in on the same device, clear stale local data before syncing.
-          if (previousUserId && currentUserId && previousUserId !== currentUserId) {
-            AppState.reset();
-            AppState.migrate();
-          }
-
-          if (currentUserId) {
-            localStorage.setItem("eduhub_last_user_id", currentUserId);
-          }
-
-          const syncMeta = await AppState.syncFull();
-
-          const googleOAuthPendingAt = Number(localStorage.getItem(GOOGLE_OAUTH_PENDING_KEY) || "0");
-          const hasFreshGoogleOAuthIntent =
-            Number.isFinite(googleOAuthPendingAt) &&
-            googleOAuthPendingAt > 0 &&
-            (Date.now() - googleOAuthPendingAt) < 30 * 60 * 1000;
-
-          if (googleOAuthPendingAt > 0) {
-            localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
-          }
-
-          const hasExplicitCloudOnboardingDone =
-            Boolean(syncMeta?.hasExplicitOnboardingDone) && Boolean(syncMeta?.resolvedOnboardingDone);
-
-          // If this auth cycle started from Google button and cloud does not explicitly confirm
-          // onboarding completion, send user to onboarding instead of home.
-          if (hasFreshGoogleOAuthIntent && !hasExplicitCloudOnboardingDone) {
-            AppState.set("onboardingDone", false);
-            Router.navigate("/onboarding", false, true);
-            return;
-          }
-
-          if (this.needsOnboarding()) {
-            Router.navigate("/onboarding", false, true);
-          } else {
-            Router.navigate("/home", false, true);
-          }
+          await this._handleAuthenticatedSession(session);
         }
         if (event === 'SIGNED_OUT') {
           this._authHandled = false;
@@ -91,6 +121,18 @@ const App = {
           }
         }
       });
+
+      // Bootstrap current session in case INITIAL_SESSION event is missed or delayed.
+      try {
+        const { data: { session } } = await client.auth.getSession();
+        this._hasSession = Boolean(session);
+
+        if (session && !this._authHandled) {
+          await this._handleAuthenticatedSession(session);
+        }
+      } catch (sessionError) {
+        console.warn("Initial session bootstrap failed:", sessionError);
+      }
     }
 
     // Check onboarding logic (routing)

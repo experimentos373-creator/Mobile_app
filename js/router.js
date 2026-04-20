@@ -65,6 +65,12 @@ const Router = {
     const path = hash.split("?")[0];
     const params = {};
 
+    const isOAuthCallbackHash = /^(access_token|refresh_token|expires_in|token_type|provider_token|error)=/i.test(path);
+    if (isOAuthCallbackHash) {
+      // Supabase OAuth callbacks can temporarily use hash params; wait for auth handler.
+      return;
+    }
+
     const onboardingRoutes = new Set(["/onboarding", "/onboarding-loading"]);
     const canForceOnboarding =
       typeof App !== "undefined" &&

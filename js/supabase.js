@@ -10,6 +10,7 @@ const SupabaseConfig = {
 
 const PROD_APP_ORIGIN = "https://mobileapp-taupe.vercel.app";
 const GOOGLE_OAUTH_PENDING_KEY = "eduhub_google_oauth_pending";
+const GOOGLE_OAUTH_INTENT_PARAM = "eduhub_oauth";
 
 function getOAuthRedirectTo() {
     const origin = String(window.location?.origin || "").trim();
@@ -28,6 +29,19 @@ function getOAuthRedirectTo() {
     }
 
     return origin || PROD_APP_ORIGIN;
+}
+
+function buildGoogleOAuthRedirectTo() {
+    const baseRedirect = getOAuthRedirectTo();
+
+    try {
+        const redirectUrl = new URL(baseRedirect);
+        redirectUrl.searchParams.set(GOOGLE_OAUTH_INTENT_PARAM, "google");
+        return redirectUrl.toString();
+    } catch (_error) {
+        const separator = baseRedirect.includes("?") ? "&" : "?";
+        return `${baseRedirect}${separator}${GOOGLE_OAUTH_INTENT_PARAM}=google`;
+    }
 }
 
 // Initialize Supabase Client (lazy loaded once keys are available)
@@ -55,7 +69,7 @@ const Supabase = {
         const client = this.getClient();
         if (!client) return { error: { message: "Conexão não configurada." } };
 
-        const redirectTo = getOAuthRedirectTo();
+        const redirectTo = buildGoogleOAuthRedirectTo();
 
         localStorage.setItem(GOOGLE_OAUTH_PENDING_KEY, String(Date.now()));
 
