@@ -153,6 +153,27 @@ Pages.cadastro = () => `
   </main>`;
 
 PageEvents.cadastro = (page) => {
+  function showRegError(errorEl, buttonEl, message) {
+    errorEl.textContent = message;
+    errorEl.classList.remove("hidden");
+    buttonEl.disabled = false;
+    buttonEl.innerHTML = 'CRIAR CONTA <span class="material-symbols-outlined font-black">person_add</span>';
+  }
+
+  function friendlySignUpError(message) {
+    if (!message) return "Nao foi possivel criar sua conta. Tente novamente.";
+    if (message.includes("User already registered") || message.includes("already registered")) {
+      return "Este e-mail ja esta cadastrado. Tente entrar no login.";
+    }
+    if (message.includes("Password should be at least")) {
+      return "Senha muito curta. Use pelo menos 6 caracteres.";
+    }
+    if (message.includes("Invalid email")) {
+      return "E-mail invalido. Confira e tente novamente.";
+    }
+    return message;
+  }
+
     page.querySelector("#reg-btn").addEventListener("click", async () => {
         try {
             const name = page.querySelector("#reg-name").value;
@@ -175,26 +196,28 @@ PageEvents.cadastro = (page) => {
             btn.disabled = true;
             btn.innerHTML = '<div class="spinner size-5 border-2 border-white/30 border-t-white"></div>';
 
-            // Salvar dados localmente primeiro (garante que funcione mesmo sem Supabase)
+            const { data, error } = await Supabase.signUp(email, pass, { full_name: name });
+            if (error) {
+              showRegError(errorEl, btn, friendlySignUpError(error.message));
+              return;
+            }
+
+            if (!data || !data.user) {
+              showRegError(errorEl, btn, "Cadastro nao concluido. Tente novamente em instantes.");
+              return;
+            }
+
+            // Salvar dados locais apenas apos criacao real no auth.
             AppState.set("userName", name);
             AppState.set("userEmail", email);
             AppState.set("onboardingDone", false);
 
-            try {
-                const { data, error } = await Supabase.signUp(email, pass, { full_name: name });
-                if (error) {
-                    console.warn("Supabase signup error (prosseguindo offline):", error.message);
-                }
-            } catch (supaErr) {
-                console.warn("Supabase offline, prosseguindo localmente:", supaErr);
-            }
-
             // Sempre avançar para onboarding
             Router.navigate("/onboarding");
         } catch (e) {
-            alert("Erro Inesperado no Cadastro: " + e.message);
-            page.querySelector("#reg-btn").disabled = false;
-            page.querySelector("#reg-btn").innerHTML = 'CRIAR CONTA <span class="material-symbols-outlined font-black">person_add</span>';
+            const errorEl = page.querySelector("#reg-error");
+            const btn = page.querySelector("#reg-btn");
+            showRegError(errorEl, btn, "Sem conexao com o servidor. Tente novamente.");
         }
     });
 };

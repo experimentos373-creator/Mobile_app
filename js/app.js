@@ -73,12 +73,11 @@ const App = {
     const syncMeta = await AppState.syncFull();
     const hasFreshGoogleOAuthIntent = this._resolveGoogleOAuthIntent();
 
-    const hasExplicitCloudOnboardingDone =
-      Boolean(syncMeta?.hasExplicitOnboardingDone) && Boolean(syncMeta?.resolvedOnboardingDone);
+    const hasResolvedCloudOnboardingDone = Boolean(syncMeta?.resolvedOnboardingDone);
 
     // If this auth cycle started from Google button and cloud does not explicitly confirm
     // onboarding completion, send user to onboarding instead of home.
-    if (hasFreshGoogleOAuthIntent && !hasExplicitCloudOnboardingDone) {
+    if (hasFreshGoogleOAuthIntent && !hasResolvedCloudOnboardingDone) {
       AppState.set("onboardingDone", false);
       Router.navigate("/onboarding", false, true);
       return;
@@ -334,7 +333,10 @@ const App = {
     if (!("serviceWorker" in navigator) || window.location.protocol === "file:") return;
 
     try {
-      await navigator.serviceWorker.register("/sw.js");
+      const registration = await navigator.serviceWorker.register("/sw.js?v=54", {
+        updateViaCache: "none"
+      });
+      registration.update().catch(() => {});
     } catch (error) {
       AppState.set("_swDisabled", true);
       console.warn("Service worker registration failed, online-only mode enabled:", error);
