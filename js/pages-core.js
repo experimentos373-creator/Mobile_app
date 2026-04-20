@@ -142,7 +142,7 @@ Pages.home = () => {
 
     <!-- Countdown Section (Compact Glass) -->
     <section class="max-w-2xl mx-auto px-6">
-      <div class="glass-card rounded-2xl p-4 flex items-center justify-between border border-white/5 shimmer-effect">
+      <div id="countdown-card" class="glass-card rounded-2xl p-4 flex items-center justify-between border border-white/5 shimmer-effect cursor-pointer active:scale-[0.99] transition-all" role="button" aria-label="Alterar data do exame">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center glow-orange shrink-0">
             <span class="material-symbols-outlined text-orange-400">timer</span>
@@ -351,6 +351,145 @@ PageEvents.home = (page) => {
     const d = el.querySelector("span:nth-child(1)");
     if (d) d.textContent = c.days + "d";
   };
+
+  const closeExamDateModal = () => {
+    const existing = document.getElementById("exam-date-modal");
+    if (existing) existing.remove();
+    document.body.style.overflow = "";
+  };
+
+  const openExamDateModal = () => {
+    closeExamDateModal();
+
+    const existingDate = String(AppState.get("examDate") || "2026-11-01");
+    const parsed = existingDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    let selectedDateStr = parsed ? existingDate : "2026-11-01";
+    let calYear = parsed ? Number(parsed[1]) : 2026;
+    let calMonth = parsed ? Number(parsed[2]) - 1 : 10;
+
+    const modal = document.createElement("div");
+    modal.id = "exam-date-modal";
+    modal.className = "fixed inset-0 z-[120] bg-slate-950/80 backdrop-blur-md p-4 flex items-center justify-center";
+    modal.innerHTML = Security.sanitize(`
+      <div class="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-black text-white uppercase tracking-widest">Escolher Data do Exame</h3>
+          <button id="exam-date-close" class="w-9 h-9 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-400 mb-4">Atualize sua data alvo e o contador D-Day será recalculado.</p>
+
+        <div id="exam-calendar-root" class="premium-calendar mb-5"></div>
+
+        <div class="flex items-center gap-3">
+          <button id="exam-date-cancel" class="flex-1 py-3 rounded-xl border border-white/10 bg-white/5 text-slate-300 font-bold text-sm">Cancelar</button>
+          <button id="exam-date-save" class="flex-1 py-3 rounded-xl bg-emerald-500 text-white font-black text-sm">Confirmar</button>
+        </div>
+      </div>
+    `);
+
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+    const renderCalendar = () => {
+      const today = new Date();
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const firstDayIdx = new Date(calYear, calMonth, 1).getDay();
+
+      let html = `
+        <div class="calendar-header">
+          <button class="calendar-btn" id="exam-cal-prev"><span class="material-symbols-outlined">chevron_left</span></button>
+          <div class="calendar-month-year">${monthNames[calMonth]} ${calYear}</div>
+          <button class="calendar-btn" id="exam-cal-next"><span class="material-symbols-outlined">chevron_right</span></button>
+        </div>
+        <div class="calendar-grid">
+          <div class="calendar-weekday">Dom</div><div class="calendar-weekday">Seg</div><div class="calendar-weekday">Ter</div>
+          <div class="calendar-weekday">Qua</div><div class="calendar-weekday">Qui</div><div class="calendar-weekday">Sex</div><div class="calendar-weekday">Sáb</div>
+      `;
+
+      for (let i = 0; i < firstDayIdx; i++) html += `<div class="calendar-day empty"></div>`;
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dStr = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        const isSelected = dStr === selectedDateStr;
+        const isToday = dStr === today.toISOString().split("T")[0];
+        html += `<div class="calendar-day ${isSelected ? "selected" : ""} ${isToday ? "today" : ""}" data-date="${dStr}">${d}</div>`;
+      }
+
+      html += `</div>`;
+      const root = modal.querySelector("#exam-calendar-root");
+      if (!root) return;
+      root.innerHTML = html;
+
+      const prevBtn = modal.querySelector("#exam-cal-prev");
+      const nextBtn = modal.querySelector("#exam-cal-next");
+      if (prevBtn) {
+        prevBtn.onclick = () => {
+          calMonth--;
+          if (calMonth < 0) {
+            calMonth = 11;
+            calYear--;
+          }
+          renderCalendar();
+        };
+      }
+      if (nextBtn) {
+        nextBtn.onclick = () => {
+          calMonth++;
+          if (calMonth > 11) {
+            calMonth = 0;
+            calYear++;
+          }
+          renderCalendar();
+        };
+      }
+
+      modal.querySelectorAll(".calendar-day:not(.empty)").forEach((el) => {
+        el.onclick = () => {
+          selectedDateStr = el.dataset.date;
+          renderCalendar();
+          SoundManager.play("tap");
+        };
+      });
+    };
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = "hidden";
+    renderCalendar();
+
+    const closeBtn = modal.querySelector("#exam-date-close");
+    const cancelBtn = modal.querySelector("#exam-date-cancel");
+    const saveBtn = modal.querySelector("#exam-date-save");
+
+    if (closeBtn) closeBtn.addEventListener("click", closeExamDateModal);
+    if (cancelBtn) cancelBtn.addEventListener("click", closeExamDateModal);
+    if (saveBtn) {
+      saveBtn.addEventListener("click", () => {
+        AppState.set("examDate", selectedDateStr);
+        AppState.saveToCloud().catch((error) => {
+          console.warn("Falha ao salvar nova data do exame:", error);
+        });
+        update();
+        if (typeof App !== "undefined" && typeof App.showToast === "function") {
+          App.showToast("Data do exame atualizada com sucesso!", "success");
+        }
+        closeExamDateModal();
+      });
+    }
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeExamDateModal();
+    });
+  };
+
+  const countdownCard = page.querySelector("#countdown-card");
+  if (countdownCard && !countdownCard.dataset.bound) {
+    countdownCard.dataset.bound = "true";
+    countdownCard.addEventListener("click", openExamDateModal);
+  }
+
+  update();
   if (window._countdownInterval) clearInterval(window._countdownInterval);
   window._countdownInterval = setInterval(update, 1000);
 };
