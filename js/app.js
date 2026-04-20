@@ -41,6 +41,17 @@ const App = {
           this._authHandled = true;
           await AppState.syncFull();
 
+          const forceGoogleOnboarding =
+            localStorage.getItem("eduhub_force_google_onboarding") === "1";
+
+          if (forceGoogleOnboarding) {
+            localStorage.removeItem("eduhub_force_google_onboarding");
+            AppState.set("onboardingDone", false);
+            AppState.set("userAge", "");
+            Router.navigate("/onboarding", false, true);
+            return;
+          }
+
           if (this.needsOnboarding()) {
             AppState.set("onboardingDone", false);
             Router.navigate("/onboarding", false, true);
@@ -51,6 +62,7 @@ const App = {
         if (event === 'SIGNED_OUT') {
           this._authHandled = false;
           this._hasSession = false;
+          localStorage.removeItem("eduhub_force_google_onboarding");
         }
       });
     }

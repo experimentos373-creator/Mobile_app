@@ -1,4 +1,4 @@
-const CACHE_NAME = "eduhub-shell-v44";
+const CACHE_NAME = "eduhub-shell-v45";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -6,19 +6,19 @@ const APP_SHELL = [
   "/termos.html",
   "/privacidade.html",
   "/css/tailwind.css",
-  "/css/app.css?v=44",
+  "/css/app.css?v=45",
   "/css/lexend.css",
   "/css/material-symbols.css",
-  "/js/data.js?v=44",
-  "/js/router.js?v=44",
-  "/js/pages-core.js?v=44",
-  "/js/pages-extra.js?v=44",
-  "/js/pages-more.js?v=44",
-  "/js/sound-manager.js?v=44",
+  "/js/data.js?v=45",
+  "/js/router.js?v=45",
+  "/js/pages-core.js?v=45",
+  "/js/pages-extra.js?v=45",
+  "/js/pages-more.js?v=45",
+  "/js/sound-manager.js?v=45",
   "/js/security-utils.js",
   "/js/supabase.js",
-  "/js/ai-service.js?v=44",
-  "/js/app.js?v=44",
+  "/js/ai-service.js?v=45",
+  "/js/app.js?v=45",
   "/js/vendor/supabase.js",
   "/js/vendor/purify.min.js",
   "/js/vendor/mathjax.js",
@@ -105,6 +105,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (isStaticAsset(url.pathname)) {
-    event.respondWith(cacheFirst(event.request));
+    const isCodeAsset = url.pathname.startsWith("/js/") || url.pathname.startsWith("/css/");
+    event.respondWith(isCodeAsset ? networkFirst(event.request) : cacheFirst(event.request));
   }
 });

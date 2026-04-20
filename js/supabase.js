@@ -9,6 +9,7 @@ const SupabaseConfig = {
 };
 
 const PROD_APP_ORIGIN = "https://mobileapp-taupe.vercel.app";
+const GOOGLE_ONBOARDING_MARKER = "eduhub_force_google_onboarding";
 
 function getOAuthRedirectTo() {
     const origin = String(window.location?.origin || "").trim();
@@ -56,12 +57,21 @@ const Supabase = {
 
         const redirectTo = getOAuthRedirectTo();
 
-        return await client.auth.signInWithOAuth({
+        // Explicitly force onboarding flow after OAuth callback.
+        localStorage.setItem(GOOGLE_ONBOARDING_MARKER, "1");
+
+        const result = await client.auth.signInWithOAuth({
             provider: 'google',
             options: {
                 redirectTo
             }
         });
+
+        if (result?.error) {
+            localStorage.removeItem(GOOGLE_ONBOARDING_MARKER);
+        }
+
+        return result;
     },
 
     async signUp(email, password, metadata) {
@@ -77,6 +87,7 @@ const Supabase = {
     async signOut() {
         const client = this.getClient();
         if (client) await client.auth.signOut();
+        localStorage.removeItem(GOOGLE_ONBOARDING_MARKER);
     },
 
     async saveProfile(userId, profileData) {
