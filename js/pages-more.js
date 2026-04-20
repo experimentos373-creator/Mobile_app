@@ -88,6 +88,11 @@ PageEvents.login = (page) => {
             if (error) {
                 return showError(friendlyError(error.message));
             }
+
+            if (data?.session?.user?.id && typeof Supabase.ensureProfile === "function") {
+                await Supabase.ensureProfile(data.session.user.id);
+            }
+
             // Sucesso real no Supabase
             await AppState.syncFull();
           const shouldOnboard =
@@ -205,6 +210,10 @@ PageEvents.cadastro = (page) => {
             if (!data || !data.user) {
               showRegError(errorEl, btn, "Cadastro nao concluido. Tente novamente em instantes.");
               return;
+            }
+
+            if (data?.session?.user?.id && typeof Supabase.ensureProfileFromSession === "function") {
+              await Supabase.ensureProfileFromSession(name);
             }
 
             // Salvar dados locais apenas apos criacao real no auth.

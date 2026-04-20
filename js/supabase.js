@@ -108,13 +108,73 @@ const Supabase = {
         localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
     },
 
-    async saveProfile(userId, profileData) {
+    async ensureProfile(userId) {
         const client = this.getClient();
-        if (!client) return;
+        if (!client || !userId) return { data: null, error: null };
+
+        // Keep bootstrap minimal so profile creation does not depend on optional columns.
+        const { data, error } = await client
+            .from('profiles')
+            .upsert({ id: userId }, { onConflict: 'id' })
+            .select('id')
+            .maybeSingle();
+
+        if (error) {
+            console.warn("Error ensuring profile row:", error);
+        }
+
+        return { data, error };
+    },
+
+    async ensureProfileFromSession(preferredName = "") {
+        const client = this.getClient();
+        if (!client) return { data: null, error: null };
+
+        const { data: { session } } = await client.auth.getSession();
+        const userId = session?.user?.id;
+        if (!userId) return { data: null, error: null };
+
+        const ensured = await this.ensureProfile(userId);
+        if (ensured.error) return ensured;
+
+        const metadata = session.user.user_metadata || {};
+        const resolvedName = String(
+            preferredName ||
+            metadata.full_name ||
+            metadata.name ||
+            metadata.given_name ||
+            ""
+        ).trim();
+
+        if (!resolvedName) return ensured;
+
         const { error } = await client
             .from('profiles')
-            .upsert({ id: userId, ...profileData, updated_at: new Date() });
+            .update({ userName: resolvedName, updated_at: new Date().toISOString() })
+            .eq('id', userId);
+
+        if (error) {
+            // Non-fatal: profile row already exists, and schema may not include this optional column.
+            console.warn("Error updating ensured profile name:", error);
+        }
+
+        return ensured;
+    },
+
+    async saveProfile(userId, profileData) {
+        const client = this.getClient();
+        if (!client) return { data: null, error: { message: "Conexão não configurada." } };
+
+        await this.ensureProfile(userId);
+
+        const { data, error } = await client
+            .from('profiles')
+            .upsert(
+                { id: userId, ...profileData, updated_at: new Date().toISOString() },
+                { onConflict: 'id' }
+            );
         if (error) console.error("Error saving profile:", error);
+        return { data, error };
     },
 
     async getProfile(userId) {

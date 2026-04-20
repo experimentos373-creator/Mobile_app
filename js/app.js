@@ -70,6 +70,14 @@ const App = {
       localStorage.setItem("eduhub_last_user_id", currentUserId);
     }
 
+    // Defensive fallback: keep one profile row per auth user even if DB trigger is missing.
+    if (currentUserId && typeof Supabase !== "undefined" && typeof Supabase.ensureProfile === "function") {
+      const { error: ensureError } = await Supabase.ensureProfile(currentUserId);
+      if (ensureError) {
+        console.warn("Profile bootstrap ensure failed:", ensureError);
+      }
+    }
+
     const syncMeta = await AppState.syncFull();
     const hasFreshGoogleOAuthIntent = this._resolveGoogleOAuthIntent();
 
