@@ -423,6 +423,7 @@ PageEvents.home = (page) => {
       panel.style.border = "1px solid rgba(148,163,184,0.25)";
       panel.style.padding = "24px";
       panel.style.boxShadow = "0 30px 80px rgba(2,6,23,0.65)";
+      panel.style.transform = "translateY(-14px)";
     }
 
     const renderCalendar = () => {
@@ -455,8 +456,10 @@ PageEvents.home = (page) => {
       if (!root) return;
       root.innerHTML = html;
       root.style.maxWidth = "380px";
-      root.style.padding = "20px";
+      root.style.padding = "22px";
+      root.style.paddingTop = "28px";
       root.style.borderRadius = "26px";
+      root.style.marginTop = "10px";
       root.style.marginBottom = "24px";
 
       const selectedLabel = modal.querySelector("#exam-date-selected-label");
