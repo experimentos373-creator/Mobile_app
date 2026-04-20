@@ -1,4 +1,4 @@
-const CACHE_NAME = "eduhub-shell-v46";
+const CACHE_NAME = "eduhub-shell-v47";
 const APP_SHELL = [
   "/",
   "/index.html",

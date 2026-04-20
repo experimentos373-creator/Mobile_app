@@ -354,6 +354,9 @@ PageEvents.home = (page) => {
 
   const closeExamDateModal = () => {
     const existing = document.getElementById("exam-date-modal");
+    if (existing && existing._onKeyDown) {
+      document.removeEventListener("keydown", existing._onKeyDown);
+    }
     if (existing) existing.remove();
     document.body.style.overflow = "";
   };
@@ -369,17 +372,27 @@ PageEvents.home = (page) => {
 
     const modal = document.createElement("div");
     modal.id = "exam-date-modal";
-    modal.className = "fixed inset-0 z-[120] bg-slate-950/80 backdrop-blur-md p-4 flex items-center justify-center";
+    modal.className = "fixed inset-0 p-4 flex items-end justify-center";
+    modal.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(2,6,23,0.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
     modal.innerHTML = Security.sanitize(`
-      <div class="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-2xl">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-black text-white uppercase tracking-widest">Escolher Data do Exame</h3>
+      <div id="exam-date-panel" class="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-2xl">
+        <div class="w-12 h-1 rounded-full bg-white/15 mx-auto mb-4"></div>
+
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-[11px] font-black text-white uppercase tracking-[0.15em]">Escolher Data do Exame</h3>
           <button id="exam-date-close" class="w-9 h-9 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all">
             <span class="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
         <p class="text-xs text-slate-400 mb-4">Atualize sua data alvo e o contador D-Day será recalculado.</p>
+
+        <div class="mb-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-center">
+          <span class="text-[10px] font-black uppercase tracking-[0.12em] text-emerald-300">Data selecionada: </span>
+          <span id="exam-date-selected-label" class="text-[11px] font-black text-white"></span>
+        </div>
 
         <div id="exam-calendar-root" class="premium-calendar mb-5"></div>
 
@@ -391,6 +404,23 @@ PageEvents.home = (page) => {
     `);
 
     const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const formatDateLabel = (iso) => {
+      const m = String(iso || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return "";
+      const year = Number(m[1]);
+      const monthIdx = Number(m[2]) - 1;
+      const day = Number(m[3]);
+      return `${String(day).padStart(2, "0")} de ${monthNames[monthIdx]} de ${year}`;
+    };
+
+    const panel = modal.querySelector("#exam-date-panel");
+    if (panel) {
+      panel.style.maxHeight = "92vh";
+      panel.style.overflowY = "auto";
+      panel.style.width = "100%";
+      panel.style.background = "rgba(15,23,42,0.98)";
+      panel.style.border = "1px solid rgba(148,163,184,0.25)";
+    }
 
     const renderCalendar = () => {
       const today = new Date();
@@ -421,6 +451,9 @@ PageEvents.home = (page) => {
       const root = modal.querySelector("#exam-calendar-root");
       if (!root) return;
       root.innerHTML = html;
+
+      const selectedLabel = modal.querySelector("#exam-date-selected-label");
+      if (selectedLabel) selectedLabel.textContent = formatDateLabel(selectedDateStr);
 
       const prevBtn = modal.querySelector("#exam-cal-prev");
       const nextBtn = modal.querySelector("#exam-cal-next");
@@ -456,6 +489,11 @@ PageEvents.home = (page) => {
 
     document.body.appendChild(modal);
     document.body.style.overflow = "hidden";
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") closeExamDateModal();
+    };
+    modal._onKeyDown = onKeyDown;
+    document.addEventListener("keydown", onKeyDown);
     renderCalendar();
 
     const closeBtn = modal.querySelector("#exam-date-close");
