@@ -321,28 +321,55 @@ const AppState = {
       if (session && session.user) {
         const profile = await Supabase.getProfile(session.user.id);
         if (profile) {
-          // Merge critical cloud state
-          // Merge FULL cloud state (Strict: reset local if cloud is empty/null)
+          const metadata = session.user.user_metadata || {};
+          const getCloudValue = (...keys) => {
+            for (const key of keys) {
+              if (profile[key] !== undefined && profile[key] !== null) {
+                return profile[key];
+              }
+            }
+            return undefined;
+          };
+
+          const cloudUserName = String(
+            getCloudValue("userName", "user_name") ??
+              metadata.full_name ??
+              metadata.name ??
+              metadata.given_name ??
+              ""
+          ).trim();
+          const cloudUserAge = String(getCloudValue("userAge", "user_age") ?? "").trim();
+          const cloudOnboardingDone = getCloudValue("onboardingDone", "onboarding_done");
+
+          // Deterministic onboarding status across devices:
+          // 1) explicit cloud flag wins; 2) otherwise infer from profile completeness.
+          const resolvedOnboardingDone =
+            typeof cloudOnboardingDone === "boolean"
+              ? cloudOnboardingDone
+              : Boolean(cloudUserName && cloudUserAge);
+
+          this.set("userEmail", String(session.user.email || "").trim());
+          this.set("userName", cloudUserName);
+          this.set("userAge", cloudUserAge);
+          this.set("onboardingDone", resolvedOnboardingDone);
+
+          // Merge remaining cloud state (strict mode for non-auth identity fields).
           const fields = [
-            "userName", "userAge", "userPlan", "onboardingDone", "studyGoal", "targetExam", 
+            "userPlan", "studyGoal", "targetExam", 
             "totalQuestionsAnswered", "correctAnswers", "studyTimeMinutes", "restTimeMinutes",
             "hasUsedFreePredictor", "subjectAccuracy", "missionProgress", "weeklyStudyData"
           ];
-          const preserveWhenMissing = new Set(["userName", "userAge", "onboardingDone", "studyGoal", "targetExam", "userPlan"]);
           
           fields.forEach(field => {
-            if (profile[field] !== undefined && profile[field] !== null) {
-              const normalizedValue = this.normalize(
-                field,
-                field === "onboardingDone" ? Boolean(profile[field]) : profile[field]
-              );
+            const cloudValue = profile[field] !== undefined && profile[field] !== null
+              ? profile[field]
+              : getCloudValue(field);
+
+            if (cloudValue !== undefined && cloudValue !== null) {
+              const normalizedValue = this.normalize(field, cloudValue);
               this.set(field, normalizedValue);
-            } else if (preserveWhenMissing.has(field)) {
-              // Keep local onboarding-critical fields when cloud payload is partial.
-              const localValue = this.get(field);
-              this.set(field, localValue);
             } else {
-              // If cloud is null/undefined, revert to default to clean stale local data
+              // If cloud is missing, use defaults to avoid stale local carry-over.
               this.set(field, this._defaults[field]);
             }
           });

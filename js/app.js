@@ -348,15 +348,63 @@ const App = {
     SoundManager.play("success");
   },
   async logout() {
+    this._authHandled = false;
+    this._hasSession = false;
+
+    const clearSupabaseStorage = () => {
+      const clearFrom = (storage) => {
+        const keysToRemove = [];
+        for (let i = 0; i < storage.length; i++) {
+          const key = storage.key(i);
+          if (!key) continue;
+          const lower = key.toLowerCase();
+          if (key.startsWith("sb-") || lower.includes("supabase") || lower.includes("auth-token")) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach((key) => storage.removeItem(key));
+      };
+
+      try {
+        clearFrom(localStorage);
+        clearFrom(sessionStorage);
+      } catch (storageError) {
+        console.warn("Falha ao limpar storage de auth:", storageError);
+      }
+    };
+
     try {
       const client = Supabase.getClient();
-      if (client) await client.auth.signOut({ scope: 'local' });
+      if (client) {
+        const localResult = await client.auth.signOut({ scope: "local" });
+        if (localResult?.error) {
+          console.warn("Logout local retornou erro:", localResult.error);
+        }
+
+        // Global sign-out revokes refresh tokens server-side when possible.
+        const globalResult = await client.auth.signOut({ scope: "global" });
+        if (globalResult?.error) {
+          console.warn("Logout global retornou erro:", globalResult.error);
+        }
+      }
     } catch (e) {
       console.error("Supabase logout error:", e);
     }
+
+    clearSupabaseStorage();
     AppState.reset();
-    // Clear hash first, then navigate to login without reload
-    window.location.hash = "/login";
+    localStorage.removeItem("eduhub_last_user_id");
+
+    // Ensure tab cache from authenticated screens does not bleed into login state.
+    if (typeof Router !== "undefined" && Router && Router.TAB_ROUTES) {
+      Array.from(Router.TAB_ROUTES).forEach((route) => {
+        const name = route.replace("/", "");
+        if (typeof Router.invalidateTab === "function") Router.invalidateTab(name);
+      });
+      Router.history = [];
+    }
+
+    Router.navigate("/login", false, true);
   },
   async deleteAccount() {
     try {
