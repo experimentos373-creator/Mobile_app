@@ -372,33 +372,33 @@ PageEvents.home = (page) => {
 
     const modal = document.createElement("div");
     modal.id = "exam-date-modal";
-    modal.className = "fixed inset-0 p-4 flex items-end justify-center";
-    modal.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(2,6,23,0.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);";
+    modal.className = "fixed inset-0";
+    modal.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(2,6,23,0.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:18px;";
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", "true");
     modal.innerHTML = Security.sanitize(`
-      <div id="exam-date-panel" class="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-2xl">
-        <div class="w-12 h-1 rounded-full bg-white/15 mx-auto mb-4"></div>
+      <div id="exam-date-panel" class="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
+        <div class="w-12 h-1 rounded-full bg-white/15 mx-auto mb-5"></div>
 
-        <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center justify-between mb-4">
           <h3 class="text-[11px] font-black text-white uppercase tracking-[0.15em]">Escolher Data do Exame</h3>
           <button id="exam-date-close" class="w-9 h-9 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all">
             <span class="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
-        <p class="text-xs text-slate-400 mb-4">Atualize sua data alvo e o contador D-Day será recalculado.</p>
+        <p class="text-xs text-slate-400 mb-5 leading-relaxed">Atualize sua data alvo e o contador D-Day será recalculado.</p>
 
-        <div class="mb-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-center">
+        <div class="mb-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-3 text-center">
           <span class="text-[10px] font-black uppercase tracking-[0.12em] text-emerald-300">Data selecionada: </span>
           <span id="exam-date-selected-label" class="text-[11px] font-black text-white"></span>
         </div>
 
-        <div id="exam-calendar-root" class="premium-calendar mb-5"></div>
+        <div id="exam-calendar-root" class="premium-calendar mb-6"></div>
 
-        <div class="flex items-center gap-3">
-          <button id="exam-date-cancel" class="flex-1 py-3 rounded-xl border border-white/10 bg-white/5 text-slate-300 font-bold text-sm">Cancelar</button>
-          <button id="exam-date-save" class="flex-1 py-3 rounded-xl bg-emerald-500 text-white font-black text-sm">Confirmar</button>
+        <div class="flex items-center gap-4 pt-1">
+          <button id="exam-date-cancel" class="flex-1 py-3.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 font-bold text-sm">Cancelar</button>
+          <button id="exam-date-save" class="flex-1 py-3.5 rounded-xl bg-emerald-500 text-white font-black text-sm">Confirmar</button>
         </div>
       </div>
     `);
@@ -418,8 +418,11 @@ PageEvents.home = (page) => {
       panel.style.maxHeight = "92vh";
       panel.style.overflowY = "auto";
       panel.style.width = "100%";
+      panel.style.maxWidth = "470px";
       panel.style.background = "rgba(15,23,42,0.98)";
       panel.style.border = "1px solid rgba(148,163,184,0.25)";
+      panel.style.padding = "24px";
+      panel.style.boxShadow = "0 30px 80px rgba(2,6,23,0.65)";
     }
 
     const renderCalendar = () => {
@@ -451,6 +454,10 @@ PageEvents.home = (page) => {
       const root = modal.querySelector("#exam-calendar-root");
       if (!root) return;
       root.innerHTML = html;
+      root.style.maxWidth = "380px";
+      root.style.padding = "20px";
+      root.style.borderRadius = "26px";
+      root.style.marginBottom = "24px";
 
       const selectedLabel = modal.querySelector("#exam-date-selected-label");
       if (selectedLabel) selectedLabel.textContent = formatDateLabel(selectedDateStr);
