@@ -315,12 +315,21 @@ const AppState = {
 
 
   async syncFull() {
-    if (typeof Supabase === "undefined" || !Supabase.getClient()) return Promise.resolve();
+    const syncMeta = {
+      hasSession: false,
+      profileExists: false,
+      hasExplicitOnboardingDone: false,
+      resolvedOnboardingDone: false
+    };
+
+    if (typeof Supabase === "undefined" || !Supabase.getClient()) return syncMeta;
     try {
       const { data: { session } } = await Supabase.getClient().auth.getSession();
       if (session && session.user) {
+        syncMeta.hasSession = true;
         const profile = await Supabase.getProfile(session.user.id);
         if (profile) {
+          syncMeta.profileExists = true;
           const metadata = session.user.user_metadata || {};
           const getCloudValue = (...keys) => {
             for (const key of keys) {
@@ -340,6 +349,7 @@ const AppState = {
           ).trim();
           const cloudUserAge = String(getCloudValue("userAge", "user_age") ?? "").trim();
           const cloudOnboardingDone = getCloudValue("onboardingDone", "onboarding_done");
+          syncMeta.hasExplicitOnboardingDone = typeof cloudOnboardingDone === "boolean";
 
           // Deterministic onboarding status across devices:
           // 1) explicit cloud flag wins; 2) otherwise infer from profile completeness.
@@ -347,6 +357,7 @@ const AppState = {
             typeof cloudOnboardingDone === "boolean"
               ? cloudOnboardingDone
               : Boolean(cloudUserName && cloudUserAge);
+          syncMeta.resolvedOnboardingDone = resolvedOnboardingDone;
 
           this.set("userEmail", String(session.user.email || "").trim());
           this.set("userName", cloudUserName);
@@ -405,6 +416,7 @@ const AppState = {
           this.set("userName", inferredName);
           this.set("userAge", "");
           this.set("onboardingDone", false);
+          syncMeta.resolvedOnboardingDone = false;
 
           // Save a clean baseline profile to cloud (no carry-over from old local sessions).
           await this.saveToCloud();
@@ -413,6 +425,8 @@ const AppState = {
     } catch (e) {
       console.warn("Failed to sync Full AppState from Supabase:", e);
     }
+
+    return syncMeta;
   },
 
   async saveToCloud() {

@@ -9,6 +9,7 @@ const SupabaseConfig = {
 };
 
 const PROD_APP_ORIGIN = "https://mobileapp-taupe.vercel.app";
+const GOOGLE_OAUTH_PENDING_KEY = "eduhub_google_oauth_pending";
 
 function getOAuthRedirectTo() {
     const origin = String(window.location?.origin || "").trim();
@@ -56,12 +57,25 @@ const Supabase = {
 
         const redirectTo = getOAuthRedirectTo();
 
-        return await client.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo
+        localStorage.setItem(GOOGLE_OAUTH_PENDING_KEY, String(Date.now()));
+
+        try {
+            const result = await client.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo
+                }
+            });
+
+            if (result?.error) {
+                localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
             }
-        });
+
+            return result;
+        } catch (error) {
+            localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+            throw error;
+        }
     },
 
     async signUp(email, password, metadata) {
@@ -77,6 +91,7 @@ const Supabase = {
     async signOut() {
         const client = this.getClient();
         if (client) await client.auth.signOut();
+        localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
     },
 
     async saveProfile(userId, profileData) {

@@ -2,6 +2,8 @@
 // EduHub Brasil - Main App Controller
 // ============================================================
 
+const GOOGLE_OAUTH_PENDING_KEY = "eduhub_google_oauth_pending";
+
 const App = {
   _authHandled: false,
   _hasSession: false,
@@ -51,7 +53,28 @@ const App = {
             localStorage.setItem("eduhub_last_user_id", currentUserId);
           }
 
-          await AppState.syncFull();
+          const syncMeta = await AppState.syncFull();
+
+          const googleOAuthPendingAt = Number(localStorage.getItem(GOOGLE_OAUTH_PENDING_KEY) || "0");
+          const hasFreshGoogleOAuthIntent =
+            Number.isFinite(googleOAuthPendingAt) &&
+            googleOAuthPendingAt > 0 &&
+            (Date.now() - googleOAuthPendingAt) < 30 * 60 * 1000;
+
+          if (googleOAuthPendingAt > 0) {
+            localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+          }
+
+          const hasExplicitCloudOnboardingDone =
+            Boolean(syncMeta?.hasExplicitOnboardingDone) && Boolean(syncMeta?.resolvedOnboardingDone);
+
+          // If this auth cycle started from Google button and cloud does not explicitly confirm
+          // onboarding completion, send user to onboarding instead of home.
+          if (hasFreshGoogleOAuthIntent && !hasExplicitCloudOnboardingDone) {
+            AppState.set("onboardingDone", false);
+            Router.navigate("/onboarding", false, true);
+            return;
+          }
 
           if (this.needsOnboarding()) {
             Router.navigate("/onboarding", false, true);
@@ -62,6 +85,7 @@ const App = {
         if (event === 'SIGNED_OUT') {
           this._authHandled = false;
           this._hasSession = false;
+          localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
           if (window.location.hash !== "#/login") {
             Router.navigate("/login", false, true);
           }
@@ -397,6 +421,7 @@ const App = {
     clearSupabaseStorage();
     AppState.reset();
     localStorage.removeItem("eduhub_last_user_id");
+    localStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
 
     // Ensure tab cache from authenticated screens does not bleed into login state.
     if (typeof Router !== "undefined" && Router && Router.TAB_ROUTES) {
