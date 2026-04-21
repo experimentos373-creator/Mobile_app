@@ -17,40 +17,40 @@ const AIService = {
       tier: "basico",
       supportsReasoning: false,
       supportsVision: false,
-      timeout: 25000
+      timeout: 8000
     },
     "minimax": {
-      id: "google/gemma-2-9b-it:free",
-      label: "Gemma 2 9B",
-      description: "Raciocinio otimizado Google",
+      id: "google/gemma-3-4b-it:free",
+      label: "Gemma 3 4B",
+      description: "IA rapida do Google",
       icon: "psychology",
       color: "blue",
       tier: "pro",
       supportsReasoning: false,
       supportsVision: false,
-      timeout: 30000
+      timeout: 8000
     },
     "nemotron-super": {
-      id: "qwen/qwen-2.5-72b-instruct:free",
-      label: "Qwen 2.5 72B Super",
-      description: "Modelo potente de 72 Bilhoes",
+      id: "meta-llama/llama-3.3-70b-instruct:free",
+      label: "Llama 3.3 70B Super",
+      description: "Modelo potente de 70 Bilhoes",
       icon: "neurology",
       color: "amber",
       tier: "plus",
       supportsReasoning: false,
       supportsVision: false,
-      timeout: 45000
+      timeout: 8000
     },
     "trinity-large": {
-      id: "mistralai/mistral-nemo:free",
-      label: "Mistral Nemo",
-      description: "Respostas analiticas e complexas",
+      id: "inclusionai/ling-2.6-flash:free",
+      label: "Ling 2.6 Flash",
+      description: "Ultra rapido e inteligente",
       icon: "water_drop",
       color: "cyan",
       tier: "plus",
       supportsReasoning: false,
       supportsVision: false,
-      timeout: 35000
+      timeout: 8000
     }
   },
 

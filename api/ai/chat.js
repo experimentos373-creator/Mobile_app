@@ -119,28 +119,23 @@ module.exports = async (req, res) => {
 
     let lastError = null;
     const fallbackModelId = "meta-llama/llama-3.2-3b-instruct:free";
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        const data = await callOpenRouter(req, requestBody, model.timeout || 60000);
-        const content = data?.choices?.[0]?.message?.content || "";
-        if (!content) {
-          throw new Error("A IA nao retornou uma resposta. Tente novamente.");
-        }
 
-        sendJson(res, 200, { content });
-        return;
-      } catch (error) {
-        lastError = error;
-        if (attempt < 3) {
-          const baseDelayMs = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
-          const jitterMs = Math.floor(Math.random() * 250);
-          await new Promise((resolve) => setTimeout(resolve, baseDelayMs + jitterMs));
-        }
+    // Single attempt — Vercel Hobby has a 10s function timeout,
+    // so retries with backoff would cause the function to be killed mid-flight.
+    try {
+      const data = await callOpenRouter(req, requestBody, model.timeout || 8000);
+      const content = data?.choices?.[0]?.message?.content || "";
+      if (!content) {
+        throw new Error("A IA nao retornou uma resposta. Tente novamente.");
       }
+
+      sendJson(res, 200, { content });
+      return;
+    } catch (error) {
+      lastError = error;
     }
 
-    // Last-resort fallback: if the selected upstream model is unstable,
-    // retry once with a highly available baseline model.
+    // Quick fallback with the fastest available model
     if (requestBody.model !== fallbackModelId) {
       try {
         const fallbackBody = {
@@ -148,7 +143,7 @@ module.exports = async (req, res) => {
           model: fallbackModelId
         };
 
-        const fallbackData = await callOpenRouter(req, fallbackBody, 60000);
+        const fallbackData = await callOpenRouter(req, fallbackBody, 8000);
         const fallbackContent = fallbackData?.choices?.[0]?.message?.content || "";
         if (fallbackContent) {
           sendJson(res, 200, {

@@ -34,37 +34,37 @@ const MODELS = {
     tier: "basico",
     supportsReasoning: false,
     supportsVision: false,
-    timeout: 25000
+    timeout: 8000
   },
   minimax: {
-    id: "google/gemma-2-9b-it:free",
-    label: "Gemma 2 9B",
+    id: "google/gemma-3-4b-it:free",
+    label: "Gemma 3 4B",
     tier: "pro",
     supportsReasoning: false,
     supportsVision: false,
-    timeout: 30000
+    timeout: 8000
   },
   "nemotron-super": {
-    id: "qwen/qwen-2.5-72b-instruct:free",
-    label: "Qwen 2.5 72B Super",
+    id: "meta-llama/llama-3.3-70b-instruct:free",
+    label: "Llama 3.3 70B Super",
     tier: "plus",
     supportsReasoning: false,
     supportsVision: false,
-    timeout: 45000
+    timeout: 8000
   },
   "trinity-large": {
-    id: "mistralai/mistral-nemo:free",
-    label: "Mistral Nemo",
+    id: "inclusionai/ling-2.6-flash:free",
+    label: "Ling 2.6 Flash",
     tier: "plus",
     supportsReasoning: false,
     supportsVision: false,
-    timeout: 35000
+    timeout: 8000
   }
 };
 
 const REDACAO_MODELS = [
-  { id: "qwen/qwen-2.5-72b-instruct:free", label: "Qwen 2.5 72B Super", timeout: 40000 },
-  { id: "google/gemma-2-9b-it:free", label: "Gemma 2 9B", timeout: 40000 }
+  { id: "meta-llama/llama-3.3-70b-instruct:free", label: "Llama 3.3 70B", timeout: 8000 },
+  { id: "google/gemma-3-4b-it:free", label: "Gemma 3 4B", timeout: 8000 }
 ];
 
 const TIER_LEVELS = { gratis: 0, basico: 1, pro: 2, plus: 3 };
