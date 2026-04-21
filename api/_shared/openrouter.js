@@ -7,7 +7,9 @@ const DEFAULT_ALLOWED_ORIGINS = [
   "https://www.eduhub.com.br",
   "https://mobileapp-taupe.vercel.app",
   "http://localhost:3000",
-  "http://localhost:4173"
+  "http://localhost:4173",
+  "http://localhost",
+  "capacitor://localhost"
 ];
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || DEFAULT_ALLOWED_ORIGINS.join(","))
@@ -144,13 +146,15 @@ function sendJson(res, status, payload) {
 function guardCors(req, res) {
   const origin = getRequestOrigin(req);
   const requestOrigin = getOrigin(req);
-  const allowed = Boolean(origin && (origin === requestOrigin || isOriginAllowed(origin)));
+  // Allow if origin matches request, is in allowed list, or is missing/null (common in Mobile App wrappers)
+  const allowed = !origin || origin === "null" || origin === requestOrigin || isOriginAllowed(origin);
+  
   if (!allowed) {
     sendJson(res, 403, { error: "Origin nao autorizada." });
     return false;
   }
 
-  setCorsHeaders(res, origin);
+  setCorsHeaders(res, origin || "*");
   if (req.method === "OPTIONS") {
     res.statusCode = 204;
     res.end();
