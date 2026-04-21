@@ -9,8 +9,8 @@ const AIService = {
   // Fast, reliable models configured for the free tier heavily prioritized queue evasion
   MODELS: {
     "step-3-5": {
-      id: "meta-llama/llama-3.1-8b-instruct:free",
-      label: "Llama 3.1 8B (Veloz)",
+      id: "meta-llama/llama-3.2-3b-instruct:free",
+      label: "Llama 3.2 3B",
       description: "Extremamente rapido e eficiente",
       icon: "bolt",
       color: "emerald",

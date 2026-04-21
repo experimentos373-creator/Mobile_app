@@ -29,8 +29,8 @@ const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 const MODELS = {
   "step-3-5": {
-    id: "meta-llama/llama-3.1-8b-instruct:free",
-    label: "Llama 3.1 8B (Veloz)",
+    id: "meta-llama/llama-3.2-3b-instruct:free",
+    label: "Llama 3.2 3B (Veloz)",
     tier: "basico",
     supportsReasoning: false,
     supportsVision: false,

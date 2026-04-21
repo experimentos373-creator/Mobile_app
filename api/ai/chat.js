@@ -118,7 +118,7 @@ module.exports = async (req, res) => {
     }
 
     let lastError = null;
-    const fallbackModelId = "meta-llama/llama-3.1-8b-instruct:free";
+    const fallbackModelId = "meta-llama/llama-3.2-3b-instruct:free";
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const data = await callOpenRouter(req, requestBody, model.timeout || 60000);
