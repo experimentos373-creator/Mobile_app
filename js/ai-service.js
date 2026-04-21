@@ -155,9 +155,19 @@ const AIService = {
 
         const client = Supabase.getClient();
         if (client) {
-          const {
-            data: { session }
-          } = await client.auth.getSession();
+          // Retry once after a short delay if the first attempt hits a lock error
+          let session = null;
+          for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+              const { data } = await client.auth.getSession();
+              session = data?.session;
+              break;
+            } catch (lockErr) {
+              if (attempt === 0) {
+                await new Promise((r) => setTimeout(r, 1000));
+              }
+            }
+          }
           if (session?.access_token) {
             headers.Authorization = `Bearer ${session.access_token}`;
           }

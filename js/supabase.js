@@ -104,7 +104,14 @@ const Supabase = {
             return null;
         }
         if (!supabaseClient) {
-            supabaseClient = supabase.createClient(SupabaseConfig.URL, SupabaseConfig.ANON_KEY);
+            supabaseClient = supabase.createClient(SupabaseConfig.URL, SupabaseConfig.ANON_KEY, {
+                auth: {
+                    flowType: 'implicit',
+                    detectSessionInUrl: true,
+                    persistSession: true,
+                    autoRefreshToken: true
+                }
+            });
         }
         return supabaseClient;
     },

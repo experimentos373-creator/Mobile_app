@@ -1702,11 +1702,16 @@ Pages["ia-tutor"] = () => {
 };
 
 PageEvents["ia-tutor"] = (page) => {
+  // Guard: free plan renders a "blocked" UI with no interactive elements
+  const plan = AppState.get("userPlan");
+  if (plan === "gratis") return;
+
   let activeModel = AIService.getAvailableModels()[0]?.key || "step-3-5";
   let isSending = false;
   const chatArea = page.querySelector("#ai-chat-area");
   const input = page.querySelector("#ai-input");
   const sendBtn = page.querySelector("#ai-send-btn");
+  if (!input || !sendBtn || !chatArea) return;
   
   // File Upload Elements
   const fileInput = page.querySelector("#ai-file-input");

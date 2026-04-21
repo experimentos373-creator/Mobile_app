@@ -179,7 +179,7 @@ const App = {
       }
     }
 
-    const syncMeta = await AppState.syncFull();
+    const syncMeta = await AppState.syncFull(session);
     const hasFreshGoogleOAuthIntent = this._resolveGoogleOAuthIntent();
 
     let hasResolvedCloudOnboardingDone = Boolean(syncMeta?.resolvedOnboardingDone);
@@ -197,7 +197,7 @@ const App = {
       if (localOnboardingDoneKey) {
         localStorage.setItem(localOnboardingDoneKey, "1");
       }
-      AppState.saveToCloud().catch((error) => {
+      AppState.saveToCloud(session).catch((error) => {
         console.warn("Failed to persist legacy onboarding fallback:", error);
       });
       hasResolvedCloudOnboardingDone = true;
@@ -228,34 +228,44 @@ const App = {
       localStorage.setItem("eduhub_data_version", "v3");
     }
 
-    // Handle Supabase auth state changes (especially after Google redirect)
+    // Handle Supabase auth state changes (especially after Google redirect).
+    // IMPORTANT: We rely exclusively on onAuthStateChange to get the initial
+    // session. Calling getSession() concurrently with the internal _initialize()
+    // that onAuthStateChange triggers causes a Web Locks API race condition
+    // ("Lock was released because another request stole it").
     const client = Supabase.getClient();
     if (client) {
-      client.auth.onAuthStateChange(async (event, session) => {
-        this._hasSession = Boolean(session);
-
-        // Handle sign-in and OAuth restore exactly once per app boot.
-        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !this._authHandled) {
-          await this._handleAuthenticatedSession(session);
-        }
-        if (event === 'SIGNED_OUT') {
-          this._authHandled = false;
-          this._hasSession = false;
-          localStorage.removeItem(APP_GOOGLE_OAUTH_PENDING_KEY);
-          if (window.location.hash !== "#/login") {
-            Router.navigate("/login", false, true);
-          }
-        }
-      });
-
-      // Bootstrap current session in case INITIAL_SESSION event is missed or delayed.
       try {
-        const { data: { session } } = await client.auth.getSession();
-        this._hasSession = Boolean(session);
+        await new Promise((resolve) => {
+          const timeoutId = setTimeout(() => {
+            console.warn("Auth INITIAL_SESSION timeout — proceeding without session.");
+            resolve();
+          }, 5000);
 
-        if (session && !this._authHandled) {
-          await this._handleAuthenticatedSession(session);
-        }
+          client.auth.onAuthStateChange(async (event, session) => {
+            this._hasSession = Boolean(session);
+
+            // Handle sign-in and OAuth restore exactly once per app boot.
+            if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !this._authHandled) {
+              await this._handleAuthenticatedSession(session);
+            }
+            if (event === 'SIGNED_OUT') {
+              this._authHandled = false;
+              this._hasSession = false;
+              localStorage.removeItem(APP_GOOGLE_OAUTH_PENDING_KEY);
+              if (window.location.hash !== "#/login") {
+                Router.navigate("/login", false, true);
+              }
+            }
+
+            // Resolve once INITIAL_SESSION has been fully handled so the rest
+            // of init() can proceed (route registration, Router.init, etc.).
+            if (event === 'INITIAL_SESSION') {
+              clearTimeout(timeoutId);
+              resolve();
+            }
+          });
+        });
       } catch (sessionError) {
         console.warn("Initial session bootstrap failed:", sessionError);
       } finally {

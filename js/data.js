@@ -323,7 +323,7 @@ const AppState = {
   },
 
 
-  async syncFull() {
+  async syncFull(existingSession = null) {
     const syncMeta = {
       hasSession: false,
       profileExists: false,
@@ -333,7 +333,11 @@ const AppState = {
 
     if (typeof Supabase === "undefined" || !Supabase.getClient()) return syncMeta;
     try {
-      const { data: { session } } = await Supabase.getClient().auth.getSession();
+      let session = existingSession;
+      if (!session) {
+        const { data: { session: fetched } } = await Supabase.getClient().auth.getSession();
+        session = fetched;
+      }
       if (session && session.user) {
         syncMeta.hasSession = true;
         const profile = await Supabase.getProfile(session.user.id);
@@ -443,7 +447,7 @@ const AppState = {
           syncMeta.resolvedOnboardingDone = localOnboardingDone;
 
           // Save a clean baseline profile to cloud (no carry-over from old local sessions).
-          await this.saveToCloud();
+          await this.saveToCloud(session);
         }
       }
     } catch (e) {
@@ -453,10 +457,14 @@ const AppState = {
     return syncMeta;
   },
 
-  async saveToCloud() {
+  async saveToCloud(existingSession = null) {
     if (typeof Supabase === "undefined" || !Supabase.getClient()) return Promise.resolve();
     try {
-      const { data: { session } } = await Supabase.getClient().auth.getSession();
+      let session = existingSession;
+      if (!session) {
+        const { data: { session: fetched } } = await Supabase.getClient().auth.getSession();
+        session = fetched;
+      }
       if (session && session.user) {
         // Save critical state that defines restrictions
         // Save FULL app state (excluding sensitive/local-only keys)
