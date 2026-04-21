@@ -155,18 +155,20 @@ const AIService = {
 
         const client = Supabase.getClient();
         if (client) {
-          // Retry once after a short delay if the first attempt hits a lock error
           let session = null;
-          for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            // Use Promise.race to prevent infinite hang on getSession()
+            const sessionPromise = client.auth.getSession();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 3000));
+            const { data } = await Promise.race([sessionPromise, timeoutPromise]);
+            session = data?.session;
+          } catch (lockErr) {
+            console.warn("[AIService] Timeout getting session, falling back to localStorage.");
+            // Fallback: try to read from localStorage if getSession timed out
             try {
-              const { data } = await client.auth.getSession();
-              session = data?.session;
-              break;
-            } catch (lockErr) {
-              if (attempt === 0) {
-                await new Promise((r) => setTimeout(r, 1000));
-              }
-            }
+               const lSession = localStorage.getItem("sb-" + SupabaseConfig.URL.split("//")[1].split(".")[0] + "-auth-token");
+               if (lSession) session = JSON.parse(lSession);
+            } catch (e) {}
           }
           if (session?.access_token) {
             headers.Authorization = `Bearer ${session.access_token}`;
