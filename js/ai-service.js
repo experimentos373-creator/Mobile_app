@@ -157,17 +157,18 @@ const AIService = {
         if (client) {
           let session = null;
           try {
-            // Use Promise.race to prevent infinite hang on getSession()
+            console.log("[AIService] Getting session...");
             const sessionPromise = client.auth.getSession();
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 3000));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 2000));
             const { data } = await Promise.race([sessionPromise, timeoutPromise]);
+            console.log("[AIService] Session retrieved smoothly.");
             session = data?.session;
           } catch (lockErr) {
-            console.warn("[AIService] Timeout getting session, falling back to localStorage.");
-            // Fallback: try to read from localStorage if getSession timed out
+            console.warn("[AIService] Timeout or error getting session, falling back to localStorage:", lockErr);
             try {
                const lSession = localStorage.getItem("sb-" + SupabaseConfig.URL.split("//")[1].split(".")[0] + "-auth-token");
                if (lSession) session = JSON.parse(lSession);
+               console.log("[AIService] Fallback session read:", !!session);
             } catch (e) {}
           }
           if (session?.access_token) {
