@@ -9,8 +9,8 @@ const AIService = {
   // Fast, reliable models configured for the free tier heavily prioritized queue evasion
   MODELS: {
     "step-3-5": {
-      id: "meta-llama/llama-3.2-3b-instruct:free",
-      label: "Llama 3.2 3B",
+      id: "liquid/lfm-2.5-1.2b-thinking:free",
+      label: "LFM 2.5 Thinking",
       description: "Extremamente rapido e eficiente",
       icon: "bolt",
       color: "emerald",
@@ -20,9 +20,9 @@ const AIService = {
       timeout: 8000
     },
     "minimax": {
-      id: "google/gemma-3-4b-it:free",
-      label: "Gemma 3 4B",
-      description: "IA rapida do Google",
+      id: "inclusionai/ling-2.6-flash:free",
+      label: "Ling 2.6 Flash",
+      description: "Ultra rapido e inteligente",
       icon: "psychology",
       color: "blue",
       tier: "pro",
@@ -31,20 +31,20 @@ const AIService = {
       timeout: 8000
     },
     "nemotron-super": {
-      id: "meta-llama/llama-3.3-70b-instruct:free",
-      label: "Llama 3.3 70B Super",
-      description: "Modelo potente de 70 Bilhoes",
+      id: "nvidia/nemotron-3-super-120b-a12b:free",
+      label: "Nemotron Super 120B",
+      description: "IA de raciocinio profundo com 120B parametros",
       icon: "neurology",
       color: "amber",
       tier: "plus",
-      supportsReasoning: false,
+      supportsReasoning: true,
       supportsVision: false,
       timeout: 8000
     },
     "trinity-large": {
-      id: "inclusionai/ling-2.6-flash:free",
-      label: "Ling 2.6 Flash",
-      description: "Ultra rapido e inteligente",
+      id: "meta-llama/llama-3.3-70b-instruct:free",
+      label: "Llama 3.3 70B",
+      description: "Modelo potente de 70 Bilhoes",
       icon: "water_drop",
       color: "cyan",
       tier: "plus",

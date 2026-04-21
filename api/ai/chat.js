@@ -118,7 +118,7 @@ module.exports = async (req, res) => {
     }
 
     let lastError = null;
-    const fallbackModelId = "meta-llama/llama-3.2-3b-instruct:free";
+    const fallbackModelId = "liquid/lfm-2.5-1.2b-thinking:free";
 
     // Single attempt — Vercel Hobby has a 10s function timeout,
     // so retries with backoff would cause the function to be killed mid-flight.

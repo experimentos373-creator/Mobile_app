@@ -29,32 +29,32 @@ const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 const MODELS = {
   "step-3-5": {
-    id: "meta-llama/llama-3.2-3b-instruct:free",
-    label: "Llama 3.2 3B (Veloz)",
+    id: "liquid/lfm-2.5-1.2b-thinking:free",
+    label: "LFM 2.5 Thinking",
     tier: "basico",
     supportsReasoning: false,
     supportsVision: false,
     timeout: 8000
   },
   minimax: {
-    id: "google/gemma-3-4b-it:free",
-    label: "Gemma 3 4B",
+    id: "inclusionai/ling-2.6-flash:free",
+    label: "Ling 2.6 Flash",
     tier: "pro",
     supportsReasoning: false,
     supportsVision: false,
     timeout: 8000
   },
   "nemotron-super": {
-    id: "meta-llama/llama-3.3-70b-instruct:free",
-    label: "Llama 3.3 70B Super",
+    id: "nvidia/nemotron-3-super-120b-a12b:free",
+    label: "Nemotron Super 120B",
     tier: "plus",
-    supportsReasoning: false,
+    supportsReasoning: true,
     supportsVision: false,
     timeout: 8000
   },
   "trinity-large": {
-    id: "inclusionai/ling-2.6-flash:free",
-    label: "Ling 2.6 Flash",
+    id: "meta-llama/llama-3.3-70b-instruct:free",
+    label: "Llama 3.3 70B",
     tier: "plus",
     supportsReasoning: false,
     supportsVision: false,
@@ -63,8 +63,8 @@ const MODELS = {
 };
 
 const REDACAO_MODELS = [
-  { id: "meta-llama/llama-3.3-70b-instruct:free", label: "Llama 3.3 70B", timeout: 8000 },
-  { id: "google/gemma-3-4b-it:free", label: "Gemma 3 4B", timeout: 8000 }
+  { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "Nemotron Super 120B", timeout: 8000 },
+  { id: "inclusionai/ling-2.6-flash:free", label: "Ling 2.6 Flash", timeout: 8000 }
 ];
 
 const TIER_LEVELS = { gratis: 0, basico: 1, pro: 2, plus: 3 };
