@@ -10,6 +10,7 @@ const Router = {
   history: [],
   _isBack: false,
   _animating: false,
+  _oauthRecoveryTimer: null,
 
   // Main tab routes that preserve state (DOM cached)
   TAB_ROUTES: new Set(["/home", "/simulados", "/pomodoro", "/videos", "/progresso"]),
@@ -67,7 +68,24 @@ const Router = {
 
     const isOAuthCallbackHash = /^(access_token|refresh_token|expires_in|token_type|provider_token|error)=/i.test(path);
     if (isOAuthCallbackHash) {
-      // Supabase OAuth callbacks can temporarily use hash params; wait for auth handler.
+      // Supabase OAuth callbacks can temporarily use hash params; wait briefly for auth handler.
+      // If session restoration fails, recover to login to avoid a blank screen.
+      if (!this._oauthRecoveryTimer) {
+        this._oauthRecoveryTimer = setTimeout(() => {
+          this._oauthRecoveryTimer = null;
+          const currentPath = (window.location.hash.slice(1) || "").split("?")[0];
+          const stillOAuthCallbackHash = /^(access_token|refresh_token|expires_in|token_type|provider_token|error)=/i.test(currentPath);
+          const hasSession = Boolean(typeof App !== "undefined" && App && App._hasSession);
+
+          if (stillOAuthCallbackHash) {
+            if (hasSession) {
+              this.navigate("/home", false, true);
+            } else {
+              this.navigate("/login", false, true);
+            }
+          }
+        }, 1500);
+      }
       return;
     }
 

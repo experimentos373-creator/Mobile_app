@@ -13,6 +13,24 @@ const App = {
   _cloudSyncInFlight: null,
   _lastCloudSyncAt: 0,
 
+  _isOAuthCallbackHash() {
+    const path = (window.location.hash.slice(1) || "").split("?")[0];
+    return /^(access_token|refresh_token|expires_in|token_type|provider_token|error)=/i.test(path);
+  },
+
+  _recoverFromOrphanOAuthHash() {
+    if (!this._isOAuthCallbackHash()) return;
+
+    // If callback params remain in hash, always force a safe route so the UI
+    // never stays blank regardless of session restoration timing.
+    if (this._hasSession) {
+      window.location.hash = "/home";
+      return;
+    }
+
+    window.location.hash = "/login";
+  },
+
   needsOnboarding() {
     const onboardingDone = Boolean(AppState.get("onboardingDone"));
 
@@ -240,6 +258,8 @@ const App = {
         }
       } catch (sessionError) {
         console.warn("Initial session bootstrap failed:", sessionError);
+      } finally {
+        this._recoverFromOrphanOAuthHash();
       }
     }
 
@@ -443,7 +463,7 @@ const App = {
     if (!("serviceWorker" in navigator) || window.location.protocol === "file:") return;
 
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js?v=60", {
+      const registration = await navigator.serviceWorker.register("/sw.js?v=62", {
         updateViaCache: "none"
       });
       registration.update().catch(() => {});
