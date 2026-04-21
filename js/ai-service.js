@@ -147,6 +147,12 @@ const AIService = {
 
     try {
       if (typeof Supabase !== "undefined") {
+        if (typeof Supabase.getPublicConfig === "function") {
+          const cfg = Supabase.getPublicConfig();
+          if (cfg?.url) headers["X-Supabase-Url"] = cfg.url;
+          if (cfg?.anonKey) headers["X-Supabase-Anon-Key"] = cfg.anonKey;
+        }
+
         const client = Supabase.getClient();
         if (client) {
           const {

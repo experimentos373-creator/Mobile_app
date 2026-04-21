@@ -67,6 +67,13 @@ const Supabase = {
         return supabaseClient;
     },
 
+    getPublicConfig() {
+        return {
+            url: String(SupabaseConfig.URL || ""),
+            anonKey: String(SupabaseConfig.ANON_KEY || "")
+        };
+    },
+
     async signIn(email, password) {
         const client = this.getClient();
         if (!client) return { error: { message: "Conexão não configurada." } };

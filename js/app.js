@@ -443,7 +443,7 @@ const App = {
     if (!("serviceWorker" in navigator) || window.location.protocol === "file:") return;
 
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js?v=57", {
+      const registration = await navigator.serviceWorker.register("/sw.js?v=58", {
         updateViaCache: "none"
       });
       registration.update().catch(() => {});

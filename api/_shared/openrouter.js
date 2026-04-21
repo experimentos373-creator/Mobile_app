@@ -98,10 +98,40 @@ function isOriginAllowed(origin) {
   return ALLOWED_ORIGINS.some((allowedOrigin) => origin === allowedOrigin);
 }
 
+function normalizeSupabaseUrl(input) {
+  const raw = String(input || "").trim();
+  if (!raw) return "";
+
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol !== "https:") return "";
+    if (!parsed.hostname.endsWith(".supabase.co")) return "";
+    return `${parsed.protocol}//${parsed.hostname}`;
+  } catch (error) {
+    return "";
+  }
+}
+
+function resolveSupabaseConfig(req) {
+  const headerUrl = normalizeSupabaseUrl(req.headers["x-supabase-url"]);
+  const headerAnonKey = String(req.headers["x-supabase-anon-key"] || "").trim();
+
+  const resolvedUrl = headerUrl || normalizeSupabaseUrl(SUPABASE_URL);
+  const resolvedAnonKey = headerAnonKey || SUPABASE_ANON_KEY;
+
+  return {
+    url: resolvedUrl,
+    anonKey: String(resolvedAnonKey || "").trim()
+  };
+}
+
 function setCorsHeaders(res, origin) {
   res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Authorization, Content-Type, X-Supabase-Url, X-Supabase-Anon-Key"
+  );
   res.setHeader("Vary", "Origin");
 }
 
@@ -113,7 +143,9 @@ function sendJson(res, status, payload) {
 
 function guardCors(req, res) {
   const origin = getRequestOrigin(req);
-  if (!isOriginAllowed(origin)) {
+  const requestOrigin = getOrigin(req);
+  const allowed = Boolean(origin && (origin === requestOrigin || isOriginAllowed(origin)));
+  if (!allowed) {
     sendJson(res, 403, { error: "Origin nao autorizada." });
     return false;
   }
@@ -131,8 +163,6 @@ function guardCors(req, res) {
 function getMissingEnvVars() {
   const missing = [];
   if (!process.env.OPENROUTER_API_KEY) missing.push("OPENROUTER_API_KEY");
-  if (!SUPABASE_URL) missing.push("SUPABASE_URL");
-  if (!SUPABASE_ANON_KEY) missing.push("SUPABASE_ANON_KEY");
   return missing;
 }
 
@@ -168,20 +198,36 @@ async function getAuthenticatedContext(req) {
     return { error: "Sessao expirada. Faca login novamente.", status: 401 };
   }
 
+  const supabaseConfig = resolveSupabaseConfig(req);
+  if (!supabaseConfig.url || !supabaseConfig.anonKey) {
+    return {
+      error: "Configuracao do Supabase ausente no servidor. Defina SUPABASE_URL/SUPABASE_ANON_KEY ou envie headers do cliente.",
+      status: 500
+    };
+  }
+
   let user;
   try {
     const userResponse = await fetchWithTimeout(
-      `${SUPABASE_URL}/auth/v1/user`,
+      `${supabaseConfig.url}/auth/v1/user`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          apikey: SUPABASE_ANON_KEY
+          apikey: supabaseConfig.anonKey
         }
       },
       5000
     );
 
     if (!userResponse.ok) {
+      const rawError = await userResponse.json().catch(() => null);
+      const message = String(rawError?.message || rawError?.error || "").toLowerCase();
+      if (message.includes("user") && message.includes("not found")) {
+        return {
+          error: "Usuario nao encontrado no projeto Supabase da API. Verifique SUPABASE_URL/SUPABASE_ANON_KEY da Vercel.",
+          status: 401
+        };
+      }
       return { error: "Sessao invalida. Faca login novamente.", status: 401 };
     }
 
@@ -196,14 +242,14 @@ async function getAuthenticatedContext(req) {
   let userPlan = "gratis";
 
   try {
-    const profileUrl = new URL(`${SUPABASE_URL}/rest/v1/profiles`);
+    const profileUrl = new URL(`${supabaseConfig.url}/rest/v1/profiles`);
     profileUrl.searchParams.set("id", `eq.${user.id}`);
     profileUrl.searchParams.set("select", "userPlan");
 
     const profileResponse = await fetchWithTimeout(profileUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
-        apikey: SUPABASE_ANON_KEY,
+        apikey: supabaseConfig.anonKey,
         Accept: "application/json"
       }
     }, 4000);
