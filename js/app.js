@@ -443,7 +443,7 @@ const App = {
     if (!("serviceWorker" in navigator) || window.location.protocol === "file:") return;
 
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js?v=59", {
+      const registration = await navigator.serviceWorker.register("/sw.js?v=60", {
         updateViaCache: "none"
       });
       registration.update().catch(() => {});
@@ -604,10 +604,51 @@ const App = {
   }
 };
 
+function showBootstrapError(error) {
+  console.error("[App] Bootstrap failed:", error);
+
+  const container = document.getElementById("app-pages") || document.body;
+  if (!container) return;
+
+  const message = `
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, Segoe UI, sans-serif;">
+      <div style="max-width: 520px; width: 100%; border: 1px solid rgba(148,163,184,0.35); border-radius: 16px; padding: 20px; background: rgba(15,23,42,0.75);">
+        <h2 style="margin: 0 0 8px; font-size: 20px; font-weight: 700;">Nao foi possivel iniciar o app</h2>
+        <p style="margin: 0 0 14px; color: #cbd5e1; font-size: 14px; line-height: 1.5;">Encontramos um erro de carregamento. Atualize a pagina para tentar novamente.</p>
+        <button id="retry-bootstrap" style="cursor: pointer; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 700; background: #14b8a6; color: #042f2e;">Atualizar pagina</button>
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = message;
+  const retryBtn = document.getElementById("retry-bootstrap");
+  if (retryBtn) {
+    retryBtn.addEventListener("click", () => window.location.reload());
+  }
+}
+
+async function bootstrapApp() {
+  try {
+    await App.init();
+  } catch (error) {
+    showBootstrapError(error);
+  }
+}
+
+window.addEventListener("unhandledrejection", (event) => {
+  const root = document.getElementById("app-pages");
+  const isVisiblyEmpty = !root || !String(root.innerHTML || "").trim();
+  if (isVisiblyEmpty) {
+    showBootstrapError(event.reason || new Error("Unhandled promise rejection"));
+  }
+});
+
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => App.init());
+  document.addEventListener("DOMContentLoaded", () => {
+    bootstrapApp();
+  });
 } else {
-  App.init();
+  bootstrapApp();
 }
 
 // ============================================================
