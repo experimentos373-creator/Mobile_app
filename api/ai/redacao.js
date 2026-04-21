@@ -55,8 +55,8 @@ module.exports = async (req, res) => {
       const requestBody = {
         model: model.id,
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.3,
-        max_tokens: 3000
+        temperature: 0.2,
+        max_tokens: 2000
       };
 
       const data = await callOpenRouter(req, requestBody, model.timeout);

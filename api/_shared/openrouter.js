@@ -29,42 +29,42 @@ const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 const MODELS = {
   "step-3-5": {
-    id: "google/gemma-4-26b-a4b-it:free",
-    label: "Gemma 4 26B (Especialista)",
+    id: "meta-llama/llama-3.1-8b-instruct:free",
+    label: "Llama 3.1 8B (Veloz)",
     tier: "basico",
-    supportsReasoning: true,
+    supportsReasoning: false,
     supportsVision: false,
-    timeout: 60000
+    timeout: 25000
   },
   minimax: {
-    id: "minimax/minimax-m2.5:free",
-    label: "MiniMax M2.5",
+    id: "google/gemma-2-9b-it:free",
+    label: "Gemma 2 9B",
     tier: "pro",
-    supportsReasoning: true,
+    supportsReasoning: false,
     supportsVision: false,
-    timeout: 50000
+    timeout: 30000
   },
   "nemotron-super": {
-    id: "nvidia/nemotron-3-super-120b-a12b:free",
-    label: "Nemotron 3 Super",
+    id: "qwen/qwen-2.5-72b-instruct:free",
+    label: "Qwen 2.5 72B Super",
     tier: "plus",
-    supportsReasoning: true,
+    supportsReasoning: false,
     supportsVision: false,
-    timeout: 60000
+    timeout: 45000
   },
   "trinity-large": {
-    id: "arcee-ai/trinity-large-preview:free",
-    label: "Trinity Large",
+    id: "mistralai/mistral-nemo:free",
+    label: "Mistral Nemo",
     tier: "plus",
-    supportsReasoning: true,
+    supportsReasoning: false,
     supportsVision: false,
-    timeout: 50000
+    timeout: 35000
   }
 };
 
 const REDACAO_MODELS = [
-  { id: "google/gemma-4-26b-a4b-it:free", label: "Gemma 4 26B A4B", timeout: 55000 },
-  { id: "google/gemma-4-31b-it:free", label: "Gemma 4 31B", timeout: 55000 }
+  { id: "qwen/qwen-2.5-72b-instruct:free", label: "Qwen 2.5 72B Super", timeout: 40000 },
+  { id: "google/gemma-2-9b-it:free", label: "Gemma 2 9B", timeout: 40000 }
 ];
 
 const TIER_LEVELS = { gratis: 0, basico: 1, pro: 2, plus: 3 };

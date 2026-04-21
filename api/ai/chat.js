@@ -109,7 +109,7 @@ module.exports = async (req, res) => {
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userContent }
       ],
-      temperature: 0.7,
+      temperature: 0.4,
       max_tokens: 1500
     };
 
@@ -118,7 +118,7 @@ module.exports = async (req, res) => {
     }
 
     let lastError = null;
-    const fallbackModelId = "google/gemma-4-26b-a4b-it:free";
+    const fallbackModelId = "meta-llama/llama-3.1-8b-instruct:free";
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const data = await callOpenRouter(req, requestBody, model.timeout || 60000);

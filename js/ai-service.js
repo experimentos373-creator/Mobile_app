@@ -6,51 +6,51 @@
 const AIService = {
   API_BASE: "/api/ai",
 
-  // All models are mirrored and validated again on the server.
+  // Fast, reliable models configured for the free tier heavily prioritized queue evasion
   MODELS: {
     "step-3-5": {
-      id: "google/gemma-4-26b-a4b-it:free",
-      label: "Gemma 4 26B (Especialista)",
-      description: "Extremamente inteligente e muito veloz",
+      id: "meta-llama/llama-3.1-8b-instruct:free",
+      label: "Llama 3.1 8B (Veloz)",
+      description: "Extremamente rapido e eficiente",
       icon: "bolt",
       color: "emerald",
       tier: "basico",
-      supportsReasoning: true,
+      supportsReasoning: false,
       supportsVision: false,
-      timeout: 60000
+      timeout: 25000
     },
     "minimax": {
-      id: "minimax/minimax-m2.5:free",
-      label: "MiniMax M2.5",
-      description: "Raciocinio logico estruturado",
+      id: "google/gemma-2-9b-it:free",
+      label: "Gemma 2 9B",
+      description: "Raciocinio otimizado Google",
       icon: "psychology",
       color: "blue",
       tier: "pro",
-      supportsReasoning: true,
+      supportsReasoning: false,
       supportsVision: false,
-      timeout: 50000
+      timeout: 30000
     },
     "nemotron-super": {
-      id: "nvidia/nemotron-3-super-120b-a12b:free",
-      label: "Nemotron 3 Super",
-      description: "Especialista em matematica e exatas",
+      id: "qwen/qwen-2.5-72b-instruct:free",
+      label: "Qwen 2.5 72B Super",
+      description: "Modelo potente de 72 Bilhoes",
       icon: "neurology",
       color: "amber",
       tier: "plus",
-      supportsReasoning: true,
+      supportsReasoning: false,
       supportsVision: false,
-      timeout: 60000
+      timeout: 45000
     },
     "trinity-large": {
-      id: "arcee-ai/trinity-large-preview:free",
-      label: "Trinity Large",
-      description: "Raciocinio profundo e analitico",
+      id: "mistralai/mistral-nemo:free",
+      label: "Mistral Nemo",
+      description: "Respostas analiticas e complexas",
       icon: "water_drop",
       color: "cyan",
       tier: "plus",
-      supportsReasoning: true,
+      supportsReasoning: false,
       supportsVision: false,
-      timeout: 50000
+      timeout: 35000
     }
   },
 
