@@ -8,6 +8,23 @@ const SupabaseConfig = {
     ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpeGZpdWt2dnlva2dheGZseGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MDYxNTEsImV4cCI6MjA4OTI4MjE1MX0.0FpUCJaH7LE47roOp1tStdhqZDCTyT2dQBeo33W9uCw"
 };
 
+const PROFILE_UPSERT_COLUMNS = new Set([
+    "userName",
+    "userAge",
+    "userPlan",
+    "onboardingDone",
+    "studyGoal",
+    "targetExam",
+    "totalQuestionsAnswered",
+    "correctAnswers",
+    "studyTimeMinutes",
+    "restTimeMinutes",
+    "hasUsedFreePredictor",
+    "subjectAccuracy",
+    "missionProgress",
+    "weeklyStudyData"
+]);
+
 const PROD_APP_ORIGIN = "https://mobileapp-taupe.vercel.app";
 const GOOGLE_OAUTH_PENDING_KEY = "eduhub_google_oauth_pending";
 const GOOGLE_OAUTH_INTENT_PARAM = "eduhub_oauth";
@@ -52,8 +69,33 @@ const Supabase = {
         const raw = [error?.message, error?.details, error?.hint]
             .filter(Boolean)
             .join(" ");
-        const match = raw.match(/column\s+"?([A-Za-z0-9_]+)"?\s+does\s+not\s+exist/i);
-        return match ? match[1] : "";
+        const patterns = [
+            /column\s+"?([A-Za-z0-9_]+)"?\s+does\s+not\s+exist/i,
+            /could\s+not\s+find\s+the\s+'?([A-Za-z0-9_]+)'?\s+column/i,
+            /column\s+"?([A-Za-z0-9_]+)"?\s+of\s+relation/i
+        ];
+
+        for (const pattern of patterns) {
+            const match = raw.match(pattern);
+            if (match?.[1]) return match[1];
+        }
+
+        return "";
+    },
+
+    _buildProfilePayload(userId, profileData) {
+        const payload = {
+            id: userId,
+            updated_at: new Date().toISOString()
+        };
+
+        Object.entries(profileData || {}).forEach(([key, value]) => {
+            if (PROFILE_UPSERT_COLUMNS.has(key)) {
+                payload[key] = value;
+            }
+        });
+
+        return payload;
     },
 
     getClient() {
@@ -182,13 +224,14 @@ const Supabase = {
 
         await this.ensureProfile(userId);
 
-        // Retry once per missing column so critical fields (e.g., onboardingDone/userPlan)
-        // still persist even when optional columns are absent in older DB schemas.
-        const payload = { id: userId, ...profileData, updated_at: new Date().toISOString() };
+        // Persist only known profile fields and progressively remove unsupported columns
+        // so old schemas can still save critical data without failing entirely.
+        const payload = this._buildProfilePayload(userId, profileData);
         let retries = 0;
         let lastError = null;
+        const maxRetries = Math.max(6, Object.keys(payload).length + 2);
 
-        while (retries <= 4) {
+        while (retries <= maxRetries) {
             const { data, error } = await client
                 .from('profiles')
                 .upsert(payload, { onConflict: 'id' });

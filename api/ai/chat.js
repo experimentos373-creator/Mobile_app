@@ -118,6 +118,7 @@ module.exports = async (req, res) => {
     }
 
     let lastError = null;
+    const fallbackModelId = "google/gemma-4-26b-a4b-it:free";
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const data = await callOpenRouter(req, requestBody, model.timeout || 60000);
@@ -135,6 +136,29 @@ module.exports = async (req, res) => {
           const jitterMs = Math.floor(Math.random() * 250);
           await new Promise((resolve) => setTimeout(resolve, baseDelayMs + jitterMs));
         }
+      }
+    }
+
+    // Last-resort fallback: if the selected upstream model is unstable,
+    // retry once with a highly available baseline model.
+    if (requestBody.model !== fallbackModelId) {
+      try {
+        const fallbackBody = {
+          ...requestBody,
+          model: fallbackModelId
+        };
+
+        const fallbackData = await callOpenRouter(req, fallbackBody, 60000);
+        const fallbackContent = fallbackData?.choices?.[0]?.message?.content || "";
+        if (fallbackContent) {
+          sendJson(res, 200, {
+            content: fallbackContent,
+            fallbackModel: fallbackModelId
+          });
+          return;
+        }
+      } catch (fallbackError) {
+        lastError = fallbackError;
       }
     }
 

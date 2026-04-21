@@ -1,5 +1,5 @@
 process.env.OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "test-openrouter-key";
-process.env.SUPABASE_URL = process.env.SUPABASE_URL || "https://supabase.test.local";
+process.env.SUPABASE_URL = process.env.SUPABASE_URL || "https://mockproject.supabase.co";
 process.env.SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "test-anon-key";
 process.env.ALLOWED_ORIGINS = "https://eduhub.vercel.app,http://localhost:3000";
 
