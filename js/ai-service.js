@@ -17,7 +17,7 @@ const AIService = {
       tier: "basico",
       supportsReasoning: false,
       supportsVision: false,
-      timeout: 8000
+      timeout: 35000
     },
     "minimax": {
       id: "inclusionai/ling-2.6-flash:free",
@@ -28,7 +28,7 @@ const AIService = {
       tier: "pro",
       supportsReasoning: false,
       supportsVision: false,
-      timeout: 8000
+      timeout: 35000
     },
     "nemotron-super": {
       id: "nvidia/nemotron-3-super-120b-a12b:free",
@@ -39,7 +39,7 @@ const AIService = {
       tier: "plus",
       supportsReasoning: true,
       supportsVision: false,
-      timeout: 8000
+      timeout: 35000
     },
     "trinity-large": {
       id: "meta-llama/llama-3.3-70b-instruct:free",
@@ -50,7 +50,7 @@ const AIService = {
       tier: "plus",
       supportsReasoning: false,
       supportsVision: false,
-      timeout: 8000
+      timeout: 35000
     }
   },
 
@@ -157,18 +157,14 @@ const AIService = {
         if (client) {
           let session = null;
           try {
-            console.log("[AIService] Getting session...");
             const sessionPromise = client.auth.getSession();
             const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 2000));
             const { data } = await Promise.race([sessionPromise, timeoutPromise]);
-            console.log("[AIService] Session retrieved smoothly.");
             session = data?.session;
           } catch (lockErr) {
-            console.warn("[AIService] Timeout or error getting session, falling back to localStorage:", lockErr);
             try {
                const lSession = localStorage.getItem("sb-" + SupabaseConfig.URL.split("//")[1].split(".")[0] + "-auth-token");
                if (lSession) session = JSON.parse(lSession);
-               console.log("[AIService] Fallback session read:", !!session);
             } catch (e) {}
           }
           if (session?.access_token) {

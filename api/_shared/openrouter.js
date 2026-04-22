@@ -34,7 +34,7 @@ const MODELS = {
     tier: "basico",
     supportsReasoning: false,
     supportsVision: false,
-    timeout: 8000
+    timeout: 35000
   },
   minimax: {
     id: "inclusionai/ling-2.6-flash:free",
@@ -42,7 +42,7 @@ const MODELS = {
     tier: "pro",
     supportsReasoning: false,
     supportsVision: false,
-    timeout: 8000
+    timeout: 35000
   },
   "nemotron-super": {
     id: "nvidia/nemotron-3-super-120b-a12b:free",
@@ -50,7 +50,7 @@ const MODELS = {
     tier: "plus",
     supportsReasoning: true,
     supportsVision: false,
-    timeout: 8000
+    timeout: 35000
   },
   "trinity-large": {
     id: "meta-llama/llama-3.3-70b-instruct:free",
@@ -58,13 +58,13 @@ const MODELS = {
     tier: "plus",
     supportsReasoning: false,
     supportsVision: false,
-    timeout: 8000
+    timeout: 35000
   }
 };
 
 const REDACAO_MODELS = [
-  { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "Nemotron Super 120B", timeout: 8000 },
-  { id: "inclusionai/ling-2.6-flash:free", label: "Ling 2.6 Flash", timeout: 8000 }
+  { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "Nemotron Super 120B", timeout: 35000 },
+  { id: "inclusionai/ling-2.6-flash:free", label: "Ling 2.6 Flash", timeout: 35000 }
 ];
 
 const TIER_LEVELS = { gratis: 0, basico: 1, pro: 2, plus: 3 };
