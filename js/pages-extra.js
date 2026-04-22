@@ -2791,7 +2791,7 @@ Pages["simulado-runner"] = (params) => {
         </div>
 
         <!-- Question View -->
-        <div id="simulado-question-view" class="hidden flex flex-col gap-8 max-w-2xl mx-auto h-full animate-in fade-in slide-in-from-bottom-12 duration-1000">
+        <div id="simulado-question-view" class="hidden flex flex-col gap-8 max-w-2xl mx-auto mb-16 animate-in fade-in slide-in-from-bottom-12 duration-1000 w-full">
            
            <div class="flex justify-between items-center px-2">
              <div class="flex flex-col gap-1.5">
@@ -2813,21 +2813,21 @@ Pages["simulado-runner"] = (params) => {
            </div>
 
            <!-- Elite Question Card -->
-           <div class="glass-card bg-[#0f172a]/60 rounded-[40px] p-8 md:p-10 border border-white/10 shadow-3xl relative overflow-hidden group">
+           <div class="glass-card simulado-question-card bg-[#0f172a]/60 rounded-[40px] p-8 md:p-10 border border-white/10 shadow-3xl relative overflow-hidden group">
              <div class="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 blur-[100px] rounded-full -mr-40 -mt-40 pointer-events-none group-hover:bg-blue-500/20 transition-all duration-1000"></div>
              
              <div id="simulado-statement-container" class="relative z-10">
                <div id="simulado-statement-header" class="mb-6"></div>
-               <div id="simulado-statement" class="text-slate-100 text-[17px] leading-[1.8] font-medium tracking-tight"></div>
+               <div id="simulado-statement" class="simulado-statement-prose text-slate-100 text-[17px] leading-[1.8] font-medium tracking-tight"></div>
                <div id="simulado-image-container" class="hidden mt-10 rounded-[40px] overflow-hidden border border-white/10 bg-slate-900/80 p-2 shadow-2xl">
-                 <img id="simulado-image" class="w-full max-h-[450px] object-scale-down mx-auto rounded-[36px]" src="" alt="Simulado Evidence"/>
+                 <img id="simulado-image" class="w-full max-h-[450px] object-scale-down mx-auto rounded-[36px]" src="" alt="Simulado Evidence" onerror="document.getElementById('simulado-image-container').classList.add('hidden')"/>
                </div>
              </div>
            </div>
 
            <div class="flex flex-col gap-2 px-1">
-             <span class="text-slate-500 font-black text-[10px] tracking-[0.4em] uppercase mb-4 ml-4 opacity-70">Escolha sua Tática</span>
-             <div id="simulado-options" class="flex flex-col gap-4 pb-12">
+             <span class="text-slate-300 font-bold text-xs tracking-[0.14em] uppercase mb-3 ml-2 opacity-90">Alternativas</span>
+             <div id="simulado-options" class="simulado-options-list flex flex-col gap-4 pb-12">
                <!-- Options generated dynamically -->
              </div>
            </div>
@@ -2846,14 +2846,14 @@ Pages["simulado-runner"] = (params) => {
                  </div>
                </div>
                
-               <div id="feedback-resolution" class="relative z-10 space-y-6">
+               <div id="feedback-resolution" class="simulado-resolution-wrap relative z-10 space-y-6">
                  <!-- Pedagogical resolution injected here -->
                </div>
              </div>
              
-             <button id="simulado-next-btn" class="group w-full py-7 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 border-t border-white/20 text-white font-black text-xs uppercase tracking-[0.4em] rounded-[32px] flex items-center justify-center gap-5 transition-all active:scale-[0.96] shadow-premium">
-                <span id="next-btn-text">Próxima Questão</span>
-                <span class="material-symbols-outlined text-2xl group-hover:translate-x-1.5 transition-transform" id="next-btn-icon">double_arrow</span>
+             <button id="simulado-next-btn" class="simulado-next-btn group w-full min-h-[60px] sm:min-h-[64px] px-5 sm:px-6 py-4 sm:py-5 rounded-[22px] border border-white/10 bg-white text-slate-950 font-extrabold text-[15px] sm:text-sm tracking-[0.02em] flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-[0_18px_40px_-20px_rgba(255,255,255,0.2)]">
+               <span id="next-btn-text">Próxima questão</span>
+               <span class="material-symbols-outlined text-xl sm:text-2xl transition-transform" id="next-btn-icon">arrow_forward</span>
              </button>
            </div>
         </div>
@@ -3041,9 +3041,9 @@ PageEvents["simulado-runner"] = async (page, params) => {
     const sName = subjectMap[q.subject] || (q.subject ? q.subject.charAt(0).toUpperCase() + q.subject.slice(1) : 'Geral');
 
     stmHeader.innerHTML = `
-      <div class="mb-5 flex flex-wrap items-center gap-2">
-        <span class="px-2.5 py-1 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[8px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/5">${categoryName} ${q.year ? '• ' + q.year : ''}</span>
-        <span class="px-2.5 py-1 rounded bg-slate-800/80 border border-white/5 text-slate-400 text-[8px] font-black uppercase tracking-[0.2em]">${sName}</span>
+      <div class="mb-5 flex flex-wrap items-center gap-2.5">
+        <span class="simulado-chip simulado-chip-primary">${categoryName} ${q.year ? '• ' + q.year : ''}</span>
+        <span class="simulado-chip simulado-chip-neutral">${sName}</span>
       </div>
     `;
 
@@ -3064,11 +3064,11 @@ PageEvents["simulado-runner"] = async (page, params) => {
     if (Array.isArray(opts)) {
       opts.forEach((optText, i) => {
         const btn = document.createElement("button");
-        btn.className = "group w-full text-left bg-[#0f172a]/40 border border-white/10 p-5 rounded-[24px] text-slate-300 font-medium text-sm transition-all shadow-xl flex items-start gap-4 active:scale-[0.98] hover:bg-[#1e293b]/60 hover:border-blue-500/30";
+        btn.className = "simulado-option-btn group";
         const letter = String.fromCharCode(65 + i);
         btn.innerHTML = `
-          <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 shrink-0 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-blue-500/20 group-hover:text-blue-300 group-hover:border-blue-500/30 transition-all duration-500 shadow-inner">${letter}</div>
-          <div class="pt-2 font-medium leading-relaxed">${renderMDInline(optText)}</div>
+          <div class="simulado-option-letter">${letter}</div>
+          <div class="simulado-option-text">${renderMDInline(optText)}</div>
         `;
         btn.onclick = () => handleAnswer(i, btn, opts);
         optsEl.appendChild(btn);
@@ -3100,22 +3100,23 @@ PageEvents["simulado-runner"] = async (page, params) => {
       btn.onclick = null;
       const isThisCorrect = (i === correctIdx);
       if (isThisCorrect) {
-        btn.className = "w-full text-left bg-emerald-500/10 border-2 border-emerald-500/60 p-5 rounded-[24px] text-emerald-50 font-black text-sm transition-all shadow-2xl shadow-emerald-500/10 flex items-start gap-4";
-        btn.firstElementChild.className = "w-10 h-10 rounded-xl bg-emerald-500 shadow-lg shadow-emerald-500/40 shrink-0 flex items-center justify-center text-xs font-black text-white";
+        btn.className = "simulado-option-btn simulado-option-correct";
+        btn.firstElementChild.className = "simulado-option-letter simulado-option-letter-correct";
         btn.firstElementChild.innerHTML = '<span class="material-symbols-outlined text-lg">check</span>';
       } else if (i === selectedIndex && !isCorrect) {
-        btn.className = "w-full text-left bg-rose-500/10 border-2 border-rose-500/60 p-5 rounded-[24px] text-rose-50 font-black text-sm transition-all shadow-2xl shadow-rose-500/10 flex items-start gap-4";
-        btn.firstElementChild.className = "w-10 h-10 rounded-xl bg-rose-500 shadow-lg shadow-rose-500/40 shrink-0 flex items-center justify-center text-xs font-black text-white";
+        btn.className = "simulado-option-btn simulado-option-wrong";
+        btn.firstElementChild.className = "simulado-option-letter simulado-option-letter-wrong";
         btn.firstElementChild.innerHTML = '<span class="material-symbols-outlined text-lg">close</span>';
       } else {
-        btn.className = "w-full text-left bg-transparent border border-white/5 p-5 rounded-[24px] text-slate-500 font-medium text-sm transition-all flex items-start gap-4 opacity-30 grayscale-[0.5]";
+        btn.className = "simulado-option-btn simulado-option-muted";
+        btn.firstElementChild.className = "simulado-option-letter simulado-option-letter-muted";
       }
     });
 
     const formatResolution = (raw) => {
-      if (!raw) return '<div class="text-slate-400 italic text-sm">Resolução não disponível para esta questão.</div>';
-      if (raw.includes('##') || raw.includes('📋') || raw.includes('💡')) return renderMD(raw);
-      return `<div class="flex items-center gap-2 mb-2 mt-2 items-center"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 font-black text-[10px] uppercase tracking-wider rounded border border-emerald-500/20">🚀 Resolução Elite</span></div><div class="text-slate-300 text-[13px] leading-relaxed p-5 rounded-[24px] bg-white/5 border border-white/10 shadow-inner">${renderMD(raw)}</div>`;
+      if (!raw) return '<div class="simulado-resolution-empty">Resolução não disponível para esta questão.</div>';
+      if (raw.includes('##') || raw.includes('📋') || raw.includes('💡')) return `<div class="simulado-resolution-prose">${renderMD(raw)}</div>`;
+      return `<div class="simulado-resolution-tag-row"><span class="simulado-resolution-tag">Resolução Elite</span></div><div class="simulado-resolution-prose simulado-resolution-surface">${renderMD(raw)}</div>`;
     };
 
     const cardBorder = document.getElementById("fb-card-border");
