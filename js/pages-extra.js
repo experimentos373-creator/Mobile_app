@@ -2742,143 +2742,155 @@ Pages["simulado-runner"] = (params) => {
   return `
     <div class="fixed inset-0 bg-[#020617] z-50 flex flex-col font-body overflow-hidden" id="simulado-runner-container">
       <!-- Ambient Aurora Background -->
-      <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none"></div>
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/5 blur-[100px] rounded-full -ml-48 -mb-48 pointer-events-none"></div>
+      <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 blur-[150px] rounded-full -mr-80 -mt-80 pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-600/10 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none"></div>
 
       <!-- Header -->
-      <header class="glass-header px-6 py-5 shrink-0 flex items-center justify-between border-b border-white/5 relative z-20">
-        <button onclick="Router.back()" class="w-11 h-11 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-slate-300 active:scale-95 transition-all">
+      <header class="glass-header px-6 py-5 shrink-0 flex items-center justify-between border-b border-white/5 relative z-20 backdrop-blur-3xl">
+        <button onclick="Router.back()" class="w-11 h-11 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-slate-300 active:scale-95 transition-all hover:bg-white/10">
           <span class="material-symbols-outlined text-xl">close</span>
         </button>
         <div class="flex flex-col items-center">
-          <div class="flex items-center gap-1.5 mb-0.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
-            <span class="text-[9px] text-blue-400 font-black uppercase tracking-[0.2em] leading-none">${type}</span>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)] animate-pulse"></span>
+            <span class="text-[10px] text-blue-400 font-black uppercase tracking-[0.3em] leading-none">${type}</span>
           </div>
-          <div class="text-xs text-white font-bold tabular-nums tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/5" id="simulado-timer">
-            25:00
+          <div class="text-[11px] text-white font-black tabular-nums tracking-[0.15em] bg-white/5 px-4 py-1.5 rounded-full border border-white/10 shadow-inner flex items-center gap-2" id="simulado-timer">
+            <span class="material-symbols-outlined text-[14px] text-slate-400">timer</span>
+            <span>25:00</span>
           </div>
         </div>
-        <div class="w-11"></div> <!-- Spacer -->
+        <div class="w-11"></div> 
       </header>
 
-      <!-- Progress Tracking -->
-      <div class="w-full h-1.5 bg-white/5 shrink-0 relative z-20">
-        <div id="simulado-progress" class="h-full bg-gradient-to-r from-blue-500 to-emerald-500 shadow-[0_0_12px_rgba(59,130,246,0.4)] transition-all duration-500" style="width: 0%"></div>
+      <!-- Elite Progress Tracking -->
+      <div class="w-full h-1.5 bg-white/5 shrink-0 relative z-20 overflow-hidden">
+        <div id="simulado-progress" class="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all duration-1000 ease-out" style="width: 0%">
+           <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+        </div>
       </div>
 
       <!-- Main Content Container -->
-      <main class="flex-1 overflow-y-auto no-scrollbar pb-32 pt-6 px-4 relative z-10" id="simulado-content-area">
+      <main class="flex-1 overflow-y-auto no-scrollbar pb-32 pt-8 px-4 relative z-10" id="simulado-content-area">
         
-        <!-- Loading State -->
-        <div id="simulado-loading" class="flex flex-col items-center justify-center h-full gap-5">
-          <div class="relative">
-            <div class="w-16 h-16 rounded-full border-2 border-slate-800 border-t-blue-500 animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-              <span class="material-symbols-outlined text-blue-500/50 text-xl animate-pulse">brain</span>
+        <!-- Question Loading State (Premium Scanning) -->
+        <div id="simulado-loading" class="flex flex-col items-center justify-center h-full min-h-[60vh] gap-10">
+          <div class="relative flex items-center justify-center scale-110">
+            <div class="absolute w-40 h-40 rounded-full border border-blue-500/10 animate-ping opacity-20"></div>
+            <div class="absolute w-32 h-32 rounded-full border-[2px] border-slate-800 border-t-cyan-500 animate-spin transition-all duration-500"></div>
+            <div class="absolute w-24 h-24 rounded-full border-[1px] border-slate-800 border-b-emerald-500 animate-[spin_1.5s_linear_infinite]"></div>
+            <div class="size-20 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center relative z-10">
+              <span class="material-symbols-outlined text-blue-400 text-3xl animate-pulse">database_search</span>
             </div>
           </div>
-          <p class="text-slate-400 font-bold text-xs uppercase tracking-[0.2em] animate-pulse">Armando protocolo de elite...</p>
+          
+          <div class="flex flex-col items-center gap-3 text-center">
+            <h3 class="text-white font-black text-xs uppercase tracking-[0.5em] animate-pulse">Sincronizando Protocolo</h3>
+            <p id="loading-subtext" class="text-slate-500 font-bold text-[9px] uppercase tracking-[0.2em] max-w-[200px]">Estabelecendo túnel seguro com a Base de Dados Elite...</p>
+          </div>
         </div>
 
-        <!-- Question View (Hidden initially) -->
-        <div id="simulado-question-view" class="hidden flex flex-col gap-6 max-w-2xl mx-auto block h-full animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <!-- Question View -->
+        <div id="simulado-question-view" class="hidden flex flex-col gap-8 max-w-2xl mx-auto h-full animate-in fade-in slide-in-from-bottom-12 duration-1000">
            
            <div class="flex justify-between items-center px-2">
-             <div class="flex flex-col gap-1">
-               <span class="text-slate-500 font-black text-[9px] tracking-[0.2em] uppercase">Status de Combate</span>
-               <div class="flex items-center gap-3">
-                 <span class="text-white font-black text-xs uppercase tracking-tight">ETAPA <span id="simulado-q-num">1</span> <span class="text-slate-600">/</span> <span id="simulado-q-total">10</span></span>
-                 <span id="simulado-usage-badge" class="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 text-slate-500 text-[8px] font-black uppercase tracking-wider"></span>
+             <div class="flex flex-col gap-1.5">
+               <span class="text-slate-500 font-black text-[10px] tracking-[0.3em] uppercase opacity-70">Progressão Elite</span>
+               <div class="flex items-center gap-4">
+                 <span class="text-white font-black text-sm uppercase tracking-tighter flex items-center gap-2 bg-white/5 pl-3 pr-4 py-1.5 rounded-full border border-white/5">
+                    <span class="text-blue-500 text-[10px] font-black">ETAPA</span> 
+                    <span id="simulado-q-num">1</span> 
+                    <span class="text-slate-700 text-xs font-medium">/</span> 
+                    <span id="simulado-q-total" class="text-slate-400 font-bold">10</span>
+                 </span>
+                 <span id="simulado-usage-badge" class="px-3 py-1.5 rounded-full bg-slate-900/80 border border-white/5 text-slate-500 text-[9px] font-black uppercase tracking-widest shadow-inner"></span>
                </div>
              </div>
-             <div class="flex flex-col items-end gap-1">
-                <span class="text-slate-500 font-black text-[9px] tracking-[0.2em] uppercase text-right">Dificuldade</span>
-                <span id="simulado-difficulty" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-orange-500/10 text-orange-400 border border-orange-500/20 shadow-lg shadow-orange-500/5"></span>
+             <div class="flex flex-col items-end gap-1.5">
+                <span class="text-slate-500 font-black text-[10px] tracking-[0.3em] uppercase text-right opacity-70">Dificuldade</span>
+                <span id="simulado-difficulty" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-orange-500/10 text-orange-400 border border-orange-500/20 shadow-xl shadow-orange-500/5"></span>
              </div>
            </div>
 
            <!-- Elite Question Card -->
-           <div class="glass-card bg-[#0f172a]/40 rounded-[32px] p-7 border border-white/10 shadow-2xl relative overflow-hidden group">
-             <!-- Card Aura -->
-             <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 blur-[60px] rounded-full -mr-24 -mt-24 group-hover:bg-blue-500/20 transition-all duration-700"></div>
+           <div class="glass-card bg-[#0f172a]/60 rounded-[40px] p-8 md:p-10 border border-white/10 shadow-3xl relative overflow-hidden group">
+             <div class="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 blur-[100px] rounded-full -mr-40 -mt-40 pointer-events-none group-hover:bg-blue-500/20 transition-all duration-1000"></div>
              
              <div id="simulado-statement-container" class="relative z-10">
-               <div id="simulado-statement-header" class="mb-4"></div>
-               <p id="simulado-statement" class="text-slate-100 text-[15px] leading-relaxed font-medium"></p>
-               <div id="simulado-image-container" class="hidden mt-6 rounded-[24px] overflow-hidden border border-white/10 bg-slate-900/50 p-1 shadow-inner">
-                 <img id="simulado-image" class="w-full max-h-[300px] object-scale-down mx-auto" src="" alt="Simulado Visual Evidence"/>
+               <div id="simulado-statement-header" class="mb-6"></div>
+               <div id="simulado-statement" class="text-slate-100 text-[17px] leading-[1.8] font-medium tracking-tight"></div>
+               <div id="simulado-image-container" class="hidden mt-10 rounded-[40px] overflow-hidden border border-white/10 bg-slate-900/80 p-2 shadow-2xl">
+                 <img id="simulado-image" class="w-full max-h-[450px] object-scale-down mx-auto rounded-[36px]" src="" alt="Simulado Evidence"/>
                </div>
              </div>
            </div>
 
-           <!-- Elite Options Grid -->
-           <div class="flex flex-col gap-1 px-1">
-             <span class="text-slate-500 font-black text-[9px] tracking-[0.2em] uppercase mb-2 ml-2">Seleção de Resposta</span>
-             <div id="simulado-options" class="flex flex-col gap-3.5 pb-8">
+           <div class="flex flex-col gap-2 px-1">
+             <span class="text-slate-500 font-black text-[10px] tracking-[0.4em] uppercase mb-4 ml-4 opacity-70">Escolha sua Tática</span>
+             <div id="simulado-options" class="flex flex-col gap-4 pb-12">
                <!-- Options generated dynamically -->
              </div>
            </div>
 
            <!-- Elite Feedback Card (Hidden initially) -->
-           <div id="simulado-feedback" class="hidden flex flex-col gap-6 mt-2 mb-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
-             <div class="glass-card bg-[#0f172a]/60 rounded-[32px] p-7 border-2 border-white/10 backdrop-blur-3xl relative overflow-hidden shadow-3xl" id="fb-card-border">
-               <div id="feedback-glow" class="absolute top-0 right-0 w-64 h-64 blur-[80px] rounded-full -mr-32 -mt-32 opacity-30"></div>
+           <div id="simulado-feedback" class="hidden flex flex-col gap-8 mt-2 mb-16 animate-in fade-in slide-in-from-bottom-12 duration-700">
+             <div class="glass-card bg-[#0f172a]/80 rounded-[40px] p-8 border-2 border-white/10 backdrop-blur-3xl relative overflow-hidden shadow-edge" id="fb-card-border">
+               <div id="feedback-glow" class="absolute top-0 right-0 w-80 h-80 blur-[100px] rounded-full -mr-40 -mt-40 opacity-40"></div>
                
-               <div class="flex items-center justify-between mb-6 relative z-10">
-                 <h3 id="feedback-title" class="text-base font-black flex items-center gap-3 uppercase tracking-tighter italic">
+               <div class="flex items-center justify-between mb-8 relative z-10">
+                 <h3 id="feedback-title" class="text-base font-black flex items-center gap-4 uppercase tracking-tighter italic">
                     <!-- Title injected here -->
                  </h3>
-                 <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                    <span class="material-symbols-outlined text-slate-400 text-xl font-bold">lightbulb</span>
+                 <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
+                    <span class="material-symbols-outlined text-slate-400 text-2xl font-bold">menu_book</span>
                  </div>
                </div>
                
-               <div id="feedback-resolution" class="relative z-10 space-y-4">
+               <div id="feedback-resolution" class="relative z-10 space-y-6">
                  <!-- Pedagogical resolution injected here -->
                </div>
              </div>
              
-             <button id="simulado-next-btn" class="group w-full py-6 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 border border-white/10 text-white font-black text-xs uppercase tracking-[0.3em] rounded-[24px] flex items-center justify-center gap-4 transition-all active:scale-[0.96] shadow-2xl shadow-blue-500/30">
+             <button id="simulado-next-btn" class="group w-full py-7 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 border-t border-white/20 text-white font-black text-xs uppercase tracking-[0.4em] rounded-[32px] flex items-center justify-center gap-5 transition-all active:scale-[0.96] shadow-premium">
                 <span id="next-btn-text">Próxima Questão</span>
-                <span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform" id="next-btn-icon">arrow_forward_ios</span>
+                <span class="material-symbols-outlined text-2xl group-hover:translate-x-1.5 transition-transform" id="next-btn-icon">double_arrow</span>
              </button>
            </div>
         </div>
 
         <!-- End Screen: Elite Finish -->
-        <div id="simulado-end-view" class="hidden flex flex-col items-center justify-center min-h-[80vh] gap-8 max-w-md mx-auto py-10 px-4 animate-in zoom-in-95 duration-500">
+        <div id="simulado-end-view" class="hidden flex flex-col items-center justify-center min-h-[85vh] gap-10 max-w-md mx-auto py-12 px-6 animate-in zoom-in-90 duration-700">
            <div class="relative">
-             <div class="w-32 h-32 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center mx-auto shadow-[0_0_60px_rgba(16,185,129,0.3)] border-4 border-white/10 animate-pulse">
-               <span class="material-symbols-outlined text-white text-6xl font-black">rewarded_ads</span>
+             <div class="w-40 h-40 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-600 flex items-center justify-center mx-auto shadow-[0_0_80px_rgba(16,185,129,0.4)] border-[6px] border-white/10 animate-pulse">
+               <span class="material-symbols-outlined text-white text-7xl font-black">trophy</span>
              </div>
-             <div class="absolute -top-2 -right-2 w-12 h-12 rounded-2xl bg-amber-500 flex items-center justify-center border-4 border-[#020617] rotate-12 shadow-lg">
-                <span class="material-symbols-outlined text-white text-xl fill-icon">grade</span>
+             <div class="absolute -top-3 -right-3 w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center border-4 border-[#020617] rotate-12 shadow-xl">
+                <span class="material-symbols-outlined text-white text-2xl fill-icon">military_tech</span>
              </div>
            </div>
            
-           <div class="text-center">
-             <h2 class="text-3xl font-black text-white italic tracking-tighter uppercase mb-2">Simulado <span class="text-emerald-400">Finalizado</span></h2>
-             <div class="flex items-center justify-center gap-2">
-                <span class="h-px w-8 bg-white/20"></span>
-                <p class="text-slate-400 uppercase tracking-[0.3em] text-[9px] font-black">${type}</p>
-                <span class="h-px w-8 bg-white/20"></span>
+           <div class="text-center space-y-3">
+             <h2 class="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">Simulado <span class="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Finalizado</span></h2>
+             <div class="flex items-center justify-center gap-3">
+                <span class="h-[2px] w-12 bg-gradient-to-r from-transparent to-white/20"></span>
+                <p class="text-slate-400 uppercase tracking-[0.4em] text-[10px] font-black">${type}</p>
+                <span class="h-[2px] w-12 bg-gradient-to-l from-transparent to-white/20"></span>
              </div>
            </div>
 
-           <div class="glass-card bg-[#0f172a]/60 rounded-[40px] p-10 border border-white/10 w-full flex flex-col items-center relative overflow-hidden">
-             <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
-             <span class="text-slate-500 text-[10px] uppercase tracking-[0.3em] mb-4 font-black">Performance Final</span>
-             <div class="flex items-baseline gap-2">
-               <span id="simulado-final-score" class="text-8xl font-black text-white tracking-tighter">0</span>
-               <span class="text-3xl font-black text-slate-700 tracking-tighter">/ <span id="simulado-final-total">10</span></span>
+           <div class="glass-card bg-[#0f172a]/70 rounded-[48px] p-12 border border-white/10 w-full flex flex-col items-center relative overflow-hidden shadow-2xl">
+             <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent"></div>
+             <span class="text-slate-500 text-[11px] uppercase tracking-[0.4em] mb-6 font-black opacity-60">Performance de Elite</span>
+             <div class="flex items-baseline gap-3">
+               <span id="simulado-final-score" class="text-9xl font-black text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">0</span>
+               <span class="text-4xl font-black text-slate-700 tracking-tighter">/ <span id="simulado-final-total" class="text-slate-600">10</span></span>
              </div>
-             <div id="final-performance-badge" class="mt-8 px-6 py-2 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest shadow-lg">Expert</div>
+             <div id="final-performance-badge" class="mt-10 px-8 py-3 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 text-xs font-black uppercase tracking-[0.2em] shadow-xl backdrop-blur-md">EXPERT PROTOCOL</div>
            </div>
 
-           <button onclick="Router.navigate('/simulados')" class="w-full py-6 bg-white hover:bg-slate-100 text-[#020617] font-black text-xs uppercase tracking-[0.4em] rounded-[24px] flex items-center justify-center gap-4 transition-all active:scale-[0.96] shadow-3xl shadow-white/10 mt-4">
-              <span>Encerrar Sessão</span>
-              <span class="material-symbols-outlined">exit_to_app</span>
+           <button onclick="Router.navigate('/simulados')" class="w-full py-7 bg-white hover:bg-slate-100 text-[#020617] font-black text-xs uppercase tracking-[0.5em] rounded-[32px] flex items-center justify-center gap-5 transition-all active:scale-[0.96] shadow-white-glow mt-2">
+              <span>Encerrar Missão</span>
+              <span class="material-symbols-outlined text-2xl">logout</span>
            </button>
         </div>
 
@@ -2889,9 +2901,47 @@ Pages["simulado-runner"] = (params) => {
 
 PageEvents["simulado-runner"] = async (page, params) => {
   const type = params && params.type ? decodeURIComponent(params.type) : "Geral";
-  
-  // 1. Initial DOM Definitions (CRITICAL: Must be first to avoid ReferenceErrors)
   const loadingView = document.getElementById("simulado-loading");
+  const loadingSubtext = document.getElementById("loading-subtext");
+  
+  let currentUser = null;
+  const client = Supabase.getClient();
+
+  // Guard: Auth check
+  if (client) {
+    try {
+      const { data } = await client.auth.getSession();
+      currentUser = data?.session?.user || null;
+    } catch(e) { console.warn("Auth check error:", e); }
+  }
+
+  // 1. Daily Limit Check
+  const plan = AppState.get("userPlan") || "gratis";
+  const planInfo = APP_DATA.plans[plan];
+  const dailyLimit = planInfo ? planInfo.dailyLimit : 30;
+  const answeredToday = AppState.get("questionsAnsweredToday") || 0;
+
+  if (answeredToday >= dailyLimit) {
+    if (loadingView) loadingView.innerHTML = `
+      <div class="flex flex-col items-center justify-center h-full text-center px-8 animate-in fade-in zoom-in duration-700">
+        <div class="size-24 rounded-[40px] bg-amber-500/10 flex items-center justify-center mb-8 border border-amber-500/20 shadow-2xl">
+          <span class="material-symbols-outlined text-amber-500 text-5xl">lock_clock</span>
+        </div>
+        <h2 class="text-2xl font-black text-white mb-2 uppercase tracking-tight italic">Protocolo <span class="text-amber-500">Bloqueado</span></h2>
+        <p class="text-slate-500 text-[11px] font-bold uppercase tracking-widest mb-10 leading-relaxed">
+          Você já respondeu <span class="text-white">${answeredToday}</span> táticas hoje.<br/>
+          Limite do Plano <span class="text-amber-400 shadow-sm">${planInfo?.name || 'Geral'}</span> atingido.
+        </p>
+        <div class="w-full flex flex-col gap-4">
+          <button onclick="Router.navigate('/premium')" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-3xl shadow-xl active:scale-95 transition-all">Desbloquear acesso Plus+</button>
+          <button onclick="Router.back()" class="w-full py-4 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-white transition-colors">Voltar Amanhã</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // UI Elements
   const questionView = document.getElementById("simulado-question-view");
   const endView = document.getElementById("simulado-end-view");
   const stmEl = document.getElementById("simulado-statement");
@@ -2907,49 +2957,6 @@ PageEvents["simulado-runner"] = async (page, params) => {
   const fbGlow = document.getElementById("feedback-glow");
   const nextBtn = document.getElementById("simulado-next-btn");
   const timerEl = document.getElementById("simulado-timer");
-
-  let currentUser = null;
-
-  // 2. Non-blocking Auth Check with Timeout
-  try {
-    const client = Supabase.getClient();
-    if (client) {
-      const authPromise = Promise.race([
-        client.auth.getUser().then(res => res.data?.user || null).catch(() => null),
-        new Promise(resolve => setTimeout(() => resolve(null), 1200)) // Faster timeout
-      ]);
-      authPromise.then(user => { currentUser = user; });
-    }
-  } catch (e) {
-    console.warn("Auth check error (non-fatal):", e);
-  }
-
-  // 3. Daily Limit Check (Blocking!)
-  const plan = AppState.get("userPlan") || "gratis";
-  const planInfo = APP_DATA.plans[plan];
-  const dailyLimit = planInfo ? planInfo.dailyLimit : 30;
-  const answeredToday = AppState.get("questionsAnsweredToday") || 0;
-
-  if (answeredToday >= dailyLimit && loadingView) {
-    loadingView.innerHTML = `
-      <div class="flex flex-col items-center justify-center min-h-[400px] text-center px-6 animate-in fade-in zoom-in duration-500">
-        <div class="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center mb-6 border border-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.1)]">
-          <span class="material-symbols-outlined text-amber-500 text-4xl">block</span>
-        </div>
-        <h2 class="text-xl font-black text-white mb-2">Limite Di\u00e1rio Atingido</h2>
-        <p class="text-slate-400 text-sm mb-8 leading-relaxed">
-          Voc\u00ea j\u00e1 respondeu <span class="text-white font-bold">${answeredToday}</span> quest\u00f5es hoje. <br/>
-          Seu plano atual <span class="text-blue-400 font-bold">(${planInfo.name})</span> permite at\u00e9 <span class="text-white font-bold">${dailyLimit}</span> por dia.
-        </p>
-        
-        <div class="w-full flex flex-col gap-3">
-          <button onclick="Router.navigate('/premium')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all">Assinar Plus+ p/ 500/dia</button>
-          <button onclick="Router.back()" class="w-full py-4 bg-slate-800 text-slate-300 font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-slate-700 transition-colors">Voltar mais tarde</button>
-        </div>
-      </div>
-    `;
-    return;
-  }
 
   // State
   const customTime = params && params.time ? parseInt(params.time) : 25;
@@ -3153,43 +3160,56 @@ PageEvents["simulado-runner"] = async (page, params) => {
     loadQuestion();
   };
 
-  // --- Initialize Flow ---
-  loadingView.classList.remove("hidden");
-  questionView.classList.add("hidden");
+  // --- Initialize Fetch Flow ---
+  const fetchQuestions = async (isRetry = false) => {
+    if (loadingSubtext && isRetry) loadingSubtext.textContent = "Falha detectada. Iniciando protocolo de recuperação...";
+    
+    try {
+      let qs = [];
+      if (type === "Random") {
+        const category = params && params.category ? decodeURIComponent(params.category) : "ENEM";
+        let subjects = null;
+        if (params && params.subjects) try { subjects = JSON.parse(decodeURIComponent(params.subjects)); } catch(e) {}
+        qs = await Supabase.getRandomSimuladoByDistribution([3, 4, 3], category, subjects);
+      } else if (type === "Custom") {
+        const configStr = params && params.config ? decodeURIComponent(params.config) : "";
+        let configObj = {};
+        if (configStr) configStr.split('|').forEach(pair => { const [id, count] = pair.split(':'); if (id && count) configObj[id] = parseInt(count); });
+        qs = await Supabase.getCustomSimulado(configObj);
+      } else {
+        qs = await Supabase.getQuestionsForSimulado(type, 10);
+      }
+      
+      // Retry logic if empty
+      if ((!qs || qs.length === 0) && !isRetry) {
+        console.warn("Questions empty, retrying...");
+        return await fetchQuestions(true);
+      }
 
-  const originalBack = Router.back;
-  Router.back = (fallback) => {
-    clearInterval(simuladoState.timerInterval);
-    Router.back = originalBack;
-    originalBack.call(Router, fallback);
+      if (!qs || qs.length === 0) {
+        throw new Error("Nenhuma questão encontrada na Base de Dados.");
+      }
+
+      simuladoState.questions = qs;
+      loadingView?.classList.add("hidden");
+      questionView?.classList.remove("hidden");
+      startTimer();
+      loadQuestion();
+      
+    } catch (err) {
+      console.error(err);
+      if (loadingView) loadingView.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-full text-center px-10 animate-fade-in">
+          <div class="size-20 rounded-3xl bg-rose-500/10 flex items-center justify-center mb-6 border border-rose-500/20 shadow-2xl">
+            <span class="material-symbols-outlined text-rose-500 text-4xl">wifi_off</span>
+          </div>
+          <h2 class="text-xl font-black text-rose-400 mb-2 uppercase italic">Falha de Conexão</h2>
+          <p class="text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-10 leading-relaxed italic">${err.message}</p>
+          <button onclick="window.location.reload()" class="w-full py-5 bg-white text-slate-950 font-black text-xs uppercase tracking-widest rounded-3xl active:scale-95 transition-all">Reiniciar Terminal</button>
+        </div>
+      `;
+    }
   };
 
-  try {
-    if (type === "Random") {
-      const category = params && params.category ? decodeURIComponent(params.category) : "ENEM";
-      let subjects = null;
-      if (params && params.subjects) try { subjects = JSON.parse(decodeURIComponent(params.subjects)); } catch(e) {}
-      simuladoState.questions = await Supabase.getRandomSimuladoByDistribution([3, 4, 3], category, subjects);
-    } else if (type === "Custom") {
-      const configStr = params && params.config ? decodeURIComponent(params.config) : "";
-      let configObj = {};
-      if (configStr) configStr.split('|').forEach(pair => { const [id, count] = pair.split(':'); if (id && count) configObj[id] = parseInt(count); });
-      simuladoState.questions = await Supabase.getCustomSimulado(configObj);
-    } else {
-      simuladoState.questions = await Supabase.getQuestionsForSimulado(type, 10);
-    }
-    
-    if (!simuladoState.questions || simuladoState.questions.length === 0) {
-      loadingView.innerHTML = `<div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 text-slate-400"><span class="material-symbols-outlined">sentiment_dissatisfied</span></div><p class="text-slate-300 font-medium tracking-tight uppercase text-xs font-black tracking-widest animate-pulse">Protocolo Vazio: Nenhuma questão encontrada.</p><button onclick="Router.back()" class="mt-8 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-[10px] text-white uppercase tracking-[0.2em] active:scale-95 transition-all">Abortar Missão</button>`;
-      return;
-    }
-
-    loadingView.classList.add("hidden");
-    questionView.classList.remove("hidden");
-    startTimer();
-    loadQuestion();
-  } catch (err) {
-    console.error(err);
-    loadingView.innerHTML = `<div class="w-16 h-16 bg-rose-900/30 rounded-full flex items-center justify-center mb-4 text-rose-500"><span class="material-symbols-outlined">report</span></div><p class="text-rose-400 font-black text-xs uppercase tracking-widest">Colapso no Protocolo de Acesso</p><p class="text-slate-500 text-[10px] mt-2 font-medium tracking-tight italic">${err.message}</p><button onclick="Router.back()" class="mt-8 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-[10px] text-white uppercase tracking-[0.2em] active:scale-95 transition-all">Reiniciar Terminal</button>`;
-  }
+  fetchQuestions();
 };

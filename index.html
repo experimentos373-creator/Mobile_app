@@ -549,15 +549,15 @@
       text = text.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
       text = text.replace(/_([^_\n]+)_/g, '<em>$1</em>');
 
-      // Premium Structure Labels Styling (Edu-Card Style) - Matches with or without emojis/colons
-      text = text.replace(/(^|[\n])(?:.*?)(Contextualização|Resumo de Dados|Dados e Parâmetros|Dados)(?::)?/gi, '$1<div class="flex items-center gap-2 mb-2 mt-4"><span class="px-2 py-0.5 bg-blue-500/10 text-blue-400 font-black text-[10px] uppercase tracking-wider rounded border border-blue-500/20">📋 $2</span></div>');
-      text = text.replace(/(^|[\n])(?:.*?)(O Comando|Comando)(?::)?/gi, '$1<div class="flex items-center gap-2 mb-2 mt-4"><span class="px-2 py-0.5 bg-rose-500/10 text-rose-400 font-black text-[10px] uppercase tracking-wider rounded border border-rose-500/20">🎯 $2</span></div>');
-      text = text.replace(/(^|[\n])(?:.*?)(Fundamentação e Fórmulas|Fundamentação)(?::)?/gi, '$1<div class="flex items-center gap-2 mb-2 mt-4"><span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 font-black text-[10px] uppercase tracking-wider rounded border border-indigo-500/20">💡 $2</span></div>');
-      text = text.replace(/(^|[\n])(?:.*?)(Resolução Integrada|Resolução)(?::)?/gi, '$1<div class="flex items-center gap-2 mb-2 mt-4"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 font-black text-[10px] uppercase tracking-wider rounded border border-emerald-500/20">🚀 $2</span></div>');
+      // Elite Edu-Card Pedagogical Sections
+      text = text.replace(/(?:^|\n)(?:[🎬📋✅🔍]*\s*)?(Contextualização|Resumo de Dados|Dados e Parâmetros|Dados|Contexto)(?::)?/gi, '\n<div class="flex items-center gap-2 mb-2 mt-6"><span class="px-2.5 py-1 bg-blue-500/10 text-blue-400 font-black text-[10px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-lg shadow-blue-500/5">📋 $1</span></div>');
+      text = text.replace(/(?:^|\n)(?:[🎯🎯📌❓]*\s*)?(O Comando|Comando|Pergunta|Objetivo)(?::)?/gi, '\n<div class="flex items-center gap-2 mb-2 mt-6"><span class="px-2.5 py-1 bg-rose-500/10 text-rose-400 font-black text-[10px] uppercase tracking-wider rounded-lg border border-rose-500/20 shadow-lg shadow-rose-500/5">🎯 $1</span></div>');
+      text = text.replace(/(?:^|\n)(?:[💡🔩📐📝]*\s*)?(Fundamentação e Fórmulas|Fundamentação|Teoria|Fórmulas)(?::)?/gi, '\n<div class="flex items-center gap-2 mb-2 mt-6"><span class="px-2.5 py-1 bg-indigo-500/10 text-indigo-400 font-black text-[10px] uppercase tracking-wider rounded-lg border border-indigo-500/20 shadow-lg shadow-indigo-500/5">💡 $1</span></div>');
+      text = text.replace(/(?:^|\n)(?:[🚀✅💡✍️]*\s*)?(Resolução Integrada|Resolução|Passo a Passo|Resposta)(?::)?/gi, '\n<div class="flex items-center gap-2 mb-2 mt-6"><span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 font-black text-[10px] uppercase tracking-wider rounded-lg border border-emerald-500/20 shadow-lg shadow-emerald-500/5">🚀 $1</span></div>');
       
       // Code blocks
       text = text.replace(/```([\s\S]*?)```/g, '\x01PRE\x02$1\x03');
-      text = text.replace(/`([^`]+)`/g, '<code class="bg-white/10 px-1 rounded text-emerald-300">$1</code>');
+      text = text.replace(/`([^`]+)`/g, '<code class="bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-mono text-[11px]">$1</code>');
       
       // Step 4: Paragraphs and Reconstruction
       let htmlOutput = '';
@@ -685,19 +685,19 @@
   </script>
 
   <!-- Scripts (defer preserves order but doesn't block rendering) -->
-  <script defer src="js/data.js?v=72"></script>
-  <script defer src="js/router.js?v=72"></script>
-  <script defer src="js/pages-core.js?v=72"></script>
-  <script defer src="js/pages-extra.js?v=72"></script>
-  <script defer src="js/pages-more.js?v=72"></script>
-  <script defer src="js/sound-manager.js?v=72"></script>
+  <script defer src="js/data.js?v=71"></script>
+  <script defer src="js/router.js?v=71"></script>
+  <script defer src="js/pages-core.js?v=71"></script>
+  <script defer src="js/pages-extra.js?v=71"></script>
+  <script defer src="js/pages-more.js?v=71"></script>
+  <script defer src="js/sound-manager.js?v=71"></script>
   <script defer src="js/vendor/supabase.js"></script>
   <script defer src="js/vendor/purify.min.js"></script>
-  <script defer src="js/security-utils.js?v=72"></script>
-  <script defer src="js/supabase.js?v=72"></script>
-  <script defer src="js/ai-service.js?v=72"></script>
-  <script defer src="js/billing-service.js?v=72"></script>
-  <script defer src="js/app.js?v=72"></script>
+  <script defer src="js/security-utils.js?v=71"></script>
+  <script defer src="js/supabase.js?v=71"></script>
+  <script defer src="js/ai-service.js?v=71"></script>
+  <script defer src="js/billing-service.js?v=71"></script>
+  <script defer src="js/app.js?v=71"></script>
 </body>
 
 </html>
