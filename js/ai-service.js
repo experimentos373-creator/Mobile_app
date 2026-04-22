@@ -11,7 +11,7 @@ const AIService = {
     "step-3-5": {
       id: "liquid/lfm-2.5-1.2b-thinking:free",
       label: "LFM 2.5 Thinking",
-      description: "Extremamente rapido e eficiente",
+      description: "Extremamente r\u00e1pido e eficiente",
       icon: "bolt",
       color: "emerald",
       tier: "basico",
@@ -22,7 +22,7 @@ const AIService = {
     "minimax": {
       id: "inclusionai/ling-2.6-flash:free",
       label: "Ling 2.6 Flash",
-      description: "Ultra rapido e inteligente",
+      description: "Ultra r\u00e1pido e inteligente",
       icon: "psychology",
       color: "blue",
       tier: "pro",
@@ -33,7 +33,7 @@ const AIService = {
     "trinity-large": {
       id: "meta-llama/llama-3.3-70b-instruct:free",
       label: "Llama 3.3 70B",
-      description: "Alta Performance: Potência e versatilidade (70B)",
+      description: "Alta Performance: Pot\u00eancia e versatilidade (70B)",
       icon: "water_drop",
       color: "cyan",
       tier: "plus",
@@ -44,7 +44,7 @@ const AIService = {
     "nemotron-super": {
       id: "nvidia/nemotron-3-super-120b-a12b:free",
       label: "Nemotron Super 120B",
-      description: "A Melhor IA: Raciocínio profundo e precisão extrema (120B)",
+      description: "A Melhor IA: Racioc\u00ednio profundo e precis\u00e3o extrema (120B)",
       icon: "neurology",
       color: "amber",
       tier: "plus",
@@ -83,14 +83,14 @@ const AIService = {
     const remaining = aiDailyLimit - used;
     if (remaining <= 0) {
       let upgradeMsg = "";
-      if (planId === "gratis") upgradeMsg = "Faca upgrade para o Plano Basico para ter mais perguntas.";
-      else if (planId === "basico") upgradeMsg = "Faca upgrade para o Plano Pro para ter mais perguntas.";
-      else if (planId === "pro") upgradeMsg = "Faca upgrade para o Plano Plus+ para ter mais perguntas.";
-      else upgradeMsg = "Volte amanha para continuar!";
+      if (planId === "gratis") upgradeMsg = "Fa\u00e7a upgrade para o Plano B\u00e1sico para ter mais perguntas.";
+      else if (planId === "basico") upgradeMsg = "Fa\u00e7a upgrade para o Plano Pro para ter mais perguntas.";
+      else if (planId === "pro") upgradeMsg = "Fa\u00e7a upgrade para o Plano Plus+ para ter mais perguntas.";
+      else upgradeMsg = "Volte amanh\u00e3 para continuar!";
 
       return {
         allowed: false,
-        reason: `Voce atingiu o limite diario de ${aiDailyLimit} usos da IA. ${upgradeMsg}`
+        reason: "Voc\u00ea atingiu o limite di\u00e1rio de " + aiDailyLimit + " usos da IA. " + upgradeMsg
       };
     }
 
@@ -102,13 +102,13 @@ const AIService = {
     if (!usage.allowed) throw new Error(usage.reason);
 
     const model = this.MODELS[modelKey];
-    if (!model) throw new Error("Modelo nao encontrado.");
+    if (!model) throw new Error("Modelo n\u00e3o encontrado.");
 
     const plan = AppState.get("userPlan");
     const userLevel = this.TIER_LEVELS[plan] || 0;
     if (userLevel < this.TIER_LEVELS[model.tier]) {
-      const tierLabel = { plus: "Plus+", pro: "Pro", basico: "Basico" }[model.tier] || model.tier;
-      throw new Error(`O modelo ${model.label} requer o plano ${tierLabel}.`);
+      const tierLabel = { plus: "Plus+", pro: "Pro", basico: "B\u00e1sico" }[model.tier] || model.tier;
+      throw new Error("O modelo " + model.label + " requer o plano " + tierLabel + ".");
     }
 
     const data = await this._postJSON(
@@ -118,7 +118,7 @@ const AIService = {
     );
 
     const content = data?.content || "";
-    if (!content) throw new Error("A IA nao retornou uma resposta. Tente novamente.");
+    if (!content) throw new Error("A IA n\u00e3o retornou uma resposta. Tente novamente.");
 
     this._incrementUsage();
     return content;
@@ -130,11 +130,11 @@ const AIService = {
 
     const fullPrompt =
       prompt +
-      "\n\nIMPORTANTE: Voce PRECISA analisar todas as 5 competencias e retornar o JSON completo sem excecoes.";
+      "\n\nIMPORTANTE: Voc\u00ea PRECISA analisar todas as 5 compet\u00eancias e retornar o JSON completo sem exce\u00e7\u00f5es.";
 
     const data = await this._postJSON("/redacao", { prompt: fullPrompt }, 70000);
     const content = data?.content || "";
-    if (!content) throw new Error("A IA nao retornou uma resposta. Tente novamente.");
+    if (!content) throw new Error("A IA n\u00e3o retornou uma resposta. Tente novamente.");
 
     this._incrementUsage();
     return content;
@@ -168,7 +168,7 @@ const AIService = {
             } catch (e) {}
           }
           if (session?.access_token) {
-            headers.Authorization = `Bearer ${session.access_token}`;
+            headers.Authorization = "Bearer " + session.access_token;
           }
         }
       }
@@ -184,7 +184,7 @@ const AIService = {
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const response = await fetch(`${this.API_BASE}${path}`, {
+      const response = await fetch(this.API_BASE + path, {
         method: "POST",
         headers: await this._buildHeaders(),
         body: JSON.stringify(payload),
@@ -193,7 +193,7 @@ const AIService = {
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const message = data?.error || `Erro ${response.status}`;
+        const message = data?.error || ("Erro " + response.status);
         throw new Error(message);
       }
 
@@ -203,7 +203,7 @@ const AIService = {
         throw new Error("A IA demorou demais para responder. Tente novamente.");
       }
       if (error.message?.includes("Failed to fetch") || error.message?.includes("Network")) {
-        throw new Error("Sem conexao com a internet. Verifique sua rede e tente novamente.");
+        throw new Error("Sem conex\u00e3o com a internet. Verifique sua rede e tente novamente.");
       }
       throw error;
     } finally {
