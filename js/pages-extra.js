@@ -2851,9 +2851,12 @@ Pages["simulado-runner"] = (params) => {
                </div>
              </div>
              
-             <button id="simulado-next-btn" class="simulado-next-btn group w-full min-h-[60px] sm:min-h-[64px] px-5 sm:px-6 py-4 sm:py-5 rounded-[22px] border border-white/10 bg-white text-slate-950 font-extrabold text-[15px] sm:text-sm tracking-[0.02em] flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-[0_18px_40px_-20px_rgba(255,255,255,0.2)]">
-               <span id="next-btn-text">Próxima questão</span>
-               <span class="material-symbols-outlined text-xl sm:text-2xl transition-transform" id="next-btn-icon">arrow_forward</span>
+             <button id="simulado-next-btn" class="simulado-next-btn group w-full min-h-[58px] sm:min-h-[64px] px-5 sm:px-6 py-4 sm:py-5 rounded-[18px] border border-white/10 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white font-extrabold text-[15px] sm:text-[15px] tracking-[0.01em] flex items-center justify-between gap-4 transition-all active:scale-[0.985] shadow-[0_18px_40px_-28px_rgba(15,23,42,0.95)]">
+               <span class="flex items-center gap-3">
+                <span class="simulado-next-dot"></span>
+                <span id="next-btn-text">Próxima questão</span>
+               </span>
+               <span class="material-symbols-outlined text-[22px] sm:text-2xl transition-transform" id="next-btn-icon">arrow_forward</span>
              </button>
            </div>
         </div>
