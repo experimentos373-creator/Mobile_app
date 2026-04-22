@@ -437,12 +437,12 @@ Pages["nota-enem"] = () => {
            <div class="absolute bottom-0 left-0 w-full h-[2px] bg-indigo-500/20"></div>
         </div>
         <div class="glass-card bg-[#0f172a]/40 p-5 rounded-[32px] border border-white/5 relative overflow-hidden group">
-           <div class="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-1.5 opacity-60">Tempo Est.</div>
+           <div class="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-1.5 opacity-60">Foco Profundo</div>
            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-indigo-400 text-lg">timer</span>
-              <span class="text-xl font-black text-white leading-none">03 <span class="text-[10px] text-slate-400 ml-1">MIN</span></span>
+              <span class="material-symbols-outlined text-emerald-400 text-lg">psychology</span>
+              <span class="text-xl font-black text-white leading-none">Alta <span class="text-[10px] text-slate-400 ml-1">PRECISÃO</span></span>
            </div>
-           <div class="absolute bottom-0 left-0 w-full h-[2px] bg-indigo-500/20"></div>
+           <div class="absolute bottom-0 left-0 w-full h-[2px] bg-emerald-500/20"></div>
         </div>
       </div>
 
