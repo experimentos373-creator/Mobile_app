@@ -30,25 +30,25 @@ const AIService = {
       supportsVision: false,
       timeout: 35000
     },
-    "nemotron-super": {
-      id: "nvidia/nemotron-3-super-120b-a12b:free",
-      label: "Nemotron Super 120B",
-      description: "IA de raciocinio profundo com 120B parametros",
-      icon: "neurology",
-      color: "amber",
-      tier: "plus",
-      supportsReasoning: true,
-      supportsVision: false,
-      timeout: 35000
-    },
     "trinity-large": {
       id: "meta-llama/llama-3.3-70b-instruct:free",
       label: "Llama 3.3 70B",
-      description: "Modelo potente de 70 Bilhoes",
+      description: "Alta Performance: Potência e versatilidade (70B)",
       icon: "water_drop",
       color: "cyan",
       tier: "plus",
       supportsReasoning: false,
+      supportsVision: false,
+      timeout: 35000
+    },
+    "nemotron-super": {
+      id: "nvidia/nemotron-3-super-120b-a12b:free",
+      label: "Nemotron Super 120B",
+      description: "A Melhor IA: Raciocínio profundo e precisão extrema (120B)",
+      icon: "neurology",
+      color: "amber",
+      tier: "plus",
+      supportsReasoning: true,
       supportsVision: false,
       timeout: 35000
     }
