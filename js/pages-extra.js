@@ -2736,118 +2736,149 @@ PageEvents.redacaoAI = (page) => {
   });
 };
 
-// ── PAGE NAME ALIASES ──
-// Routes use hyphenated names (e.g. /redacao-ai) but JS properties use camelCase.
-// showPage() looks up Pages[name], so we need aliases for hyphenated names.
-Pages["redacao-ai"] = Pages.redacaoAI;
-PageEvents["redacao-ai"] = PageEvents.redacaoAI;
-Pages["ia-tutor"] = Pages["ia-tutor"] || null; // Already defined with bracket notation
-
-// ── SIMULADO RUNNER ──
-let simuladoState = {
-  questions: [],
-  currentIndex: 0,
-  score: 0,
-  timeLeft: 25 * 60, // 25 minutes
-  timerInterval: null,
-  answeredCurrent: false
-};
-
 Pages["simulado-runner"] = (params) => {
   const type = params && params.type ? decodeURIComponent(params.type) : "Geral";
   
   return `
-    <div class="fixed inset-0 bg-slate-950 z-50 flex flex-col" id="simulado-runner-container">
-      
+    <div class="fixed inset-0 bg-[#020617] z-50 flex flex-col font-body overflow-hidden" id="simulado-runner-container">
+      <!-- Ambient Aurora Background -->
+      <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/5 blur-[100px] rounded-full -ml-48 -mb-48 pointer-events-none"></div>
+
       <!-- Header -->
-      <header class="glass-header px-4 py-4 shrink-0 flex items-center justify-between">
-        <button onclick="Router.back()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-slate-300">
-          <span class="material-symbols-outlined">close</span>
+      <header class="glass-header px-6 py-5 shrink-0 flex items-center justify-between border-b border-white/5 relative z-20">
+        <button onclick="Router.back()" class="w-11 h-11 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-slate-300 active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-xl">close</span>
         </button>
         <div class="flex flex-col items-center">
-          <h1 class="text-sm font-bold text-white uppercase tracking-wider">${type}</h1>
-          <div class="text-[10px] text-slate-400 font-medium tracking-widest mt-0.5 w-[80px] text-center" id="simulado-timer">
+          <div class="flex items-center gap-1.5 mb-0.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
+            <span class="text-[9px] text-blue-400 font-black uppercase tracking-[0.2em] leading-none">${type}</span>
+          </div>
+          <div class="text-xs text-white font-bold tabular-nums tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/5" id="simulado-timer">
             25:00
           </div>
         </div>
-        <div class="w-10"></div> <!-- Spacer -->
+        <div class="w-11"></div> <!-- Spacer -->
       </header>
 
-      <!-- Progress Bar -->
-      <div class="w-full h-1 bg-white/5 shrink-0">
-        <div id="simulado-progress" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%"></div>
+      <!-- Progress Tracking -->
+      <div class="w-full h-1.5 bg-white/5 shrink-0 relative z-20">
+        <div id="simulado-progress" class="h-full bg-gradient-to-r from-blue-500 to-emerald-500 shadow-[0_0_12px_rgba(59,130,246,0.4)] transition-all duration-500" style="width: 0%"></div>
       </div>
 
       <!-- Main Content Container -->
-      <main class="flex-1 overflow-y-auto pb-32 pt-6 px-4" id="simulado-content-area">
+      <main class="flex-1 overflow-y-auto no-scrollbar pb-32 pt-6 px-4 relative z-10" id="simulado-content-area">
         
         <!-- Loading State -->
-        <div id="simulado-loading" class="flex flex-col items-center justify-center h-full gap-4">
-          <div class="w-12 h-12 rounded-full border-2 border-slate-700 border-t-blue-500 animate-spin"></div>
-          <p class="text-slate-400 font-medium text-sm animate-pulse">Pesquisando as melhores questões para você...</p>
+        <div id="simulado-loading" class="flex flex-col items-center justify-center h-full gap-5">
+          <div class="relative">
+            <div class="w-16 h-16 rounded-full border-2 border-slate-800 border-t-blue-500 animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="material-symbols-outlined text-blue-500/50 text-xl animate-pulse">brain</span>
+            </div>
+          </div>
+          <p class="text-slate-400 font-bold text-xs uppercase tracking-[0.2em] animate-pulse">Armando protocolo de elite...</p>
         </div>
 
         <!-- Question View (Hidden initially) -->
-        <div id="simulado-question-view" class="hidden flex flex-col gap-6 max-w-2xl mx-auto block h-full">
+        <div id="simulado-question-view" class="hidden flex flex-col gap-6 max-w-2xl mx-auto block h-full animate-in fade-in slide-in-from-bottom-4 duration-700">
            
-           <div class="flex justify-between items-center px-1">
-             <div class="flex items-center gap-3">
-               <span class="text-slate-400 font-medium text-xs tracking-widest uppercase">Questão <span id="simulado-q-num" class="text-white">1</span> de <span id="simulado-q-total">10</span></span>
-               <span id="simulado-usage-badge" class="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-500 text-[9px] font-bold uppercase tracking-wider"></span>
+           <div class="flex justify-between items-center px-2">
+             <div class="flex flex-col gap-1">
+               <span class="text-slate-500 font-black text-[9px] tracking-[0.2em] uppercase">Status de Combate</span>
+               <div class="flex items-center gap-3">
+                 <span class="text-white font-black text-xs uppercase tracking-tight">ETAPA <span id="simulado-q-num">1</span> <span class="text-slate-600">/</span> <span id="simulado-q-total">10</span></span>
+                 <span id="simulado-usage-badge" class="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 text-slate-500 text-[8px] font-black uppercase tracking-wider"></span>
+               </div>
              </div>
-             <span id="simulado-difficulty" class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300"></span>
+             <div class="flex flex-col items-end gap-1">
+                <span class="text-slate-500 font-black text-[9px] tracking-[0.2em] uppercase text-right">Dificuldade</span>
+                <span id="simulado-difficulty" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-orange-500/10 text-orange-400 border border-orange-500/20 shadow-lg shadow-orange-500/5"></span>
+             </div>
            </div>
 
-           <!-- Statement -->
-           <div class="bg-white/5 rounded-3xl p-6 border border-white/10 shadow-xl relative overflow-hidden shrink-0">
-             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[40px] rounded-full -mr-16 -mt-16"></div>
-             <p id="simulado-statement" class="text-slate-200 text-base leading-relaxed relative z-10 font-medium"></p>
-             <img id="simulado-image" class="hidden mt-4 rounded-xl border border-white/10 max-h-[200px] object-scale-down mx-auto w-full bg-slate-900" src="" alt="Questão imagem"/>
+           <!-- Elite Question Card -->
+           <div class="glass-card bg-[#0f172a]/40 rounded-[32px] p-7 border border-white/10 shadow-2xl relative overflow-hidden group">
+             <!-- Card Aura -->
+             <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 blur-[60px] rounded-full -mr-24 -mt-24 group-hover:bg-blue-500/20 transition-all duration-700"></div>
+             
+             <div id="simulado-statement-container" class="relative z-10">
+               <div id="simulado-statement-header" class="mb-4"></div>
+               <p id="simulado-statement" class="text-slate-100 text-[15px] leading-relaxed font-medium"></p>
+               <div id="simulado-image-container" class="hidden mt-6 rounded-[24px] overflow-hidden border border-white/10 bg-slate-900/50 p-1 shadow-inner">
+                 <img id="simulado-image" class="w-full max-h-[300px] object-scale-down mx-auto" src="" alt="Simulado Visual Evidence"/>
+               </div>
+             </div>
            </div>
 
-           <!-- Options -->
-           <div id="simulado-options" class="flex flex-col gap-3 pb-8 shrink-0">
-             <!-- Options generated dynamically -->
+           <!-- Elite Options Grid -->
+           <div class="flex flex-col gap-1 px-1">
+             <span class="text-slate-500 font-black text-[9px] tracking-[0.2em] uppercase mb-2 ml-2">Seleção de Resposta</span>
+             <div id="simulado-options" class="flex flex-col gap-3.5 pb-8">
+               <!-- Options generated dynamically -->
+             </div>
            </div>
 
-           <!-- Feedback / Resolution (Hidden initially) -->
-           <div id="simulado-feedback" class="hidden flex flex-col gap-4 mt-2 mb-8 animate-[slideUp_0.3s_ease-out]">
-             <div class="px-6 py-5 rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-md relative overflow-hidden">
-               <div id="feedback-glow" class="absolute top-0 right-0 w-32 h-32 blur-[40px] rounded-full -mr-16 -mt-16"></div>
-               <h3 id="feedback-title" class="text-sm font-bold flex items-center gap-2 mb-2 relative z-10 flex text-emerald-400">
-                  <span class="material-symbols-outlined text-lg">check_circle</span> Resposta Correta
-               </h3>
-               <p id="feedback-resolution" class="text-slate-300 text-sm leading-relaxed relative z-10"></p>
+           <!-- Elite Feedback Card (Hidden initially) -->
+           <div id="simulado-feedback" class="hidden flex flex-col gap-6 mt-2 mb-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
+             <div class="glass-card bg-[#0f172a]/60 rounded-[32px] p-7 border-2 border-white/10 backdrop-blur-3xl relative overflow-hidden shadow-3xl" id="fb-card-border">
+               <div id="feedback-glow" class="absolute top-0 right-0 w-64 h-64 blur-[80px] rounded-full -mr-32 -mt-32 opacity-30"></div>
+               
+               <div class="flex items-center justify-between mb-6 relative z-10">
+                 <h3 id="feedback-title" class="text-base font-black flex items-center gap-3 uppercase tracking-tighter italic">
+                    <!-- Title injected here -->
+                 </h3>
+                 <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                    <span class="material-symbols-outlined text-slate-400 text-xl font-bold">lightbulb</span>
+                 </div>
+               </div>
+               
+               <div id="feedback-resolution" class="relative z-10 space-y-4">
+                 <!-- Pedagogical resolution injected here -->
+               </div>
              </div>
              
-             <button id="simulado-next-btn" class="w-full py-5 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white font-black text-sm uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-blue-500/20">
-                <span>Próxima Questão</span>
-                <span class="material-symbols-outlined">arrow_forward</span>
+             <button id="simulado-next-btn" class="group w-full py-6 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 border border-white/10 text-white font-black text-xs uppercase tracking-[0.3em] rounded-[24px] flex items-center justify-center gap-4 transition-all active:scale-[0.96] shadow-2xl shadow-blue-500/30">
+                <span id="next-btn-text">Próxima Questão</span>
+                <span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform" id="next-btn-icon">arrow_forward_ios</span>
              </button>
            </div>
         </div>
 
-        <!-- End Screen -->
-        <div id="simulado-end-view" class="hidden flex flex-col items-center justify-center h-full gap-8 max-w-md mx-auto py-10">
-           <div class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center mx-auto shadow-[0_0_40px_rgba(99,102,241,0.4)]">
-             <span class="material-symbols-outlined text-white text-5xl">emoji_events</span>
+        <!-- End Screen: Elite Finish -->
+        <div id="simulado-end-view" class="hidden flex flex-col items-center justify-center min-h-[80vh] gap-8 max-w-md mx-auto py-10 px-4 animate-in zoom-in-95 duration-500">
+           <div class="relative">
+             <div class="w-32 h-32 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center mx-auto shadow-[0_0_60px_rgba(16,185,129,0.3)] border-4 border-white/10 animate-pulse">
+               <span class="material-symbols-outlined text-white text-6xl font-black">rewarded_ads</span>
+             </div>
+             <div class="absolute -top-2 -right-2 w-12 h-12 rounded-2xl bg-amber-500 flex items-center justify-center border-4 border-[#020617] rotate-12 shadow-lg">
+                <span class="material-symbols-outlined text-white text-xl fill-icon">grade</span>
+             </div>
            </div>
            
            <div class="text-center">
-             <h2 class="text-2xl font-black text-white mb-2">Simulado Concluído</h2>
-             <p class="text-slate-400 uppercase tracking-widest text-xs font-semibold">TIPO: ${type}</p>
-           </div>
-
-           <div class="bg-white/5 rounded-3xl p-8 border border-white/10 w-full flex flex-col items-center">
-             <span class="text-slate-400 text-xs uppercase tracking-widest mb-2 font-bold">Sua Pontuação</span>
-             <div class="flex items-baseline gap-1">
-               <span id="simulado-final-score" class="text-6xl font-black text-white">0</span>
-               <span class="text-2xl font-bold text-slate-500">/<span id="simulado-final-total">10</span></span>
+             <h2 class="text-3xl font-black text-white italic tracking-tighter uppercase mb-2">Simulado <span class="text-emerald-400">Finalizado</span></h2>
+             <div class="flex items-center justify-center gap-2">
+                <span class="h-px w-8 bg-white/20"></span>
+                <p class="text-slate-400 uppercase tracking-[0.3em] text-[9px] font-black">${type}</p>
+                <span class="h-px w-8 bg-white/20"></span>
              </div>
            </div>
 
-           <button onclick="Router.navigate('/simulados')" class="w-full py-5 bg-white text-slate-900 font-black text-sm uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-white/10 mt-4">
-              <span>Voltar aos Simulados</span>
+           <div class="glass-card bg-[#0f172a]/60 rounded-[40px] p-10 border border-white/10 w-full flex flex-col items-center relative overflow-hidden">
+             <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+             <span class="text-slate-500 text-[10px] uppercase tracking-[0.3em] mb-4 font-black">Performance Final</span>
+             <div class="flex items-baseline gap-2">
+               <span id="simulado-final-score" class="text-8xl font-black text-white tracking-tighter">0</span>
+               <span class="text-3xl font-black text-slate-700 tracking-tighter">/ <span id="simulado-final-total">10</span></span>
+             </div>
+             <div id="final-performance-badge" class="mt-8 px-6 py-2 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest shadow-lg">Expert</div>
+           </div>
+
+           <button onclick="Router.navigate('/simulados')" class="w-full py-6 bg-white hover:bg-slate-100 text-[#020617] font-black text-xs uppercase tracking-[0.4em] rounded-[24px] flex items-center justify-center gap-4 transition-all active:scale-[0.96] shadow-3xl shadow-white/10 mt-4">
+              <span>Encerrar Sessão</span>
+              <span class="material-symbols-outlined">exit_to_app</span>
            </button>
         </div>
 
@@ -2858,39 +2889,57 @@ Pages["simulado-runner"] = (params) => {
 
 PageEvents["simulado-runner"] = async (page, params) => {
   const type = params && params.type ? decodeURIComponent(params.type) : "Geral";
-  let currentUser = null;
   
-  try {
-    const client = Supabase.getClient();
-    if (client) {
-        const { data: authData } = await client.auth.getUser();
-        currentUser = authData ? authData.user : null;
-    }
-  } catch (e) {
-    console.warn("Auth check failed.", e);
-  }
-
-  // View Elements
+  // 1. Initial DOM Definitions (CRITICAL: Must be first to avoid ReferenceErrors)
   const loadingView = document.getElementById("simulado-loading");
   const questionView = document.getElementById("simulado-question-view");
   const endView = document.getElementById("simulado-end-view");
+  const stmEl = document.getElementById("simulado-statement");
+  const stmHeader = document.getElementById("simulado-statement-header");
+  const imgEl = document.getElementById("simulado-image");
+  const optsEl = document.getElementById("simulado-options");
+  const numEl = document.getElementById("simulado-q-num");
+  const diffEl = document.getElementById("simulado-difficulty");
+  const pBar = document.getElementById("simulado-progress");
+  const fbBox = document.getElementById("simulado-feedback");
+  const fbTitle = document.getElementById("feedback-title");
+  const fbRes = document.getElementById("feedback-resolution");
+  const fbGlow = document.getElementById("feedback-glow");
+  const nextBtn = document.getElementById("simulado-next-btn");
+  const timerEl = document.getElementById("simulado-timer");
 
-  // 1. Daily Limit Check (Blocking Moment: Antes!)
+  let currentUser = null;
+
+  // 2. Non-blocking Auth Check with Timeout
+  try {
+    const client = Supabase.getClient();
+    if (client) {
+      const authPromise = Promise.race([
+        client.auth.getUser().then(res => res.data?.user || null).catch(() => null),
+        new Promise(resolve => setTimeout(() => resolve(null), 1200)) // Faster timeout
+      ]);
+      authPromise.then(user => { currentUser = user; });
+    }
+  } catch (e) {
+    console.warn("Auth check error (non-fatal):", e);
+  }
+
+  // 3. Daily Limit Check (Blocking!)
   const plan = AppState.get("userPlan") || "gratis";
   const planInfo = APP_DATA.plans[plan];
   const dailyLimit = planInfo ? planInfo.dailyLimit : 30;
   const answeredToday = AppState.get("questionsAnsweredToday") || 0;
 
-  if (answeredToday >= dailyLimit) {
+  if (answeredToday >= dailyLimit && loadingView) {
     loadingView.innerHTML = `
       <div class="flex flex-col items-center justify-center min-h-[400px] text-center px-6 animate-in fade-in zoom-in duration-500">
         <div class="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center mb-6 border border-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.1)]">
           <span class="material-symbols-outlined text-amber-500 text-4xl">block</span>
         </div>
-        <h2 class="text-xl font-black text-white mb-2">Limite Diário Atingido</h2>
+        <h2 class="text-xl font-black text-white mb-2">Limite Di\u00e1rio Atingido</h2>
         <p class="text-slate-400 text-sm mb-8 leading-relaxed">
-          Você já respondeu <span class="text-white font-bold">${answeredToday}</span> questões hoje. <br/>
-          Seu plano atual <span class="text-blue-400 font-bold">(${planInfo.name})</span> permite até <span class="text-white font-bold">${dailyLimit}</span> por dia.
+          Voc\u00ea j\u00e1 respondeu <span class="text-white font-bold">${answeredToday}</span> quest\u00f5es hoje. <br/>
+          Seu plano atual <span class="text-blue-400 font-bold">(${planInfo.name})</span> permite at\u00e9 <span class="text-white font-bold">${dailyLimit}</span> por dia.
         </p>
         
         <div class="w-full flex flex-col gap-3">
@@ -2901,29 +2950,10 @@ PageEvents["simulado-runner"] = async (page, params) => {
     `;
     return;
   }
-  
-  // Question Elements
-  const stmEl = document.getElementById("simulado-statement");
-  const imgEl = document.getElementById("simulado-image");
-  const optsEl = document.getElementById("simulado-options");
-  const numEl = document.getElementById("simulado-q-num");
-  const diffEl = document.getElementById("simulado-difficulty");
-  const pBar = document.getElementById("simulado-progress");
-  
-  // Feedback Elements
-  const fbBox = document.getElementById("simulado-feedback");
-  const fbTitle = document.getElementById("feedback-title");
-  const fbRes = document.getElementById("feedback-resolution");
-  const fbGlow = document.getElementById("feedback-glow");
-  const nextBtn = document.getElementById("simulado-next-btn");
-  
-  // Timer Elements
-  const timerEl = document.getElementById("simulado-timer");
 
-  // State Reset (Attach to window for global access/debugging)
+  // State
   const customTime = params && params.time ? parseInt(params.time) : 25;
-  
-  window.simuladoState = {
+  const simuladoState = {
     questions: [],
     currentIndex: 0,
     score: 0,
@@ -2931,16 +2961,10 @@ PageEvents["simulado-runner"] = async (page, params) => {
     timerInterval: null,
     answeredCurrent: false
   };
-  const simuladoState = window.simuladoState;
 
-  // Set initial timer display
-  if (timerEl) {
-    const mm = String(customTime).padStart(2, '0');
-    timerEl.textContent = `${mm}:00`;
-  }
+  if (timerEl) timerEl.textContent = `${String(customTime).padStart(2, '0')}:00`;
 
   // --- Functions ---
-  
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -2949,18 +2973,15 @@ PageEvents["simulado-runner"] = async (page, params) => {
 
   const startTimer = () => {
     clearInterval(simuladoState.timerInterval);
-    timerEl.textContent = formatTime(simuladoState.timeLeft);
     simuladoState.timerInterval = setInterval(() => {
       simuladoState.timeLeft--;
       if (simuladoState.timeLeft <= 0) {
         clearInterval(simuladoState.timerInterval);
-        simuladoState.timeLeft = 0;
         finishSimulado();
+        return;
       }
       timerEl.textContent = formatTime(simuladoState.timeLeft);
-      if (simuladoState.timeLeft <= 300) { // last 5 mins
-        timerEl.classList.add("text-red-500", "animate-pulse");
-      }
+      if (simuladoState.timeLeft <= 300) timerEl.classList.add("text-red-500", "animate-pulse");
     }, 1000);
   };
 
@@ -2971,30 +2992,16 @@ PageEvents["simulado-runner"] = async (page, params) => {
     pBar.style.width = "100%";
     
     document.getElementById("simulado-final-score").textContent = simuladoState.score;
-    const finalTotalEl = document.getElementById("simulado-final-total");
-    if (finalTotalEl) finalTotalEl.textContent = simuladoState.questions.length;
+    document.getElementById("simulado-final-total").textContent = simuladoState.questions.length;
 
-    // Save to AppState (Local)
     const currentSims = AppState.get("completedSimulados") || [];
-    currentSims.push({
-      type: type,
-      score: simuladoState.score,
-      total: simuladoState.questions.length,
-      date: new Date().toISOString()
-    });
+    currentSims.push({ type, score: simuladoState.score, total: simuladoState.questions.length, date: new Date().toISOString() });
     AppState.set("completedSimulados", currentSims);
 
-    // Save to DB
     try {
-      if (currentUser) {
-        await Supabase.saveSimuladoHistory(currentUser.id, type, simuladoState.score, simuladoState.questions.length);
-      }
-    } catch (e) { console.warn("Supabase History Save failed:", e); }
-
-    // Sync cloud metrics
-    try {
-      AppState.saveToCloud();
-    } catch (e) { console.warn("AppState Cloud Sync failed:", e); }
+      if (currentUser) await Supabase.saveSimuladoHistory(currentUser.id, type, simuladoState.score, simuladoState.questions.length);
+    } catch (e) { console.warn("DB Save failed:", e); }
+    AppState.saveToCloud();
   };
 
   const loadQuestion = () => {
@@ -3007,86 +3014,62 @@ PageEvents["simulado-runner"] = async (page, params) => {
     }
 
     const q = simuladoState.questions[simuladoState.currentIndex];
-    
     const totalQ = simuladoState.questions.length;
-    if (numEl) numEl.textContent = simuladoState.currentIndex + 1;
-
-    // Refresh usage badge
+    numEl.textContent = simuladoState.currentIndex + 1;
+    document.getElementById("simulado-q-total").textContent = totalQ;
+    pBar.style.width = `${(simuladoState.currentIndex / totalQ) * 100}%`;
+    diffEl.textContent = q.difficulty || "Médio";
+    
+    // Usage Badge Refresh
     const usageBadge = document.getElementById("simulado-usage-badge");
     if (usageBadge) {
       const plan = AppState.get("userPlan") || "gratis";
-      const planInfo = APP_DATA.plans[plan];
-      const limit = planInfo ? planInfo.dailyLimit : 30;
+      const limit = APP_DATA.plans[plan]?.dailyLimit || 30;
       const current = AppState.get("questionsAnsweredToday") || 0;
-      usageBadge.textContent = `HOJE: ${current}/${limit}`;
+      usageBadge.textContent = `QOD: ${current}/${limit}`;
     }
 
-    const totalEl = document.getElementById("simulado-q-total");
-    if (totalEl) totalEl.textContent = totalQ;
-    pBar.style.width = `${(simuladoState.currentIndex / Math.max(1, totalQ)) * 100}%`;
-    diffEl.textContent = q.difficulty || "Médio";
-    
-    // Exam Header for Authentic "Test Sheet" Feel
     const categoryName = q.type === 'ENEM' ? 'ENEM' : (q.type === 'VESTIBULAR' ? 'VESTIBULAR' : 'CONCURSO');
-    const subjectMap = {
-        'rlm': 'Raciocínio Lógico',
-        'direito': 'Direito e Ética',
-        'portugues': 'Português',
-        'matematica': 'Matemática',
-        'fisica': 'Física',
-        'quimica': 'Química',
-        'biologia': 'Biologia',
-        'historia': 'História',
-        'geografia': 'Geografia'
-    };
+    const subjectMap = { 'rlm': 'Raciocínio Lógico', 'direito': 'Direito', 'portugues': 'Português', 'matematica': 'Matemática', 'fisica': 'Física', 'quimica': 'Química', 'biologia': 'Biologia', 'historia': 'História', 'geografia': 'Geografia' };
     const sName = subjectMap[q.subject] || (q.subject ? q.subject.charAt(0).toUpperCase() + q.subject.slice(1) : 'Geral');
 
-    const headerHtml = `
-      <div class="mb-8 flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-700">
-        <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-black uppercase tracking-[0.2em]">Questão ${simuladoState.currentIndex + 1}</span>
-        <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">${categoryName} ${q.year ? '• ' + q.year : ''}</span>
-        <span class="px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-black uppercase tracking-[0.2em]">${sName}</span>
+    stmHeader.innerHTML = `
+      <div class="mb-5 flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-1 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[8px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/5">${categoryName} ${q.year ? '• ' + q.year : ''}</span>
+        <span class="px-2.5 py-1 rounded bg-slate-800/80 border border-white/5 text-slate-400 text-[8px] font-black uppercase tracking-[0.2em]">${sName}</span>
       </div>
     `;
 
-    // Process question text to remove any remaining pedagogical artifacts and style it
-    let cleanText = (q.text || q.statement || "");
-    stmEl.innerHTML = headerHtml + `<div class="text-slate-200 leading-relaxed text-base font-medium exam-text-style">${renderMD(cleanText)}</div>`;
+    stmEl.innerHTML = renderMD(q.text || q.statement || "");
     typesetMath(stmEl);
     
     if (q.image_url) {
       imgEl.src = q.image_url;
-      imgEl.classList.remove("hidden");
+      document.getElementById("simulado-image-container").classList.remove("hidden");
     } else {
-      imgEl.classList.add("hidden");
+      document.getElementById("simulado-image-container").classList.add("hidden");
     }
 
     optsEl.innerHTML = "";
-    
-    // Parse options if stringified
     let opts = q.options;
-    if (typeof opts === 'string') {
-      try { opts = JSON.parse(opts); } catch(e) { opts = []; }
-    }
+    if (typeof opts === 'string') try { opts = JSON.parse(opts); } catch(e) { opts = []; }
     
     if (Array.isArray(opts)) {
       opts.forEach((optText, i) => {
         const btn = document.createElement("button");
-        btn.className = "w-full text-left bg-slate-900 border border-white/5 hover:border-slate-700 p-5 rounded-2xl text-slate-300 font-medium text-sm transition-all shadow-md flex items-start gap-4 active:scale-[0.98]";
-        
+        btn.className = "group w-full text-left bg-[#0f172a]/40 border border-white/10 p-5 rounded-[24px] text-slate-300 font-medium text-sm transition-all shadow-xl flex items-start gap-4 active:scale-[0.98] hover:bg-[#1e293b]/60 hover:border-blue-500/30";
         const letter = String.fromCharCode(65 + i);
         btn.innerHTML = `
-          <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 shrink-0 flex items-center justify-center text-xs font-bold text-slate-400 group-hover:bg-blue-500/10 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-colors">${letter}</div>
-          <div class="pt-1">${renderMDInline(optText)}</div>
+          <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 shrink-0 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-blue-500/20 group-hover:text-blue-300 group-hover:border-blue-500/30 transition-all duration-500 shadow-inner">${letter}</div>
+          <div class="pt-2 font-medium leading-relaxed">${renderMDInline(optText)}</div>
         `;
-        
         btn.onclick = () => handleAnswer(i, btn, opts);
         optsEl.appendChild(btn);
       });
       typesetMath(optsEl);
     }
-
-    document.getElementById("simulado-content-area").scrollTop = 0;
+    const contentArea = document.getElementById("simulado-content-area");
+    if (contentArea) contentArea.scrollTop = 0;
   };
 
   const handleAnswer = (selectedIndex, buttonEl, options) => {
@@ -3094,90 +3077,74 @@ PageEvents["simulado-runner"] = async (page, params) => {
     simuladoState.answeredCurrent = true;
     
     const q = simuladoState.questions[simuladoState.currentIndex];
-    // Support both 'correct_option' (API) and 'correct' (local/Legacy)
-    const correctIdx = (typeof q.correct_option !== 'undefined') ? q.correct_option : 
-                       (typeof q.correct !== 'undefined') ? q.correct : 0;
-    
+    const correctIdx = (typeof q.correct_option !== 'undefined') ? q.correct_option : (typeof q.correct !== 'undefined' ? q.correct : 0);
     const isCorrect = (selectedIndex === correctIdx);
-    
-    console.log(`[Simulado] Q#${simuladoState.currentIndex+1} - Selected: ${selectedIndex}, Correct: ${correctIdx}, Status: ${isCorrect ? 'OK' : 'FAIL'}`);
     
     if (isCorrect) {
       simuladoState.score++;
-      const currentCorrect = AppState.get("correctAnswers") || 0;
-      AppState.set("correctAnswers", currentCorrect + 1);
+      AppState.set("correctAnswers", (AppState.get("correctAnswers") || 0) + 1);
     }
 
-    // Update Subject Accuracy Metric
-    try {
-      const subject = q.subject || 'geral';
-      const accuracy = AppState.get("subjectAccuracy") || {};
-      if (!accuracy[subject]) accuracy[subject] = { correct: 0, total: 0 };
-      if (isCorrect) accuracy[subject].correct++;
-      accuracy[subject].total++;
-      AppState.set("subjectAccuracy", accuracy);
-    } catch (e) { console.warn("Subject accuracy update failed:", e); }
-
-    // Increment daily tracking (Qualquer tentativa conta)
-    const todayCount = AppState.get("questionsAnsweredToday") || 0;
-    AppState.set("questionsAnsweredToday", todayCount + 1);
-    
-    // Increment total count
-    const totalCount = AppState.get("totalQuestionsAnswered") || 0;
-    AppState.set("totalQuestionsAnswered", totalCount + 1);
-    
-    // Save state update
+    AppState.set("questionsAnsweredToday", (AppState.get("questionsAnsweredToday") || 0) + 1);
+    AppState.set("totalQuestionsAnswered", (AppState.get("totalQuestionsAnswered") || 0) + 1);
     AppState.saveToCloud();
 
-    // Mark all buttons
     Array.from(optsEl.children).forEach((btn, i) => {
-      btn.onclick = null; // Remove listener
+      btn.onclick = null;
       const isThisCorrect = (i === correctIdx);
-      
       if (isThisCorrect) {
-        btn.className = "w-full text-left bg-emerald-950/40 border border-emerald-500 p-5 rounded-2xl text-emerald-100 font-medium text-sm transition-all shadow-md flex items-start gap-4";
-        btn.firstElementChild.className = "w-8 h-8 rounded-full bg-emerald-500 shrink-0 flex items-center justify-center text-xs font-bold text-white";
+        btn.className = "w-full text-left bg-emerald-500/10 border-2 border-emerald-500/60 p-5 rounded-[24px] text-emerald-50 font-black text-sm transition-all shadow-2xl shadow-emerald-500/10 flex items-start gap-4";
+        btn.firstElementChild.className = "w-10 h-10 rounded-xl bg-emerald-500 shadow-lg shadow-emerald-500/40 shrink-0 flex items-center justify-center text-xs font-black text-white";
+        btn.firstElementChild.innerHTML = '<span class="material-symbols-outlined text-lg">check</span>';
       } else if (i === selectedIndex && !isCorrect) {
-        btn.className = "w-full text-left bg-red-950/40 border border-red-500 p-5 rounded-2xl text-red-100 font-medium text-sm transition-all shadow-md flex items-start gap-4";
-        btn.firstElementChild.className = "w-8 h-8 rounded-full bg-red-500 shrink-0 flex items-center justify-center text-xs font-bold text-white";
-        btn.firstElementChild.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span>';
+        btn.className = "w-full text-left bg-rose-500/10 border-2 border-rose-500/60 p-5 rounded-[24px] text-rose-50 font-black text-sm transition-all shadow-2xl shadow-rose-500/10 flex items-start gap-4";
+        btn.firstElementChild.className = "w-10 h-10 rounded-xl bg-rose-500 shadow-lg shadow-rose-500/40 shrink-0 flex items-center justify-center text-xs font-black text-white";
+        btn.firstElementChild.innerHTML = '<span class="material-symbols-outlined text-lg">close</span>';
       } else {
-        btn.className = "w-full text-left bg-slate-900 border border-white/5 p-5 rounded-2xl text-slate-500 font-medium text-sm transition-all shadow-md flex items-start gap-4 opacity-50";
+        btn.className = "w-full text-left bg-transparent border border-white/5 p-5 rounded-[24px] text-slate-500 font-medium text-sm transition-all flex items-start gap-4 opacity-30 grayscale-[0.5]";
       }
     });
 
+    const formatResolution = (raw) => {
+      if (!raw) return '<div class="text-slate-400 italic text-sm">Resolução não disponível para esta questão.</div>';
+      if (raw.includes('##') || raw.includes('📋') || raw.includes('💡')) return renderMD(raw);
+      return `<div class="flex items-center gap-2 mb-2 mt-2 items-center"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 font-black text-[10px] uppercase tracking-wider rounded border border-emerald-500/20">🚀 Resolução Elite</span></div><div class="text-slate-300 text-[13px] leading-relaxed p-5 rounded-[24px] bg-white/5 border border-white/10 shadow-inner">${renderMD(raw)}</div>`;
+    };
+
+    const cardBorder = document.getElementById("fb-card-border");
     if (isCorrect) {
-      if(buttonEl) buttonEl.firstElementChild.innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span>';
       SoundManager.play("success");
-      fbTitle.innerHTML = '<span class="material-symbols-outlined text-lg">check_circle</span> Resposta Correta';
-      fbTitle.className = "text-sm font-bold flex items-center gap-2 mb-2 relative z-10 text-emerald-400";
-      fbGlow.className = "absolute top-0 right-0 w-32 h-32 blur-[40px] rounded-full -mr-16 -mt-16 bg-emerald-500/20";
+      fbTitle.innerHTML = '<span class="material-symbols-outlined text-lg">check_circle</span> PERFORMANCE EXCELENTE';
+      fbTitle.className = "text-base font-black flex items-center gap-3 italic text-emerald-400 tracking-tighter";
+      fbGlow.className = "absolute top-0 right-0 w-64 h-64 blur-[80px] rounded-full -mr-32 -mt-32 opacity-40 bg-emerald-500/30";
+      if(cardBorder) cardBorder.style.borderColor = "rgba(16, 185, 129, 0.4)";
     } else {
       SoundManager.play("error");
-      fbTitle.innerHTML = '<span class="material-symbols-outlined text-lg">cancel</span> Resposta Incorreta';
-      fbTitle.className = "text-sm font-bold flex items-center gap-2 mb-2 relative z-10 text-red-400";
-      fbGlow.className = "absolute top-0 right-0 w-32 h-32 blur-[40px] rounded-full -mr-16 -mt-16 bg-red-500/20";
+      fbTitle.innerHTML = '<span class="material-symbols-outlined text-lg">dangerous</span> FALHA NO PROTOCOLO';
+      fbTitle.className = "text-base font-black flex items-center gap-3 italic text-rose-400 tracking-tighter";
+      fbGlow.className = "absolute top-0 right-0 w-64 h-64 blur-[80px] rounded-full -mr-32 -mt-32 opacity-40 bg-rose-500/30";
+      if(cardBorder) cardBorder.style.borderColor = "rgba(244, 63, 94, 0.4)";
     }
 
-    fbRes.innerHTML = renderMD(q.explanation || q.resolution || "Sem resolução adicional para esta questão.");
+    fbRes.innerHTML = formatResolution(q.explanation || q.resolution);
     typesetMath(fbRes);
     fbBox.classList.remove("hidden");
     
-    // Auto-scroll to show feedback + keep "Próxima Questão" button visible
     setTimeout(() => {
       fbBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       setTimeout(() => {
-        nextBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          if (nextBtn) nextBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }, 350);
     }, 100);
 
-    // Update next button text if last question
+    const nextText = document.getElementById("next-btn-text");
+    const nextIcon = document.getElementById("next-btn-icon");
     if (simuladoState.currentIndex >= simuladoState.questions.length - 1) {
-      nextBtn.firstElementChild.textContent = "Finalizar Simulado";
-      nextBtn.lastElementChild.textContent = "done_all";
+      if (nextText) nextText.textContent = "Finalizar Protocolo";
+      if (nextIcon) nextIcon.textContent = "military_tech";
     } else {
-      nextBtn.firstElementChild.textContent = "Próxima Questão";
-      nextBtn.lastElementChild.textContent = "arrow_forward";
+      if (nextText) nextText.textContent = "Próxima Questão";
+      if (nextIcon) nextIcon.textContent = "arrow_forward_ios";
     }
   };
 
@@ -3186,67 +3153,43 @@ PageEvents["simulado-runner"] = async (page, params) => {
     loadQuestion();
   };
 
-  // --- Start Flow ---
+  // --- Initialize Flow ---
   loadingView.classList.remove("hidden");
   questionView.classList.add("hidden");
 
-  // Allow back button to cancel the quiz and clear interval
   const originalBack = Router.back;
   Router.back = (fallback) => {
-      clearInterval(simuladoState.timerInterval);
-      Router.back = originalBack;
-      originalBack.call(Router, fallback);
+    clearInterval(simuladoState.timerInterval);
+    Router.back = originalBack;
+    originalBack.call(Router, fallback);
   };
 
   try {
-      if (type === "Random") {
-        const category = params && params.category ? decodeURIComponent(params.category) : "ENEM";
-        let allowedSubjects = null;
-        if (params && params.subjects) {
-          try {
-            allowedSubjects = JSON.parse(decodeURIComponent(params.subjects));
-          } catch(e) { console.error("Error parsing subjects:", e); }
-        }
-        simuladoState.questions = await Supabase.getRandomSimuladoByDistribution([3, 4, 3], category, allowedSubjects);
-      } else if (type === "Custom") {
-        const configStr = params && params.config ? decodeURIComponent(params.config) : "";
-        let configObj = {};
-        
-        if (configStr) {
-          configStr.split('|').forEach(pair => {
-            const [id, count] = pair.split(':');
-            if (id && count) configObj[id] = parseInt(count);
-          });
-        }
-        
-        simuladoState.questions = await Supabase.getCustomSimulado(configObj);
-      } else {
-        simuladoState.questions = await Supabase.getQuestionsForSimulado(type, 10);
-      }
-      
-      // If not enough or errored
-      if (!simuladoState.questions || simuladoState.questions.length === 0) {
-        loadingView.innerHTML = `
-          <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 text-slate-400"><span class="material-symbols-outlined">sentiment_dissatisfied</span></div>
-          <p class="text-slate-300 font-medium">Nenhuma questão encontrada para este simulado.</p>
-          <button onclick="Router.back()" class="mt-6 px-6 py-3 bg-slate-800 rounded-xl font-bold text-sm text-white">Voltar</button>
-        `;
-        return;
-      }
+    if (type === "Random") {
+      const category = params && params.category ? decodeURIComponent(params.category) : "ENEM";
+      let subjects = null;
+      if (params && params.subjects) try { subjects = JSON.parse(decodeURIComponent(params.subjects)); } catch(e) {}
+      simuladoState.questions = await Supabase.getRandomSimuladoByDistribution([3, 4, 3], category, subjects);
+    } else if (type === "Custom") {
+      const configStr = params && params.config ? decodeURIComponent(params.config) : "";
+      let configObj = {};
+      if (configStr) configStr.split('|').forEach(pair => { const [id, count] = pair.split(':'); if (id && count) configObj[id] = parseInt(count); });
+      simuladoState.questions = await Supabase.getCustomSimulado(configObj);
+    } else {
+      simuladoState.questions = await Supabase.getQuestionsForSimulado(type, 10);
+    }
+    
+    if (!simuladoState.questions || simuladoState.questions.length === 0) {
+      loadingView.innerHTML = `<div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 text-slate-400"><span class="material-symbols-outlined">sentiment_dissatisfied</span></div><p class="text-slate-300 font-medium tracking-tight uppercase text-xs font-black tracking-widest animate-pulse">Protocolo Vazio: Nenhuma questão encontrada.</p><button onclick="Router.back()" class="mt-8 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-[10px] text-white uppercase tracking-[0.2em] active:scale-95 transition-all">Abortar Missão</button>`;
+      return;
+    }
 
-      // Load first question
-      loadingView.classList.add("hidden");
-      questionView.classList.remove("hidden");
-      
-      startTimer();
-      loadQuestion();
+    loadingView.classList.add("hidden");
+    questionView.classList.remove("hidden");
+    startTimer();
+    loadQuestion();
   } catch (err) {
-      console.error(err);
-      loadingView.innerHTML = `
-          <div class="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mb-4 text-red-500"><span class="material-symbols-outlined">error</span></div>
-          <p class="text-red-400 font-medium text-center">Ocorreu um erro ao carregar as questões.</p>
-          <p class="text-slate-500 text-xs mt-2">${err.message}</p>
-          <button onclick="Router.back()" class="mt-6 px-6 py-3 bg-slate-800 rounded-xl font-bold text-sm text-white">Voltar</button>
-      `;
+    console.error(err);
+    loadingView.innerHTML = `<div class="w-16 h-16 bg-rose-900/30 rounded-full flex items-center justify-center mb-4 text-rose-500"><span class="material-symbols-outlined">report</span></div><p class="text-rose-400 font-black text-xs uppercase tracking-widest">Colapso no Protocolo de Acesso</p><p class="text-slate-500 text-[10px] mt-2 font-medium tracking-tight italic">${err.message}</p><button onclick="Router.back()" class="mt-8 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-[10px] text-white uppercase tracking-[0.2em] active:scale-95 transition-all">Reiniciar Terminal</button>`;
   }
 };

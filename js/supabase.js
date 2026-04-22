@@ -109,7 +109,9 @@ const Supabase = {
                     flowType: 'implicit',
                     detectSessionInUrl: true,
                     persistSession: true,
-                    autoRefreshToken: true
+                    autoRefreshToken: true,
+                    storage: window.localStorage,
+                    storageKey: 'sb-tixfiukvvyokgaxflxdr-auth-token-v2' // Unique key to avoid contention
                 }
             });
         }

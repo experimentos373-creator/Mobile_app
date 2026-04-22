@@ -526,8 +526,8 @@
         return '\x01UL\x02' + items.join('\x04') + '\x03';
       });
       
-      // Tables - handle AI-generated tables with varying spacing
-      const tableRegex = /(?:^\|.+\|\r?\n(?:^\|[-: ]+\|\r?\n)?(?:^\|.+\|(?:\r?\n|$))+)/gm;
+      // Tables - handle AI-generated tables with varying spacing and leading/trailing whitespace
+      const tableRegex = /(?:^[ \t]*\|.+\|[ \t]*\r?\n(?:^[ \t]*\|[-: ]+\|[ \t]*\r?\n)?(?:^[ \t]*\|.+\|[ \t]*(?:\r?\n|$))+)/gm;
       text = text.replace(tableRegex, (match) => {
         const lines = match.trim().split(/\n/).filter(r => r.trim().startsWith('|') && r.trim().endsWith('|'));
         const bodyContent = lines.map((row, idx) => {
@@ -541,21 +541,19 @@
       // Horizontal Rule
       text = text.replace(/^---+$/gm, '\x01HR\x02\x03');
       
-      // Bold/Italic
+      // Pre-process: fix AI table quirks (e.g. using 'I' instead of '|')
+      // Only do this if the line looks like a table row: starts and ends with I or |
+      text = text.replace(/^[ \t]*I(.+?)I[ \t]*$/gm, (_, content) => `|${content.replace(/I/g, '|')}|`);
       text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
       text = text.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
       text = text.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
       text = text.replace(/_([^_\n]+)_/g, '<em>$1</em>');
 
-      // Premium Structure Labels Styling
-      text = text.replace(/Contextualização:/g, '<span class="text-blue-400 font-bold">Contextualização:</span>');
-      text = text.replace(/Dados e Parâmetros:/g, '<span class="text-amber-400 font-bold">Dados e Parâmetros:</span>');
-      text = text.replace(/Dados:/g, '<span class="text-amber-400 font-bold">Dados:</span>');
-      text = text.replace(/O Comando:/g, '<span class="text-rose-400 font-bold">O Comando:</span>');
-      text = text.replace(/Fundamentação e Fórmulas:/g, '<span class="text-indigo-400 font-bold">Fundamentação e Fórmulas:</span>');
-      text = text.replace(/Fundamentação:/g, '<span class="text-indigo-400 font-bold">Fundamentação:</span>');
-      text = text.replace(/Resolução Integrada:/g, '<span class="text-emerald-400 font-bold">Resolução Integrada:</span>');
-      text = text.replace(/Resolução:/g, '<span class="text-emerald-400 font-bold">Resolução:</span>');
+      // Premium Structure Labels Styling (Edu-Card Style) - Matches with or without emojis/colons
+      text = text.replace(/(^|[\n])(?:.*?)(Contextualização|Resumo de Dados|Dados e Parâmetros|Dados)(?::)?/gi, '$1<div class="flex items-center gap-2 mb-2 mt-4"><span class="px-2 py-0.5 bg-blue-500/10 text-blue-400 font-black text-[10px] uppercase tracking-wider rounded border border-blue-500/20">📋 $2</span></div>');
+      text = text.replace(/(^|[\n])(?:.*?)(O Comando|Comando)(?::)?/gi, '$1<div class="flex items-center gap-2 mb-2 mt-4"><span class="px-2 py-0.5 bg-rose-500/10 text-rose-400 font-black text-[10px] uppercase tracking-wider rounded border border-rose-500/20">🎯 $2</span></div>');
+      text = text.replace(/(^|[\n])(?:.*?)(Fundamentação e Fórmulas|Fundamentação)(?::)?/gi, '$1<div class="flex items-center gap-2 mb-2 mt-4"><span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 font-black text-[10px] uppercase tracking-wider rounded border border-indigo-500/20">💡 $2</span></div>');
+      text = text.replace(/(^|[\n])(?:.*?)(Resolução Integrada|Resolução)(?::)?/gi, '$1<div class="flex items-center gap-2 mb-2 mt-4"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 font-black text-[10px] uppercase tracking-wider rounded border border-emerald-500/20">🚀 $2</span></div>');
       
       // Code blocks
       text = text.replace(/```([\s\S]*?)```/g, '\x01PRE\x02$1\x03');
@@ -563,17 +561,32 @@
       
       // Step 4: Paragraphs and Reconstruction
       let htmlOutput = '';
-      const parts = text.split('\n\n');
+      // Improved splitting: split by double newline but handle cases where blocks are mixed with text
+      const parts = text.split(/\n\n/);
       parts.forEach(part => {
         let trimmed = part.trim();
         if (!trimmed) return;
         
+        // If it starts with a marker, it's a block
         if (trimmed.startsWith('\x01')) {
           htmlOutput += trimmed;
         } else {
-          // Keep internal newlines as <br> for better layout of step-by-step
-          let pContent = trimmed.replace(/\n/g, '<br>');
-          htmlOutput += `<div class="mb-4 text-white/90 leading-relaxed text-sm">${pContent}</div>`;
+          // If a table or other block is INSIDE a paragraph (due to single \n), pull it out
+          if (trimmed.includes('\x01')) {
+            // This is a complex case, we'll just handle it by reconstruction
+            let subParts = trimmed.split(/(\x01[\s\S]+?\x03)/);
+            subParts.forEach(sp => {
+                if (sp.startsWith('\x01')) {
+                    htmlOutput += sp;
+                } else {
+                    let pContent = sp.trim().replace(/\n/g, '<br>');
+                    if (pContent) htmlOutput += `<div class="mb-4 text-white/90 leading-relaxed text-sm">${pContent}</div>`;
+                }
+            });
+          } else {
+            let pContent = trimmed.replace(/\n/g, '<br>');
+            htmlOutput += `<div class="mb-4 text-white/90 leading-relaxed text-sm">${pContent}</div>`;
+          }
         }
       });
 
@@ -587,13 +600,13 @@
           return `<ul class="mb-4 space-y-1">${listHtml}</ul>`;
         })
         .replace(/\x01TABLE\x02(.+?)\x03/g, (_, rows) => {
-          let tableHtml = '<div class="overflow-x-auto my-4"><table class="w-full text-sm border-collapse border border-white/10 text-white/80 rounded-lg overflow-hidden">';
+          let tableHtml = '<div class="overflow-x-auto my-4 shadow-xl rounded-xl border border-white/5 bg-slate-900/40"><table class="w-full text-xs border-collapse text-white/80 overflow-hidden">';
           rows.split('\x05').forEach((row, idx) => {
             const cells = row.split('\x04');
             const isHeader = idx === 0;
             const tag = isHeader ? 'th' : 'td';
-            const bg = isHeader ? 'bg-slate-800 font-bold text-white' : 'border-t border-white/5';
-            tableHtml += '<tr>' + cells.map(c => `<${tag} class="px-3 py-2 ${bg}">${c}</${tag}>`).join('') + '</tr>';
+            const bg = isHeader ? 'bg-slate-800/80 font-black text-white border-b border-white/10' : 'border-t border-white/5';
+            tableHtml += '<tr>' + cells.map(c => `<${tag} class="px-4 py-3 ${bg} text-left truncate max-w-[150px]">${c}</${tag}>`).join('') + '</tr>';
           });
           tableHtml += '</table></div>';
           return tableHtml;
@@ -606,7 +619,6 @@
       
       return window.Security ? Security.sanitizeRichHTML(htmlOutput) : htmlOutput;
     }
-
     window.renderMDInline = function(text) {
       if (!text) return '';
       text = text.replace(/\\n/g, '\n');
@@ -673,19 +685,19 @@
   </script>
 
   <!-- Scripts (defer preserves order but doesn't block rendering) -->
-  <script defer src="js/data.js?v=56"></script>
-  <script defer src="js/router.js?v=56"></script>
-  <script defer src="js/pages-core.js?v=55"></script>
-  <script defer src="js/pages-extra.js?v=66"></script>
-  <script defer src="js/pages-more.js?v=55"></script>
-  <script defer src="js/sound-manager.js?v=53"></script>
+  <script defer src="js/data.js?v=72"></script>
+  <script defer src="js/router.js?v=72"></script>
+  <script defer src="js/pages-core.js?v=72"></script>
+  <script defer src="js/pages-extra.js?v=72"></script>
+  <script defer src="js/pages-more.js?v=72"></script>
+  <script defer src="js/sound-manager.js?v=72"></script>
   <script defer src="js/vendor/supabase.js"></script>
   <script defer src="js/vendor/purify.min.js"></script>
-  <script defer src="js/security-utils.js?v=54"></script>
-  <script defer src="js/supabase.js?v=58"></script>
-  <script defer src="js/ai-service.js?v=70"></script>
-  <script defer src="js/billing-service.js?v=1"></script>
-  <script defer src="js/app.js?v=70"></script>
+  <script defer src="js/security-utils.js?v=72"></script>
+  <script defer src="js/supabase.js?v=72"></script>
+  <script defer src="js/ai-service.js?v=72"></script>
+  <script defer src="js/billing-service.js?v=72"></script>
+  <script defer src="js/app.js?v=72"></script>
 </body>
 
 </html>
