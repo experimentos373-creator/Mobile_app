@@ -2,6 +2,7 @@ const {
   createStripeCheckoutSession,
   getAuthenticatedUser,
   guardCors,
+  isPayloadTooLarge,
   missingCheckoutEnv,
   readBody,
   sendJson
@@ -27,9 +28,23 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (isPayloadTooLarge(req)) {
+    sendJson(res, 413, { error: "Payload muito grande." });
+    return;
+  }
+
   const body = readBody(req);
   if (!body) {
     sendJson(res, 400, { error: "Payload JSON invalido." });
+    return;
+  }
+
+  if (body.planId != null && typeof body.planId !== "string") {
+    sendJson(res, 400, { error: "Campo planId invalido." });
+    return;
+  }
+  if (body.billingCycle != null && typeof body.billingCycle !== "string") {
+    sendJson(res, 400, { error: "Campo billingCycle invalido." });
     return;
   }
 

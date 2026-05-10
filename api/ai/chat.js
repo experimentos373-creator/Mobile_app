@@ -7,6 +7,10 @@ const {
   getAuthenticatedContext,
   getModel,
   guardCors,
+  isPayloadTooLarge,
+  MAX_AI_BODY_BYTES,
+  MAX_AI_IMAGE_BYTES,
+  MAX_CHAT_MESSAGE_CHARS,
   normalizeAiError,
   readBody,
   requireOpenRouterKey,
@@ -24,15 +28,33 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (isPayloadTooLarge(req, MAX_AI_BODY_BYTES)) {
+    sendJson(res, 413, { error: "Payload muito grande." });
+    return;
+  }
+
   const body = readBody(req);
   if (!body) {
     sendJson(res, 400, { error: "Payload JSON invalido." });
     return;
   }
 
+  if (body.message != null && typeof body.message !== "string") {
+    sendJson(res, 400, { error: "Campo message invalido." });
+    return;
+  }
+  if (body.modelKey != null && typeof body.modelKey !== "string") {
+    sendJson(res, 400, { error: "Campo modelKey invalido." });
+    return;
+  }
   const message = String(body.message || "").trim();
   const modelKey = String(body.modelKey || "").trim();
   const imageBase64 = typeof body.imageBase64 === "string" ? body.imageBase64 : null;
+
+  if (message.length > MAX_CHAT_MESSAGE_CHARS) {
+    sendJson(res, 413, { error: `Mensagem muito longa. Limite de ${MAX_CHAT_MESSAGE_CHARS} caracteres.` });
+    return;
+  }
 
   if (imageBase64) {
     if (!imageBase64.startsWith("data:image/")) {
@@ -48,10 +70,11 @@ module.exports = async (req, res) => {
 
     const base64Payload = imageBase64.slice(delimiterIndex + 1);
     const estimatedBytes = Math.floor((base64Payload.length * 3) / 4);
-    const maxBytes = 5 * 1024 * 1024;
+    const maxBytes = MAX_AI_IMAGE_BYTES;
 
     if (estimatedBytes > maxBytes) {
-      sendJson(res, 413, { error: "Imagem muito grande. Limite de 5MB." });
+      const maxMb = Math.max(1, Math.round(maxBytes / (1024 * 1024)));
+      sendJson(res, 413, { error: `Imagem muito grande. Limite de ${maxMb}MB.` });
       return;
     }
   }

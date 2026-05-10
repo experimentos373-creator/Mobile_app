@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const Stripe = require("stripe");
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
@@ -5,6 +6,11 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
+const APP_BASE_URL = process.env.APP_BASE_URL || "https://eduhub.vercel.app";
+const MAX_BILLING_BODY_BYTES = Number(process.env.MAX_BILLING_BODY_BYTES || 64 * 1024);
+const MAX_STRIPE_WEBHOOK_BODY_BYTES = Number(
+  process.env.MAX_STRIPE_WEBHOOK_BODY_BYTES || 1024 * 1024
+);
 
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://eduhub.vercel.app",
@@ -49,6 +55,7 @@ const INLINE_PRICE_CENTS_BY_PLAN = {
     semestral: 25960
   }
 };
+const ALLOWED_PLAN_IDS = new Set(["basico", "pro", "plus"]);
 
 let stripeClient = null;
 
@@ -63,13 +70,44 @@ function getStripe() {
 
 function sendJson(res, status, payload) {
   res.statusCode = status;
+  setSecurityHeaders(res);
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.end(JSON.stringify(payload));
 }
 
+function setSecurityHeaders(res) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Cache-Control", "no-store");
+}
+
+function appendVaryHeader(res, value) {
+  const currentValue =
+    typeof res.getHeader === "function"
+      ? res.getHeader("Vary")
+      : (res.headers && (res.headers.Vary || res.headers.vary)) || "";
+  const entries = String(currentValue || "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  if (!entries.includes(value)) entries.push(value);
+  if (entries.length > 0) res.setHeader("Vary", entries.join(", "));
+}
+
+function isPayloadTooLarge(req, maxBytes = MAX_BILLING_BODY_BYTES) {
+  const contentLength = Number(req.headers["content-length"] || 0);
+  return Number.isFinite(contentLength) && contentLength > maxBytes;
+}
+
 function readBody(req) {
+  if (isPayloadTooLarge(req)) return null;
+
   if (req.body && typeof req.body === "object") return req.body;
   if (typeof req.body === "string" && req.body.trim()) {
+    if (Buffer.byteLength(req.body, "utf8") > MAX_BILLING_BODY_BYTES) {
+      return null;
+    }
     try {
       return JSON.parse(req.body);
     } catch (error) {
@@ -104,8 +142,30 @@ function getOrigin(req) {
   return `${proto}://${host}`;
 }
 
+function normalizeBaseUrl(rawValue) {
+  const value = String(rawValue || "").trim();
+  if (!value) return "";
+  try {
+    const parsed = new URL(value);
+    if (!["https:", "http:"].includes(parsed.protocol)) return "";
+    if (parsed.protocol === "http:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") {
+      return "";
+    }
+    parsed.hash = "";
+    parsed.search = "";
+    return parsed.toString().replace(/\/$/, "");
+  } catch (error) {
+    return "";
+  }
+}
+
 function getAppBaseUrl(req) {
-  return process.env.BILLING_APP_BASE_URL || process.env.APP_BASE_URL || getOrigin(req);
+  const configuredBase = normalizeBaseUrl(process.env.BILLING_APP_BASE_URL || process.env.APP_BASE_URL);
+  if (configuredBase) return configuredBase;
+
+  const requestOrigin = normalizeBaseUrl(getOrigin(req));
+  if (isOriginAllowed(requestOrigin)) return requestOrigin;
+  return normalizeBaseUrl(APP_BASE_URL) || DEFAULT_ALLOWED_ORIGINS[0];
 }
 
 function getRequestOrigin(req) {
@@ -121,10 +181,11 @@ function setCorsHeaders(res, origin) {
   res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Stripe-Signature");
-  res.setHeader("Vary", "Origin");
+  appendVaryHeader(res, "Origin");
 }
 
 function guardCors(req, res, options = {}) {
+  setSecurityHeaders(res);
   const { allowMissingOrigin = false } = options;
   const origin = getRequestOrigin(req);
 
@@ -154,6 +215,16 @@ function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timeoutId));
+}
+
+function makeHttpError(message, status = 400) {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+}
+
+function normalizePlanId(value) {
+  return String(value || "").trim().toLowerCase();
 }
 
 function missingCheckoutEnv() {
@@ -215,7 +286,7 @@ function normalizeBillingCycle(value) {
   const normalized = String(value || "monthly").trim().toLowerCase();
   if (normalized === "semestral") return "semestral";
   if (normalized === "monthly" || normalized === "mensal") return "monthly";
-  return normalized;
+  return null;
 }
 
 function getPriceId(planId, billingCycle) {
@@ -257,10 +328,13 @@ function buildStripeLineItem(planId, billingCycle, checkoutMode, priceId) {
 
   const normalizedPlan = String(planId || "").trim().toLowerCase();
   const normalizedCycle = normalizeBillingCycle(billingCycle);
+  if (!normalizedCycle) {
+    throw makeHttpError("Ciclo de cobranca invalido.", 400);
+  }
   const amount = INLINE_PRICE_CENTS_BY_PLAN?.[normalizedPlan]?.[normalizedCycle] || null;
 
   if (!amount) {
-    throw new Error(`Price ID nao configurado para ${planId}/${billingCycle}.`);
+    throw makeHttpError(`Price ID nao configurado para ${planId}/${billingCycle}.`, 400);
   }
 
   const productLabel = `EduHub ${normalizedPlan.toUpperCase()} ${normalizedCycle}`;
@@ -285,32 +359,45 @@ function buildStripeLineItem(planId, billingCycle, checkoutMode, priceId) {
 }
 
 async function createStripeCheckoutSession(req, user, payload) {
-  const { planId, billingCycle } = payload;
-  const priceId = getPriceId(planId, billingCycle);
+  const normalizedPlanId = normalizePlanId(payload?.planId);
+  const normalizedCycle = normalizeBillingCycle(payload?.billingCycle);
+  if (!ALLOWED_PLAN_IDS.has(normalizedPlanId)) {
+    throw makeHttpError("Plano invalido.", 400);
+  }
+  if (!normalizedCycle) {
+    throw makeHttpError("Ciclo de cobranca invalido.", 400);
+  }
+
+  const priceId = getPriceId(normalizedPlanId, normalizedCycle);
 
   const appBaseUrl = getAppBaseUrl(req);
   const successUrl = process.env.STRIPE_SUCCESS_URL || `${appBaseUrl}/#/premium`;
   const cancelUrl = process.env.STRIPE_CANCEL_URL || `${appBaseUrl}/#/premium`;
   const checkoutMode = getCheckoutMode();
   const paymentMethodTypes = getCheckoutPaymentMethodTypes();
-  const lineItem = buildStripeLineItem(planId, billingCycle, checkoutMode, priceId);
+  const lineItem = buildStripeLineItem(normalizedPlanId, normalizedCycle, checkoutMode, priceId);
 
   const metadata = {
     user_id: user.id,
-    plan_id: String(planId || "").toLowerCase(),
-    billing_cycle: normalizeBillingCycle(billingCycle)
+    plan_id: normalizedPlanId,
+    billing_cycle: normalizedCycle
   };
 
-  const session = await getStripe().checkout.sessions.create({
-    mode: checkoutMode,
-    payment_method_types: paymentMethodTypes,
-    customer_email: user.email || undefined,
-    line_items: [lineItem],
-    success_url: successUrl,
-    cancel_url: cancelUrl,
-    metadata,
-    subscription_data: checkoutMode === "subscription" ? { metadata } : undefined
-  });
+  const session = await getStripe().checkout.sessions.create(
+    {
+      mode: checkoutMode,
+      payment_method_types: paymentMethodTypes,
+      customer_email: user.email || undefined,
+      line_items: [lineItem],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata,
+      subscription_data: checkoutMode === "subscription" ? { metadata } : undefined
+    },
+    {
+      idempotencyKey: crypto.randomUUID()
+    }
+  );
 
   return {
     checkoutUrl: session.url || "",
@@ -374,9 +461,10 @@ async function applyStripeEvent(event) {
   if (type === "checkout.session.completed") {
     const metadata = object.metadata || {};
     const userId = String(metadata.user_id || "");
-    const planId = String(metadata.plan_id || "").toLowerCase();
+    const planId = normalizePlanId(metadata.plan_id);
 
     if (!userId || !planId) return { applied: false, reason: "missing-metadata" };
+    if (!ALLOWED_PLAN_IDS.has(planId)) return { applied: false, reason: "invalid-plan" };
 
     await updateProfilePlan(userId, planId);
     return { applied: true, userId, planId, source: type };
@@ -385,9 +473,10 @@ async function applyStripeEvent(event) {
   if (type === "invoice.paid" || type === "invoice.payment_succeeded") {
     const metadata = object.parent?.subscription_details?.metadata || object.lines?.data?.[0]?.metadata || {};
     const userId = String(metadata.user_id || "");
-    const planId = String(metadata.plan_id || "").toLowerCase();
+    const planId = normalizePlanId(metadata.plan_id);
 
     if (!userId || !planId) return { applied: false, reason: "missing-metadata" };
+    if (!ALLOWED_PLAN_IDS.has(planId)) return { applied: false, reason: "invalid-plan" };
 
     await updateProfilePlan(userId, planId);
     return { applied: true, userId, planId, source: type };
@@ -405,10 +494,11 @@ async function applyStripeEvent(event) {
   if (type === "customer.subscription.updated" || type === "subscription.updated") {
     const metadata = object.metadata || {};
     const userId = String(metadata.user_id || "");
-    const planId = String(metadata.plan_id || "").toLowerCase();
+    const planId = normalizePlanId(metadata.plan_id);
     const status = String(object.status || "");
 
     if (!userId || !planId) return { applied: false, reason: "missing-metadata" };
+    if (!ALLOWED_PLAN_IDS.has(planId)) return { applied: false, reason: "invalid-plan" };
 
     if (["active", "trialing", "past_due"].includes(status)) {
       await updateProfilePlan(userId, planId);
@@ -440,6 +530,11 @@ async function constructStripeEvent(req) {
     error.status = 400;
     throw error;
   }
+  if (Buffer.byteLength(payload, "utf8") > MAX_STRIPE_WEBHOOK_BODY_BYTES) {
+    const error = new Error("Payload do webhook excede o limite.");
+    error.status = 413;
+    throw error;
+  }
 
   try {
     return getStripe().webhooks.constructEvent(payload, signature, STRIPE_WEBHOOK_SECRET);
@@ -457,6 +552,7 @@ module.exports = {
   guardCors,
   missingCheckoutEnv,
   missingWebhookEnv,
+  isPayloadTooLarge,
   readBody,
   sendJson
 };

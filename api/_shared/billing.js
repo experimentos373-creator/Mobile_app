@@ -6,6 +6,10 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const MERCADOPAGO_ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN || "";
 const MERCADOPAGO_WEBHOOK_SECRET = process.env.MERCADOPAGO_WEBHOOK_SECRET || "";
+const MAX_BILLING_BODY_BYTES = Number(process.env.MAX_BILLING_BODY_BYTES || 64 * 1024);
+const WEBHOOK_SIGNATURE_TOLERANCE_SECONDS = Number(
+  process.env.WEBHOOK_SIGNATURE_TOLERANCE_SECONDS || 300
+);
 
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://eduhub.vercel.app",
@@ -36,13 +40,30 @@ const PLAN_CATALOG = {
 
 function sendJson(res, status, payload) {
   res.statusCode = status;
+  setSecurityHeaders(res);
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.end(JSON.stringify(payload));
 }
 
+function setSecurityHeaders(res) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Cache-Control", "no-store");
+}
+
+function isPayloadTooLarge(req, maxBytes = MAX_BILLING_BODY_BYTES) {
+  const contentLength = Number(req.headers["content-length"] || 0);
+  return Number.isFinite(contentLength) && contentLength > maxBytes;
+}
+
 function readBody(req) {
+  if (isPayloadTooLarge(req)) return null;
   if (req.body && typeof req.body === "object") return req.body;
   if (typeof req.body === "string" && req.body.trim()) {
+    if (Buffer.byteLength(req.body, "utf8") > MAX_BILLING_BODY_BYTES) {
+      return null;
+    }
     try {
       return JSON.parse(req.body);
     } catch (error) {
@@ -85,6 +106,7 @@ function setCorsHeaders(res, origin) {
 }
 
 function guardCors(req, res, options = {}) {
+  setSecurityHeaders(res);
   const { allowMissingOrigin = false } = options;
   const origin = getRequestOrigin(req);
 
@@ -262,6 +284,8 @@ function parseSignatureHeader(headerValue) {
 }
 
 function safeTimingEqualHex(a, b) {
+  const isHex = (value) => /^[a-fA-F0-9]+$/.test(value);
+  if (!isHex(String(a || "")) || !isHex(String(b || ""))) return false;
   if (!a || !b || a.length !== b.length) return false;
   const aBuffer = Buffer.from(a, "hex");
   const bBuffer = Buffer.from(b, "hex");
@@ -303,6 +327,11 @@ function verifyWebhookSignature(req, paymentId) {
 
   if (!ts || !v1 || !paymentId || !requestId) {
     return { ok: false, reason: "missing-signature-fields" };
+  }
+  const parsedTs = Number(ts);
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (!Number.isFinite(parsedTs) || Math.abs(nowSeconds - parsedTs) > WEBHOOK_SIGNATURE_TOLERANCE_SECONDS) {
+    return { ok: false, reason: "signature-expired" };
   }
 
   const manifest = `id:${paymentId};request-id:${requestId};ts:${ts};`;
@@ -401,6 +430,7 @@ module.exports = {
   guardCors,
   missingCheckoutEnv,
   missingWebhookEnv,
+  isPayloadTooLarge,
   readBody,
   sendJson,
   verifyWebhookSignature

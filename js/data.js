@@ -213,6 +213,8 @@ const APP_DATA = {
 // State Management (localStorage-based)
 // ============================================================
 const AppState = {
+  _allowTrustedPlanWrite: false,
+
   _defaults: {
     onboardingDone: false,
     userName: "",
@@ -233,6 +235,7 @@ const AppState = {
     studyTimeMinutes: 0,
     restTimeMinutes: 0, // [NOVO] Acumulado de descanso do Pomodoro
     pomodoroStudyMin: 25,
+    pomodoroBreakMin: 5,
     pomodoroLongBreak: 15,
     weeklyStudyData: [0, 0, 0, 0, 0, 0, 0], // Sun-Sat in minutes
     subjectAccuracy: {},
@@ -253,7 +256,30 @@ const AppState = {
   },
 
   set(key, value) {
+    if (key === "userPlan") {
+      const normalized = this.normalize("userPlan", value);
+      const isTrustedWrite = this._allowTrustedPlanWrite === true;
+
+      if (!isTrustedWrite && normalized !== "gratis") {
+        console.warn("[Security] Ignoring local paid-plan mutation outside trusted sync path.");
+        localStorage.setItem("eduhub_" + key, JSON.stringify("gratis"));
+        return;
+      }
+
+      localStorage.setItem("eduhub_" + key, JSON.stringify(normalized));
+      return;
+    }
+
     localStorage.setItem("eduhub_" + key, JSON.stringify(value));
+  },
+
+  setTrustedPlan(value) {
+    this._allowTrustedPlanWrite = true;
+    try {
+      this.set("userPlan", value);
+    } finally {
+      this._allowTrustedPlanWrite = false;
+    }
   },
 
   reset() {
@@ -383,8 +409,11 @@ const AppState = {
 
           // Merge remaining cloud state (strict mode for non-auth identity fields).
           const fields = [
-            "userPlan", "studyGoal", "targetExam", 
+            "userPlan", "darkMode", "studyGoal", "targetExam", "examDate",
+            "difficultSubject", "studyCommitment", "mainDifficulty", "favoriteSubjects",
+            "questionsAnsweredToday",
             "totalQuestionsAnswered", "correctAnswers", "studyTimeMinutes", "restTimeMinutes",
+            "pomodoroStudyMin", "pomodoroBreakMin", "pomodoroLongBreak",
             "hasUsedFreePredictor", "subjectAccuracy", "missionProgress", "weeklyStudyData"
           ];
           
@@ -395,7 +424,11 @@ const AppState = {
 
             if (cloudValue !== undefined && cloudValue !== null) {
               const normalizedValue = this.normalize(field, cloudValue);
-              this.set(field, normalizedValue);
+              if (field === "userPlan") {
+                this.setTrustedPlan(normalizedValue);
+              } else {
+                this.set(field, normalizedValue);
+              }
             }
           });
           
@@ -471,14 +504,23 @@ const AppState = {
         await Supabase.saveProfile(session.user.id, {
           userName: this.get("userName"),
           userAge: this.get("userAge"),
-          userPlan: this.get("userPlan"),
           onboardingDone: this.get("onboardingDone"),
+          darkMode: this.get("darkMode"),
           studyGoal: this.get("studyGoal"),
           targetExam: this.get("targetExam"),
+          examDate: this.get("examDate"),
+          difficultSubject: this.get("difficultSubject"),
+          studyCommitment: this.get("studyCommitment"),
+          mainDifficulty: this.get("mainDifficulty"),
+          favoriteSubjects: this.get("favoriteSubjects"),
+          questionsAnsweredToday: this.get("questionsAnsweredToday"),
           totalQuestionsAnswered: this.get("totalQuestionsAnswered"),
           correctAnswers: this.get("correctAnswers"),
           studyTimeMinutes: this.get("studyTimeMinutes"),
           restTimeMinutes: this.get("restTimeMinutes"),
+          pomodoroStudyMin: this.get("pomodoroStudyMin"),
+          pomodoroBreakMin: this.get("pomodoroBreakMin"),
+          pomodoroLongBreak: this.get("pomodoroLongBreak"),
           hasUsedFreePredictor: this.get("hasUsedFreePredictor"),
           subjectAccuracy: this.get("subjectAccuracy"),
           missionProgress: this.get("missionProgress"),

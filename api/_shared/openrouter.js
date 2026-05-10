@@ -1,6 +1,12 @@
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
+const APP_BASE_URL = process.env.APP_BASE_URL || "https://eduhub.vercel.app";
+const MAX_AI_BODY_BYTES = Number(process.env.MAX_AI_BODY_BYTES || 128 * 1024);
+const MAX_CHAT_MESSAGE_CHARS = Number(process.env.MAX_CHAT_MESSAGE_CHARS || 6000);
+const MAX_REDACTION_PROMPT_CHARS = Number(process.env.MAX_REDACTION_PROMPT_CHARS || 12000);
+const MAX_AI_IMAGE_BYTES = Number(process.env.MAX_AI_IMAGE_BYTES || 5 * 1024 * 1024);
+const ALLOW_MISSING_ORIGIN = String(process.env.ALLOW_MISSING_ORIGIN || "").toLowerCase() === "true";
 
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://eduhub.vercel.app",
@@ -26,6 +32,7 @@ const DAILY_REQUEST_LIMITS = {
 
 const RATE_LIMIT_BUCKETS = new Map();
 const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+let RATE_LIMIT_OP_COUNT = 0;
 
 const MODELS = {
   "step-3-5": {
@@ -101,12 +108,6 @@ Regras de Ouro:
 - **LaTeX Total**: Qualquer simbolo matematico ($x$, $\Delta$, $\pi$) deve estar em LaTeX.
 - **Tone**: Profissional e encorajador.`;
 
-function getOrigin(req) {
-  const proto = req.headers["x-forwarded-proto"] || "https";
-  const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:3000";
-  return `${proto}://${host}`;
-}
-
 function getRequestOrigin(req) {
   return String(req.headers.origin || "").trim();
 }
@@ -116,61 +117,56 @@ function isOriginAllowed(origin) {
   return ALLOWED_ORIGINS.some((allowedOrigin) => origin === allowedOrigin);
 }
 
-function normalizeSupabaseUrl(input) {
-  const raw = String(input || "").trim();
-  if (!raw) return "";
-
-  try {
-    const parsed = new URL(raw);
-    if (parsed.protocol !== "https:") return "";
-    if (!parsed.hostname.endsWith(".supabase.co")) return "";
-    return `${parsed.protocol}//${parsed.hostname}`;
-  } catch (error) {
-    return "";
-  }
+function setSecurityHeaders(res) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Cache-Control", "no-store");
 }
 
-function resolveSupabaseConfig(req) {
-  const headerUrl = normalizeSupabaseUrl(req.headers["x-supabase-url"]);
-  const headerAnonKey = String(req.headers["x-supabase-anon-key"] || "").trim();
-
-  const resolvedUrl = headerUrl || normalizeSupabaseUrl(SUPABASE_URL);
-  const resolvedAnonKey = headerAnonKey || SUPABASE_ANON_KEY;
-
-  return {
-    url: resolvedUrl,
-    anonKey: String(resolvedAnonKey || "").trim()
-  };
+function appendVaryHeader(res, value) {
+  const currentValue =
+    typeof res.getHeader === "function"
+      ? res.getHeader("Vary")
+      : (res.headers && (res.headers.Vary || res.headers.vary)) || "";
+  const current = String(currentValue || "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  if (!current.includes(value)) current.push(value);
+  if (current.length > 0) res.setHeader("Vary", current.join(", "));
 }
 
 function setCorsHeaders(res, origin) {
   res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Authorization, Content-Type, X-Supabase-Url, X-Supabase-Anon-Key"
-  );
-  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  appendVaryHeader(res, "Origin");
 }
 
 function sendJson(res, status, payload) {
   res.statusCode = status;
+  setSecurityHeaders(res);
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.end(JSON.stringify(payload));
 }
 
 function guardCors(req, res) {
+  setSecurityHeaders(res);
   const origin = getRequestOrigin(req);
-  const requestOrigin = getOrigin(req);
-  // Allow if origin matches request, is in allowed list, or is missing/null (common in Mobile App wrappers)
-  const allowed = !origin || origin === "null" || origin === requestOrigin || isOriginAllowed(origin);
-  
-  if (!allowed) {
+
+  if (!origin) {
+    if (!ALLOW_MISSING_ORIGIN) {
+      sendJson(res, 403, { error: "Origin nao autorizada." });
+      return false;
+    }
+  } else if (!isOriginAllowed(origin)) {
     sendJson(res, 403, { error: "Origin nao autorizada." });
     return false;
+  } else {
+    setCorsHeaders(res, origin);
   }
 
-  setCorsHeaders(res, origin || "*");
   if (req.method === "OPTIONS") {
     res.statusCode = 204;
     res.end();
@@ -183,12 +179,24 @@ function guardCors(req, res) {
 function getMissingEnvVars() {
   const missing = [];
   if (!process.env.OPENROUTER_API_KEY) missing.push("OPENROUTER_API_KEY");
+  if (!SUPABASE_URL) missing.push("SUPABASE_URL");
+  if (!SUPABASE_ANON_KEY) missing.push("SUPABASE_ANON_KEY");
   return missing;
 }
 
+function isPayloadTooLarge(req, maxBytes = MAX_AI_BODY_BYTES) {
+  const contentLength = Number(req.headers["content-length"] || 0);
+  return Number.isFinite(contentLength) && contentLength > maxBytes;
+}
+
 function readBody(req) {
+  if (isPayloadTooLarge(req)) return null;
+
   if (req.body && typeof req.body === "object") return req.body;
   if (typeof req.body === "string" && req.body.trim()) {
+    if (Buffer.byteLength(req.body, "utf8") > MAX_AI_BODY_BYTES) {
+      return null;
+    }
     try {
       return JSON.parse(req.body);
     } catch (error) {
@@ -218,22 +226,14 @@ async function getAuthenticatedContext(req) {
     return { error: "Sessao expirada. Faca login novamente.", status: 401 };
   }
 
-  const supabaseConfig = resolveSupabaseConfig(req);
-  if (!supabaseConfig.url || !supabaseConfig.anonKey) {
-    return {
-      error: "Configuracao do Supabase ausente no servidor. Defina SUPABASE_URL/SUPABASE_ANON_KEY ou envie headers do cliente.",
-      status: 500
-    };
-  }
-
   let user;
   try {
     const userResponse = await fetchWithTimeout(
-      `${supabaseConfig.url}/auth/v1/user`,
+      `${SUPABASE_URL}/auth/v1/user`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          apikey: supabaseConfig.anonKey
+          apikey: SUPABASE_ANON_KEY
         }
       },
       5000
@@ -262,14 +262,14 @@ async function getAuthenticatedContext(req) {
   let userPlan = "gratis";
 
   try {
-    const profileUrl = new URL(`${supabaseConfig.url}/rest/v1/profiles`);
+    const profileUrl = new URL(`${SUPABASE_URL}/rest/v1/profiles`);
     profileUrl.searchParams.set("id", `eq.${user.id}`);
     profileUrl.searchParams.set("select", "userPlan");
 
     const profileResponse = await fetchWithTimeout(profileUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
-        apikey: supabaseConfig.anonKey,
+        apikey: SUPABASE_ANON_KEY,
         Accept: "application/json"
       }
     }, 4000);
@@ -317,6 +317,12 @@ function fetchWithTimeout(url, options = {}, timeoutMs = 60000) {
   });
 }
 
+function getSafeReferer(req) {
+  const origin = getRequestOrigin(req);
+  if (isOriginAllowed(origin)) return origin;
+  return APP_BASE_URL;
+}
+
 function getModel(modelKey) {
   return MODELS[modelKey] || null;
 }
@@ -342,7 +348,7 @@ async function callOpenRouter(req, body, timeoutMs = 60000) {
       headers: {
         Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": getOrigin(req),
+        "HTTP-Referer": getSafeReferer(req),
         "X-Title": "EduHub Brasil"
       },
       body: JSON.stringify(body)
@@ -370,7 +376,22 @@ function buildRateBucketKey(userId, scope, windowMs) {
   return `${scope}:${userId}:${window}`;
 }
 
+function pruneRateLimitBuckets(windowMs) {
+  RATE_LIMIT_OP_COUNT += 1;
+  if (RATE_LIMIT_OP_COUNT % 250 !== 0) return;
+
+  const currentWindow = Math.floor(Date.now() / windowMs);
+  for (const key of RATE_LIMIT_BUCKETS.keys()) {
+    const parts = key.split(":");
+    const bucketWindow = Number(parts[parts.length - 1]);
+    if (Number.isFinite(bucketWindow) && bucketWindow < currentWindow - 1) {
+      RATE_LIMIT_BUCKETS.delete(key);
+    }
+  }
+}
+
 function consumeRateLimit(userId, userPlan, scope, windowMs = RATE_LIMIT_WINDOW_MS) {
+  pruneRateLimitBuckets(windowMs);
   const limit = getDailyLimitForPlan(userPlan);
   const bucketKey = buildRateBucketKey(userId, scope, windowMs);
   const used = RATE_LIMIT_BUCKETS.get(bucketKey) || 0;
@@ -430,6 +451,11 @@ module.exports = {
   getAuthenticatedContext,
   getModel,
   guardCors,
+  isPayloadTooLarge,
+  MAX_AI_BODY_BYTES,
+  MAX_AI_IMAGE_BYTES,
+  MAX_CHAT_MESSAGE_CHARS,
+  MAX_REDACTION_PROMPT_CHARS,
   normalizeAiError,
   readBody,
   requireOpenRouterKey,

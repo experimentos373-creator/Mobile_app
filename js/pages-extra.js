@@ -2925,7 +2925,8 @@ PageEvents["simulado-runner"] = async (page, params) => {
   const answeredToday = AppState.get("questionsAnsweredToday") || 0;
 
   if (answeredToday >= dailyLimit) {
-    if (loadingView) loadingView.innerHTML = `
+    if (loadingView) {
+      loadingView.innerHTML = Security.sanitize(`
       <div class="flex flex-col items-center justify-center h-full text-center px-8 animate-in fade-in zoom-in duration-700">
         <div class="size-24 rounded-[40px] bg-amber-500/10 flex items-center justify-center mb-8 border border-amber-500/20 shadow-2xl">
           <span class="material-symbols-outlined text-amber-500 text-5xl">lock_clock</span>
@@ -2940,7 +2941,11 @@ PageEvents["simulado-runner"] = async (page, params) => {
           <button onclick="Router.back()" class="w-full py-4 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-white transition-colors">Voltar Amanhã</button>
         </div>
       </div>
-    `;
+    `);
+      if (typeof Security.bindInlineHandlers === "function") {
+        Security.bindInlineHandlers(loadingView);
+      }
+    }
     return;
   }
 
@@ -3202,7 +3207,8 @@ PageEvents["simulado-runner"] = async (page, params) => {
       
     } catch (err) {
       console.error(err);
-      if (loadingView) loadingView.innerHTML = `
+      if (loadingView) {
+        loadingView.innerHTML = Security.sanitize(`
         <div class="flex flex-col items-center justify-center h-full text-center px-10 animate-fade-in">
           <div class="size-20 rounded-3xl bg-rose-500/10 flex items-center justify-center mb-6 border border-rose-500/20 shadow-2xl">
             <span class="material-symbols-outlined text-rose-500 text-4xl">wifi_off</span>
@@ -3211,7 +3217,11 @@ PageEvents["simulado-runner"] = async (page, params) => {
           <p class="text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-10 leading-relaxed italic">${err.message}</p>
           <button onclick="window.location.reload()" class="w-full py-5 bg-white text-slate-950 font-black text-xs uppercase tracking-widest rounded-3xl active:scale-95 transition-all">Reiniciar Terminal</button>
         </div>
-      `;
+      `);
+        if (typeof Security.bindInlineHandlers === "function") {
+          Security.bindInlineHandlers(loadingView);
+        }
+      }
     }
   };
 

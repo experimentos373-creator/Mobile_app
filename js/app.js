@@ -373,6 +373,9 @@ const App = {
 
     // Sanitize and render
     page.innerHTML = Security.sanitize(renderer(params));
+    if (typeof Security.bindInlineHandlers === "function") {
+      Security.bindInlineHandlers(page);
+    }
     // Attach events after render
     requestAnimationFrame(() => {
       if (PageEvents[name]) PageEvents[name](page, params);
@@ -542,8 +545,18 @@ const App = {
     document.documentElement.classList.toggle("dark", d);
   },
   async switchPlan(tierId, redirectPath = '/perfil') {
+    const normalizedTierId = String(tierId || "").trim().toLowerCase();
+    if (normalizedTierId !== "gratis") {
+      console.warn("[Security] Blocked local plan promotion attempt:", normalizedTierId);
+      if (typeof this.showToast === "function") {
+        this.showToast("Mudanca de plano paga so pode ocorrer via checkout seguro.", "warning");
+      }
+      await this._refreshCloudSessionState("manual");
+      return;
+    }
+
     // 1. Update State
-    AppState.set("userPlan", tierId);
+    AppState.set("userPlan", normalizedTierId);
     
     // 2. Invalidate Tabs (so they re-render with new plan permissions)
     const tabsToInvalidate = ['home', 'simulados', 'pomodoro', 'progresso'];

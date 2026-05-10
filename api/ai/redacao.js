@@ -5,6 +5,9 @@ const {
   consumeRateLimit,
   getAuthenticatedContext,
   guardCors,
+  isPayloadTooLarge,
+  MAX_AI_BODY_BYTES,
+  MAX_REDACTION_PROMPT_CHARS,
   normalizeAiError,
   readBody,
   requireOpenRouterKey,
@@ -36,15 +39,31 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (isPayloadTooLarge(req, MAX_AI_BODY_BYTES)) {
+    sendJson(res, 413, { error: "Payload muito grande." });
+    return;
+  }
+
   const body = readBody(req);
   if (!body) {
     sendJson(res, 400, { error: "Payload JSON invalido." });
     return;
   }
 
+  if (body.prompt != null && typeof body.prompt !== "string") {
+    sendJson(res, 400, { error: "Campo prompt invalido." });
+    return;
+  }
+
   const prompt = String(body.prompt || "").trim();
   if (!prompt) {
     sendJson(res, 400, { error: "Envie o texto da redacao para correcao." });
+    return;
+  }
+  if (prompt.length > MAX_REDACTION_PROMPT_CHARS) {
+    sendJson(res, 413, {
+      error: `Texto muito longo. Limite de ${MAX_REDACTION_PROMPT_CHARS} caracteres.`
+    });
     return;
   }
 

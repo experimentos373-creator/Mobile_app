@@ -253,7 +253,7 @@ const handlePlanSelect = (tierId) => {
     // Audio Feedback
     SoundManager.play("success");
 
-    // Set Plan & Navigate using the centralized App.switchPlan
+    // Start checkout and rely on webhook + cloud sync to unlock paid plans.
     setTimeout(async () => {
       AppState.set("billingCycle", billingCycle);
 
@@ -270,13 +270,20 @@ const handlePlanSelect = (tierId) => {
           return;
         }
       } catch (error) {
-        console.warn("[Premium] Checkout indisponivel, usando fallback local:", error.message);
+        console.warn("[Premium] Checkout indisponivel:", error.message);
         if (typeof App !== "undefined" && typeof App.showToast === "function") {
-          App.showToast("Gateway indisponivel agora. Modo teste local ativado.", "warning");
+          App.showToast(
+            "Nao foi possivel abrir o checkout agora. Seu plano atual foi mantido.",
+            "error"
+          );
         }
+        setTimeout(() => overlay.remove(), 500);
+        return;
       }
 
-      App.switchPlan(tierId, "/progresso");
+      if (tierId === "gratis") {
+        App.switchPlan(tierId, "/progresso");
+      }
       setTimeout(() => overlay.remove(), 500);
     }, 1800);
 };
@@ -551,35 +558,6 @@ Pages.perfil = () => {
       
       <!-- Abstract Decors -->
       <div class="absolute -top-10 -left-20 w-40 h-40 bg-cyan-500/5 rounded-full blur-3xl -z-10"></div>
-    </section>
-
-    <!-- Plan Switcher (Dev Mode / Practice) -->
-    <section class="space-y-4">
-      <div class="flex items-center justify-between ml-2">
-        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Sua Assinatura</p>
-        <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Modo Prático</span>
-      </div>
-      
-      <div class="glass-card p-1.5 rounded-2xl border border-white/5 flex gap-1 relative overflow-hidden">
-        <button onclick="App.switchPlan('gratis')" 
-                class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${plan === 'gratis' ? 'bg-white/10 text-white shadow-inner scale-105 border border-white/20' : 'text-slate-500 hover:text-slate-300'}">
-          GRÁTIS
-        </button>
-        <button onclick="App.switchPlan('basico')" 
-                class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${plan === 'basico' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] scale-105 text-white' : 'text-slate-500 hover:text-slate-300'}">
-          BÁSICO
-        </button>
-        <button onclick="App.switchPlan('pro')" 
-                class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${plan === 'pro' ? 'bg-emerald-500 text-slate-900 shadow-lg shadow-emerald-500/20 scale-105' : 'text-slate-500 hover:text-slate-300'}">
-          PRO
-        </button>
-        <button onclick="App.switchPlan('plus')" 
-                class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${plan === 'plus' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20 scale-105 border border-violet-400/30' : 'text-slate-500 hover:text-slate-300'}">
-          PLUS+
-        </button>
-      </div>
-      
-      <p class="text-[9px] text-center text-slate-600 font-bold uppercase tracking-tight">Troque o plano acima para testar recursos exclusivos</p>
     </section>
 
     <!-- Settings Groups -->
